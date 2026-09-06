@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Elysia — Design and technology studio</title>
+    <meta name="description" content="<!--@description-->" />
+    <link rel="canonical" href="https://elysia.example/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Elysia" />
+    <meta property="og:description" content="<!--@tagline-->" />
+    <meta property="og:url" content="https://elysia.example/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0B0616" />
+    <meta name="color-scheme" content="dark" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- The wordmark is the first thing that renders; its font should not be
+         discovered halfway through parsing the stylesheet. -->
+    <link
+      rel="preload"
+      href="/src/assets/fonts/archivo-latin-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- Marks the document as scripted before first paint, so the reveal
+         animations only hide content that JavaScript can actually reveal. -->
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+
+  <body>
+    <a class="skip-link mono" href="#practice">Skip to content</a>
+
+    <header class="nav" id="nav">
+      <a class="nav-mark" href="#top"><!--@site-name--></a>
+      <nav class="nav-links mono" aria-label="Primary">
+        <!--@nav-links-->
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="wordmark">
+        <div class="sky"></div>
+        <canvas class="wind" id="wind" aria-hidden="true"></canvas>
+        <div class="horizon" role="presentation"></div>
+
+        <div class="hero-name">
+          <h1 class="wordmark" id="wordmark"><!--@site-name--></h1>
+        </div>
+        <p class="hero-sub mono"><!--@tagline--></p>
+        <a class="hero-cue mono" href="#practice">Scroll</a>
+      </section>
+
+      <section class="section" id="practice" aria-labelledby="practice-label">
+        <div class="wrap">
+          <span class="eyebrow mono" id="practice-label">Practice</span>
+          <div class="split reveal">
+            <!--@practice-->
+          </div>
+          <ul class="index-list reveal">
+            <!--@capabilities-->
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="work" aria-labelledby="work-label">
+        <div class="wrap">
+          <span class="eyebrow mono" id="work-label">Selected work</span>
+          <div class="work reveal">
+            <div class="work-head mono" aria-hidden="true">
+              <span>Project</span><span>Scope</span><span style="text-align: right">Year</span
+              ><span></span>
+            </div>
+            <!--@work-->
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="studio" aria-labelledby="studio-label">
+        <div class="wrap">
+          <span class="eyebrow mono" id="studio-label">Studio</span>
+          <div class="split reveal">
+            <!--@studio-->
+          </div>
+          <ul class="index-list index-list--facts reveal">
+            <!--@facts-->
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="contact" aria-labelledby="contact-label">
+        <div class="wrap reveal">
+          <span class="eyebrow mono" id="contact-label">Contact</span>
+          <!--@contact-->
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot mono">
+      <nav aria-label="Elsewhere">
+        <!--@footer-links-->
+      </nav>
+      <p class="legal">
+        <span
+          >&copy;
+          <!--@year-->
+          <!--@site-name-->
+          Studio</span
+        >
+        <span>A fictional studio, built as a front-end exercise</span>
+      </p>
+    </footer>
+
+    <script type="application/ld+json">
+      <!--@structured-data-->
+    </script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+@layer components {
+  .contact-link {
+    display: inline-block;
+    margin-top: clamp(24px, 4vh, 44px);
+    font-size: var(--size-contact);
+    font-weight: 700;
+    font-stretch: 108%;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--halo);
+    text-decoration: none;
+    background-image: linear-gradient(
+      to right,
+      rgb(var(--halo-rgb) / 0.5),
+      rgb(var(--halo-rgb) / 0.5)
+    );
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size var(--dur-mid) var(--ease-out);
+  }
+
+  .contact-link:hover,
+  .contact-link:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .contact-note {
+    max-width: 40ch;
+    margin-top: clamp(22px, 3vh, 34px);
+    color: var(--text-dim);
+  }
+}

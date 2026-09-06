@@ -1,0 +1,195 @@
+@layer components {
+  .work-head {
+    display: grid;
+    grid-template-columns: var(--work-cols);
+    gap: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-faint);
+  }
+
+  .work {
+    --work-cols: minmax(0, 1.1fr) minmax(0, 1.9fr) 90px 72px;
+  }
+
+  .work-item {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Native disclosure: keyboard, screen-reader semantics and one-open-at-a-time
+     come from the platform. `name` makes the group exclusive without script. */
+  .work-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--work-cols);
+    gap: 24px;
+    align-items: baseline;
+    padding: clamp(20px, 2.6vh, 30px) 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .work-row::-webkit-details-marker {
+    display: none;
+  }
+
+  /* The horizon, repeated: each row's rule sweeps in from the left. */
+  .work-row::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--rule-lit));
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.75s var(--ease-out);
+  }
+
+  .work-item:hover .work-row::after,
+  .work-row:focus-visible::after,
+  .work-item[open] .work-row::after {
+    transform: scaleX(1);
+  }
+
+  .work-name {
+    font-size: var(--size-work);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--halo);
+  }
+
+  .work-scope {
+    font-size: 14.5px;
+    color: var(--text-dim);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .work-item:hover .work-scope {
+    color: var(--text);
+  }
+
+  .work-year {
+    text-align: right;
+    color: var(--text-faint);
+  }
+
+  .work-cue {
+    text-align: right;
+    color: var(--text-faint);
+    transition: color var(--dur-fast) ease;
+  }
+
+  .work-item:hover .work-cue {
+    color: var(--text-dim);
+  }
+
+  .work-item[open] .work-cue {
+    color: var(--halo);
+  }
+
+  .work-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.9fr);
+    gap: 24px clamp(24px, 4vw, 64px);
+    padding: 4px 0 clamp(28px, 3.4vh, 42px);
+  }
+
+  .work-detail {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 10px 24px;
+    max-width: 62ch;
+  }
+
+  .work-detail dt {
+    color: var(--text-faint);
+    padding-top: 3px;
+  }
+
+  .work-detail dd {
+    color: var(--text);
+    font-size: 15px;
+  }
+
+  .work-stack {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .work-stack li {
+    padding: 6px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--text-dim);
+  }
+
+  /* Animating to a keyword height needs `interpolate-size` (base.css).
+     Where that is unsupported the panel simply appears, which is fine. */
+  .work-item::details-content {
+    block-size: 0;
+    overflow: clip;
+    opacity: 0;
+    transition:
+      block-size var(--dur-mid) var(--ease-out),
+      content-visibility var(--dur-mid) allow-discrete,
+      opacity var(--dur-fast) ease;
+  }
+
+  .work-item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+
+  @media (max-width: 860px) {
+    .work-panel,
+    .work-detail {
+      grid-template-columns: 1fr;
+    }
+
+    .work-panel > *,
+    .work-detail,
+    .work-stack {
+      grid-column: 1;
+    }
+
+    .work-detail dt {
+      padding-top: 0;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .work-head {
+      display: none;
+    }
+
+    .work-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px 16px;
+    }
+
+    .work-name {
+      grid-column: 1;
+    }
+
+    .work-year {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    /* The cue sits beside the scope rather than taking a row of its own,
+       so a row stays two lines tall on a phone. */
+    .work-scope {
+      grid-column: 1;
+    }
+
+    .work-cue {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: end;
+      text-align: right;
+    }
+  }
+}

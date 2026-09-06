@@ -1,0 +1,139 @@
+@layer layout {
+  .wrap {
+    width: 100%;
+    max-width: var(--wrap);
+    margin-inline: auto;
+  }
+
+  .section {
+    padding: var(--section-gap) var(--edge);
+    border-top: 1px solid var(--rule);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .lede {
+    max-width: 22ch;
+    font-size: var(--size-lede);
+    font-weight: 500;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    color: var(--halo);
+  }
+
+  .lede--wide {
+    max-width: 26ch;
+  }
+
+  .body p + p {
+    margin-top: 1.15em;
+  }
+
+  .body p {
+    max-width: 54ch;
+  }
+
+  @media (max-width: 860px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .lede {
+      max-width: 100%;
+    }
+  }
+}
+
+@layer components {
+  /* Capabilities and studio facts are the same object: a labelled term and a
+     short gloss, ruled off from the one above it. */
+  .index-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--index-min, 220px), 1fr));
+    gap: 0 clamp(24px, 4vw, 64px);
+    margin-top: clamp(32px, 5vh, 56px);
+  }
+
+  .index-list li {
+    padding: 15px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .index-list b {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--size-mono);
+    font-weight: 400;
+    letter-spacing: var(--track-mono);
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .index-list span {
+    display: block;
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--halo);
+  }
+
+  .index-list--facts {
+    --index-min: 160px;
+  }
+}
+
+@layer utilities {
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--size-mono);
+    letter-spacing: var(--track-mono);
+    text-transform: uppercase;
+  }
+
+  .eyebrow {
+    display: block;
+    margin-bottom: clamp(28px, 4vh, 52px);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-dim);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Scroll reveals. The class is added by JS; without JS the content is
+     already visible because `is-in` is the default in the no-js case. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--dur-slow) ease,
+      transform var(--dur-slow) var(--ease-out);
+  }
+
+  .reveal.is-in,
+  html:not(.js) .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

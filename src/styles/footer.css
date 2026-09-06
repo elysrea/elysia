@@ -1,0 +1,48 @@
+@layer components {
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px 32px;
+    padding: 34px var(--edge);
+    border-top: 1px solid var(--rule);
+  }
+
+  .foot nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+  }
+
+  .foot a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color var(--dur-fast) ease;
+  }
+
+  .foot a:hover {
+    color: var(--halo);
+  }
+
+  .legal {
+    text-align: right;
+    line-height: 2;
+    color: var(--text-faint);
+  }
+
+  .legal span {
+    display: block;
+  }
+
+  @media (max-width: 720px) {
+    .foot {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .legal {
+      text-align: left;
+    }
+  }
+}

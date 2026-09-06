@@ -1,0 +1,89 @@
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* The fixed header must not cover the target of an in-page link. */
+    scroll-padding-top: 5rem;
+    /* Lets the work panels animate open from height 0 to auto. */
+    interpolate-size: allow-keywords;
+  }
+
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  dl,
+  dd,
+  figure {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: rgb(var(--halo-rgb) / 0.2);
+    color: var(--halo);
+  }
+
+  :focus-visible {
+    outline: 1px solid rgb(var(--halo-rgb) / 0.85);
+    outline-offset: 5px;
+    border-radius: 1px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: var(--edge);
+    top: 0;
+    z-index: 40;
+    padding: 10px 16px;
+    background: var(--deep);
+    color: var(--halo);
+    text-decoration: none;
+    transform: translateY(-120%);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

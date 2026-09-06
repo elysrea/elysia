@@ -1,0 +1,14 @@
+/* Cascade order is declared once, up front, so a later file can never win a
+   specificity fight by accident. The only !important in the project is the
+   reduced-motion safety net in base.css, which is meant to beat everything. */
+@layer tokens, base, layout, components, utilities;
+
+@import './fonts.css';
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './nav.css';
+@import './hero.css';
+@import './work.css';
+@import './contact.css';
+@import './footer.css';
