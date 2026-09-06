@@ -26,7 +26,7 @@ instead of shipping.
 **Context.** The original prototype advanced the simulation by a constant amount
 every animation frame.
 
-**Problem.** That ties speed to refresh rate: the wind blew roughly twice as
+**Problem.** That ties speed to refresh rate: the animation ran roughly twice as
 fast on a 120Hz display and slowed whenever the machine was busy. Restoring a
 backgrounded tab replayed the entire gap in one frame.
 
@@ -38,10 +38,40 @@ and `planSteps` is a pure function, so all of this is tested without a browser.
 
 ## A seeded PRNG
 
-`Math.random` cannot be reproduced, which makes a particle system impossible to
+`Math.random` cannot be reproduced, which makes a generated scene impossible to
 test and impossible to debug from a screenshot. `mulberry32` is 8 lines, has no
-dependencies, and makes "the same seed draws the same field" an assertion rather
+dependencies, and makes "the same seed draws the same globe" an assertion rather
 than a hope.
+
+## The globe is drawn, not embedded
+
+**Context.** The hero needed a subject with more to say than drifting lines. A
+rotating globe with traffic between landmasses is the reference; the question
+was how to get one.
+
+**Options.** A map SDK (Mapbox, MapLibre) gives a real globe and costs an API
+key, a tile server, a third-party request on first paint and several hundred
+kilobytes. A globe library (three-globe, globe.gl) drags in WebGL and a scene
+graph for one static camera. Or draw it.
+
+**Decision.** Draw it. The whole thing is orthographic projection and great
+circles — a page of trigonometry — over a land mask baked at build time from
+Natural Earth polygons by `scripts/build-land-mask.js`. The mask is one bit per
+two-degree cell, 2.7 kB base64, committed as generated source.
+
+**Consequence.** No key, no network, no runtime geo dependency, and the globe
+is made of pure functions that a test can interrogate directly. The trade is
+that it is a stylised globe and always will be: there are no labels, no zoom and
+no projection other than the one it was built for. That is the right trade for a
+hero image and the wrong one for a map.
+
+## Dots on the far side are drawn too
+
+An orthographic globe only shows a hemisphere, so the back half could be culled
+outright. Drawing it at a fraction of the brightness costs one `fillRect` per
+point and turns a flat disc into something with a volume you can read. The limb
+gets a faint rim gradient for the same reason: without an edge, the unlit side
+of the dot field reads as a scatter rather than a sphere.
 
 ## Native `<details>` for the case studies
 
@@ -68,5 +98,5 @@ large decrements and recovers in small ones, so the field never visibly pulses.
 ## Reduced motion gets a picture, not a blank
 
 Turning the effect off entirely would leave the hero with a flat gradient and
-lose the composition. Instead the same simulation is run forward to its steady
-state and left on screen: the animation, paused.
+lose the composition. Instead the same simulation is run forward until arcs are
+in flight and then drawn once: the animation, paused.

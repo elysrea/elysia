@@ -37,7 +37,7 @@
     pointer-events: none;
   }
 
-  .wind {
+  .globe {
     position: absolute;
     inset: 0;
     display: block;

@@ -3,7 +3,7 @@ import './styles/index.css';
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
 import { query } from './lib/dom.ts';
-import { WindField } from './features/wind/index.ts';
+import { GlobeField } from './features/globe/index.ts';
 
 /**
  * Entry point.
@@ -29,7 +29,7 @@ enhance('reveal', () => {
   initReveal();
 });
 
-enhance('wind', () => {
-  const canvas = query<HTMLCanvasElement>('#wind');
-  if (canvas) new WindField(canvas);
+enhance('globe', () => {
+  const canvas = query<HTMLCanvasElement>('#globe');
+  if (canvas) new GlobeField(canvas);
 });

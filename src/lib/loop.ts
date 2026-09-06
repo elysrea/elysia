@@ -2,8 +2,8 @@
  * A fixed-timestep animation loop.
  *
  * The original page advanced its simulation by a constant amount per frame, so
- * the wind blew twice as fast on a 120Hz display and slowed to a crawl when the
- * machine was busy. Here the loop accumulates real elapsed time and runs whole
+ * the globe spun twice as fast on a 120Hz display and slowed to a crawl when
+ * the machine was busy. Here the loop accumulates real elapsed time and runs whole
  * simulation steps, which makes motion identical everywhere.
  */
 

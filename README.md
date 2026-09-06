@@ -1,9 +1,9 @@
 # Elysia
 
 A studio site built as a front-end engineering exercise: no framework, typed
-content rendered to static HTML at build time, and a canvas wind field over the
-hero that is deterministic, frame-rate independent, and turns itself off when
-nobody is looking.
+content rendered to static HTML at build time, and a dot globe over the hero —
+real continents, traffic arcing between them — that is deterministic,
+frame-rate independent, and turns itself off when nobody is looking.
 
 **Elysia is not a real studio.** The copy and the case studies are invented so
 that a realistic content model had something to model. The engineering is the
@@ -15,14 +15,15 @@ npm install && npm run dev
 
 ## What is interesting here
 
-|                                         |                                                                                                                                                                                                                                              |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zero client-side templating**         | Content lives in `src/content/site.ts` as typed data and is rendered into `index.html` by a Vite plugin at build time. The shipped page is complete markup: it reads with JavaScript disabled and crawlers get real text.                    |
-| **Deterministic simulation**            | The particle field runs on a seeded PRNG, so the same load produces the same opening frames — and a test can assert exact positions instead of statistical hand-waving.                                                                      |
-| **Fixed timestep**                      | Time is accumulated and consumed in whole 16.67ms steps, so the wind moves at the same speed on a 60Hz laptop and a 144Hz monitor. A tab restored after ten minutes does not replay ten minutes of simulation.                               |
-| **Self-governing effect**               | A quality governor watches median frame time and scales the particle count between 100% and 35%. A background animation should never be the reason a page drops frames.                                                                      |
-| **One source of truth for the horizon** | `--horizon` is declared once in CSS. The gradient, the rule, and the canvas all read that value; the canvas asks the cascade rather than restating the breakpoints in JavaScript.                                                            |
-| **Platform first**                      | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync. |
+|                                         |                                                                                                                                                                                                                                                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zero client-side templating**         | Content lives in `src/content/site.ts` as typed data and is rendered into `index.html` by a Vite plugin at build time. The shipped page is complete markup: it reads with JavaScript disabled and crawlers get real text.                                                                                       |
+| **A globe with no globe library**       | Continents come from Natural Earth polygons baked into a 2.7 kB bitmask at build time (`npm run land:sync`). The browser gets an array lookup instead of a GeoJSON, a projection library, or a map tile server. Rotation, orthographic projection and great-circle paths are about 150 lines of pure functions. |
+| **Deterministic simulation**            | The dot lattice and the arc traffic run on a seeded PRNG, so the same load produces the same globe — and a test can assert exact positions instead of statistical hand-waving.                                                                                                                                  |
+| **Fixed timestep**                      | Time is accumulated and consumed in whole 16.67ms steps, so the globe turns at the same speed on a 60Hz laptop and a 144Hz monitor. A tab restored after ten minutes does not replay ten minutes of simulation.                                                                                                 |
+| **Self-governing effect**               | A quality governor watches median frame time and scales the dot count between 100% and 35%. A background animation should never be the reason a page drops frames.                                                                                                                                              |
+| **One source of truth for the horizon** | `--horizon` is declared once in CSS. The gradient, the rule, and the globe's placement all read that value; the canvas asks the cascade rather than restating the breakpoints in JavaScript.                                                                                                                    |
+| **Platform first**                      | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync.                                                                    |
 
 ## Architecture
 
@@ -30,6 +31,8 @@ npm install && npm run dev
 index.html              HTML shell with <!--@slot--> placeholders
 plugins/
   html-content.ts       Vite plugin: fills slots, emits robots.txt + sitemap.xml
+scripts/
+  build-land-mask.js    Natural Earth polygons -> a committed bitmask
 src/
   content/
     site.ts             All copy, as typed data
@@ -37,11 +40,12 @@ src/
   features/
     nav.ts              Sticky header + scrollspy, both IntersectionObserver
     reveal.ts           Scroll-in transitions
-    wind/
-      flow-field.ts     Pure: layered sines -> a drift angle
-      particles.ts      Pure-ish: the particle pool and its recycling
-      palette.ts        Pure: position -> colour and opacity
-      wind-field.ts     Canvas, browser events, and when not to run
+    globe/
+      geo.ts            Pure: sphere coordinates, rotation, projection, slerp
+      land.ts           Pure: bitmask lookup -> the points that are on land
+      land-mask.ts      Generated: Natural Earth land as one bit per cell
+      arcs.ts           The travelling connections and their lifecycle
+      globe-field.ts    Canvas, browser events, and when not to run
   lib/
     loop.ts             Fixed-timestep render loop
     quality.ts          Frame-budget governor
@@ -60,9 +64,10 @@ cannot take the rest of the page down with it.
 
 - Complete, readable content with JavaScript off; the reveal animations only
   hide what a scripted page can reveal (`html.js`, set before first paint).
-- `prefers-reduced-motion` is honoured **and watched**: the wind stops moving and
-  is replaced by a still frame of the same simulation, not an empty canvas — and
-  it responds if the setting is changed while the page is open.
+- `prefers-reduced-motion` is honoured **and watched**: the globe stops turning
+  and is replaced by a still frame of the same scene — arcs mid-flight, not an
+  empty canvas — and it responds if the setting is changed while the page is
+  open.
 - `prefers-contrast: more` raises the ink and rule opacities, rather than leaving
   the design sitting at 44% alpha for people who asked for more contrast.
 - Skip link, visible focus rings, `scroll-padding-top` so the fixed header never
@@ -81,22 +86,30 @@ Measured from `npm run build` (gzipped where it matters):
 
 Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
 request on first paint, no layout shift from a late stylesheet. Everything else
-the page needs is under 11 kB over the wire.
+the page needs is a little over 12 kB on the wire.
 
 The canvas pauses when the hero scrolls away, when the tab is hidden, and when
 motion is reduced. Resizes are coalesced, and the device pixel ratio is capped
-at 2 — above that the cost is real and the visible gain is not.
+at 2 — above that the cost is real and the visible gain is not. Dots are drawn
+as `fillRect`, not `arc`: at roughly two pixels across the difference is
+invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 95 tests, 93% statement coverage, no browser required.
+`npm test` — 132 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
 stall, that the governor ignores a single long frame but reacts to a sustained
-one, that the flow field never turns the wind back on itself, that particles
-recycle without leaking the pool, that colour channels stay in range, and that
-every content slot the HTML asks for actually exists.
+one, that rotation is a rotation and never stretches the sphere, that a
+great-circle path travels at a constant rate and stays on the surface, that arcs
+retire instead of accumulating, and that every content slot the HTML asks for
+actually exists.
+
+The land mask gets its own tests, and they are the ones worth stealing: they
+assert that the Sahara, Greenland, Siberia, Australia and Antarctica are land
+while the mid-Pacific and the Arctic Ocean are not. A flipped row order or an
+off-by-one in the projection fails all of them at once.
 
 DOM behaviour is tested against controllable stand-ins rather than a real
 browser: an `IntersectionObserver` the test drives by hand, a manually advanced
@@ -116,6 +129,7 @@ npm test             # unit tests
 npm run coverage     # tests with coverage
 npm run check        # everything CI runs
 npm run fonts:sync   # re-vendor the font subsets
+npm run land:sync    # regenerate the land mask from Natural Earth
 ```
 
 ## Deployment
@@ -136,4 +150,6 @@ to `main`. A project page is served from a subpath, so the workflow passes
 
 Typeset in [Archivo](https://fonts.google.com/specimen/Archivo) and
 [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), both under the
-SIL Open Font License. Code is MIT — see [LICENSE](LICENSE).
+SIL Open Font License. Coastlines from
+[Natural Earth](https://www.naturalearthdata.com/) 110m physical land, public
+domain. Code is MIT — see [LICENSE](LICENSE).
