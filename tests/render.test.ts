@@ -2,7 +2,14 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { escapeHtml, renderStructuredData, renderWork, slots } from '../src/content/render.ts';
+import {
+  escapeHtml,
+  renderHeroTabs,
+  renderStructuredData,
+  renderWork,
+  slots,
+} from '../src/content/render.ts';
+import { DEFAULT_HERO, HERO_CATALOGUE } from '../src/features/hero/catalogue.ts';
 import { projects } from '../src/content/site.ts';
 
 describe('escapeHtml', () => {
@@ -38,6 +45,25 @@ describe('renderWork', () => {
     const tags = projects.flatMap((project) => project.stack);
 
     for (const tag of tags) expect(html).toContain(`<li>${escapeHtml(tag)}</li>`);
+  });
+});
+
+describe('renderHeroTabs', () => {
+  it('renders a real link per hero, so the switcher works without JavaScript', () => {
+    const html = renderHeroTabs();
+
+    for (const entry of HERO_CATALOGUE) {
+      expect(html).toContain(`href="?hero=${entry.name}"`);
+      expect(html).toContain(`data-hero="${entry.name}"`);
+      expect(html).toContain(entry.label);
+    }
+  });
+
+  it('marks the default before any script runs', () => {
+    const marked = renderHeroTabs().match(/aria-current="true"/g) ?? [];
+
+    expect(marked).toHaveLength(1);
+    expect(renderHeroTabs()).toContain(`data-hero="${DEFAULT_HERO}" title`);
   });
 });
 

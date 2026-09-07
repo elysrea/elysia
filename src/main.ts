@@ -3,7 +3,7 @@ import './styles/index.css';
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
 import { query } from './lib/dom.ts';
-import { SceneHost, resolveScene } from './features/hero/index.ts';
+import { SceneHost, initHeroSwitcher, resolveScene } from './features/hero/index.ts';
 
 /**
  * Entry point.
@@ -35,5 +35,8 @@ enhance('hero', () => {
 
   const { name, scene } = resolveScene(window.location.search);
   document.documentElement.setAttribute('data-hero', name);
-  new SceneHost(canvas, scene);
+
+  const host = new SceneHost(canvas, scene);
+  const tabs = query('.deck-tabs');
+  if (tabs) initHeroSwitcher(host, tabs);
 });

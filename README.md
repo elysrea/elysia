@@ -28,8 +28,11 @@ npm install && npm run dev
 
 ## Four heroes, one page
 
-The hero is swappable. `?hero=planet|eclipse|aurora|nebula` picks the treatment,
-and the choice is meant to be made by looking:
+The hero is swappable, and the switch is in the page: the tabs in the seam
+between the hero and the content change it in place, without a reload. They are
+real links to `?hero=…`, so they still work with JavaScript off — it just costs
+a navigation. What the script adds is not the ability to switch but the ability
+to switch _without losing the animation you were comparing_.
 
 |           |                                                                                                                           |
 | --------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -38,8 +41,10 @@ and the choice is meant to be made by looking:
 | `aurora`  | Curtains of light low in the frame, each one filled path whose edge is a sum of three sines.                              |
 | `nebula`  | Domain-warped noise through the same colour ramp the planet uses, drifting.                                               |
 
-Four is three too many for a finished site. The registry exists so the losers
-can be deleted in one commit once the choice is made.
+Four is arguably three too many for a finished site, and the switcher is a
+demo affordance rather than a feature a studio would ship. Both are one commit
+from being deleted: the catalogue drives the tabs, the registry builds the
+scenes, and a test keeps the two in step.
 
 Everything about _hosting_ an effect is shared and lives in `hero/host.ts`:
 sizing for the device pixel ratio, pausing off-screen and on a hidden tab,
@@ -66,6 +71,8 @@ src/
       host.ts           Canvas, events, timing, quality — everything but drawing
       scene.ts          What a hero has to implement: layout, step, draw
       noise.ts          Pure: seeded value noise and fBm
+      catalogue.ts      The heroes as data, imported by the build-time renderer
+      switcher.ts       Turns the seam tabs into an in-place hero switch
       scenes/           planet, eclipse, aurora, nebula
     globe/
       geo.ts            Pure: sphere coordinates, rotation, projection, slerp
@@ -140,7 +147,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 172 tests, no browser required.
+`npm test` — 185 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long

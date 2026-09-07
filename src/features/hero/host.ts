@@ -14,8 +14,10 @@ export interface SceneHostOptions {
   readonly initialQuality?: number;
 }
 
-/** How fast a scene fades up, per fixed step. */
+/** How fast a scene fades up on first load, per fixed step. */
 const RISE_RATE = 0.006;
+/** Faster on a swap: the visitor asked for this one and is waiting for it. */
+const SWAP_RISE_RATE = 0.022;
 /** Steps a scene is run forward before the reduced-motion still frame. */
 const DEFAULT_STILL_STEPS = 620;
 
@@ -29,12 +31,13 @@ export class SceneHost {
   readonly #canvas: HTMLCanvasElement;
   readonly #context: CanvasRenderingContext2D;
   readonly #options: SceneHostOptions;
-  readonly #scene: Scene;
+  #scene: Scene;
   readonly #governor: QualityGovernor;
   readonly #loop: RenderLoop;
   readonly #teardown: (() => void)[] = [];
 
   #rise = 0;
+  #riseRate = RISE_RATE;
   #quality: number;
   #onScreen = true;
   #reduced: boolean;
@@ -54,7 +57,7 @@ export class SceneHost {
 
     this.#loop = new RenderLoop({
       onStep: () => {
-        this.#rise = Math.min(1, this.#rise + RISE_RATE);
+        this.#rise = Math.min(1, this.#rise + this.#riseRate);
         this.#scene.step(1);
       },
       onRender: (frameMs) => {
@@ -66,6 +69,27 @@ export class SceneHost {
     this.#measure();
     this.#observe();
     this.#start();
+  }
+
+  /**
+   * Swaps in a different scene on the same canvas.
+   *
+   * The old one is released, the new one is laid out at the current size and
+   * fades up quickly — this happens because someone clicked, so it should feel
+   * like an answer rather than an entrance.
+   */
+  setScene(scene: Scene): void {
+    if (scene === this.#scene) return;
+
+    this.#scene.destroy?.();
+    this.#scene = scene;
+    this.#rise = 0;
+    this.#riseRate = SWAP_RISE_RATE;
+    this.#governor.reset();
+
+    this.#measure();
+    if (this.#reduced) this.#drawStill();
+    else this.#start();
   }
 
   destroy(): void {

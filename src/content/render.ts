@@ -7,6 +7,7 @@
  * empty root element.
  */
 
+import { DEFAULT_HERO, HERO_CATALOGUE } from '../features/hero/catalogue.ts';
 import {
   announcement,
   capabilities,
@@ -63,6 +64,20 @@ export function renderAnnouncement(): string {
           <span class="announce-text">${escapeHtml(announcement.text)}</span>
           <span class="announce-arrow" aria-hidden="true">&rarr;</span>
         </a>`;
+}
+
+/**
+ * The tabs in the seam between the hero and the page.
+ *
+ * They are rendered as real links to `?hero=…`, so the switcher works with
+ * JavaScript off — it just costs a reload. The active one is marked here from
+ * the default, and re-marked by the switcher once it takes over.
+ */
+export function renderHeroTabs(): string {
+  return HERO_CATALOGUE.map((entry) => {
+    const current = entry.name === DEFAULT_HERO ? ' aria-current="true"' : '';
+    return `<a class="deck-tab" href="?hero=${escapeHtml(entry.name)}" data-hero="${escapeHtml(entry.name)}" title="${escapeHtml(entry.blurb)}"${current}>${escapeHtml(entry.label)}</a>`;
+  }).join('\n          ');
 }
 
 export function renderPractice(): string {
@@ -160,6 +175,7 @@ export function renderStructuredData(): string {
 export const slots: Readonly<Record<string, () => string>> = {
   'nav-links': renderNavLinks,
   'nav-cta': renderNavCta,
+  'hero-tabs': renderHeroTabs,
   announcement: renderAnnouncement,
   practice: renderPractice,
   capabilities: renderCapabilities,

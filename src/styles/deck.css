@@ -19,30 +19,24 @@
     background: var(--surface);
   }
 
-  .deck-tab {
+  /* The group is the shape that rises out of the deck; the tabs sit in it. */
+  .deck-tabs {
     position: absolute;
     left: 50%;
     bottom: 100%;
     transform: translateX(-50%);
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
+    max-width: calc(100vw - var(--edge) * 2);
     height: var(--tab-height);
-    padding: 0 22px;
+    padding: 0 10px;
     border-radius: 18px 18px 0 0;
     background: var(--surface);
-    color: var(--text-dim);
-    text-decoration: none;
-    white-space: nowrap;
-    transition: color var(--dur-fast) ease;
   }
 
-  .deck-tab:hover {
-    color: var(--halo);
-  }
-
-  .deck-tab::before,
-  .deck-tab::after {
+  .deck-tabs::before,
+  .deck-tabs::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -51,24 +45,49 @@
     background: var(--surface);
   }
 
-  .deck-tab::before {
+  .deck-tabs::before {
     right: 100%;
     -webkit-mask: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000 100%);
     mask: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000 100%);
   }
 
-  .deck-tab::after {
+  .deck-tabs::after {
     left: 100%;
     -webkit-mask: radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000 100%);
     mask: radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000 100%);
   }
 
-  .deck-tab-arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
+  .deck-tab {
+    padding: 8px 13px;
+    border-radius: 999px;
+    color: var(--text-faint);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      color var(--dur-fast) ease,
+      background var(--dur-fast) ease;
   }
 
-  .deck-tab:hover .deck-tab-arrow {
-    transform: translateY(2px);
+  .deck-tab:hover {
+    color: var(--text);
+    background: var(--surface-raised);
+  }
+
+  .deck-tab[aria-current='true'] {
+    background: var(--surface-hover);
+    color: var(--halo);
+  }
+
+  @media (max-width: 560px) {
+    .deck-tabs {
+      gap: 0;
+      padding: 0 6px;
+    }
+
+    .deck-tab {
+      padding: 8px 9px;
+      letter-spacing: 0;
+    }
   }
 
   /* The first section starts under the tab, so it needs room for it. */

@@ -247,3 +247,24 @@ A query string is user input, not configuration, so an unknown name falls back
 to the default — and the lookup uses `Object.hasOwn` rather than `in`, because
 `?hero=constructor` otherwise resolves through the prototype chain and gets
 `Object` called as a scene factory. A test covers exactly that.
+
+## The switcher is links first
+
+The tabs in the seam are anchors to `?hero=…` rendered at build time, with the
+active one marked from the default. Script then intercepts the clicks and swaps
+the scene in place.
+
+Doing it in that order means the page has no state that only exists in
+JavaScript: the URL is the state, it is shareable, and with scripting off the
+tabs still work by navigating. Modified clicks are left alone, because a
+cmd-click on a link means "new tab" and this is a link. The URL is updated with
+`replaceState` rather than `pushState` — the hero is a preference, not a place,
+and it should not fill the back button.
+
+## The catalogue is data, the registry is code
+
+The build-time HTML renderer needs to know what the heroes are called; it cannot
+import the scene classes, which expect a DOM. So the list lives in
+`catalogue.ts`, which imports nothing, and the registry that builds scenes is
+checked against it by a test. Two sources of truth would drift the first time
+someone added a hero and forgot the tab.
