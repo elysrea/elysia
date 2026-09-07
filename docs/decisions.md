@@ -227,3 +227,23 @@ a concave flare either side. The flares are two small squares masked by a
 circle, which is what makes the tab look cut from the same sheet as the deck
 rather than stuck on top of it — and it is the one place in the page where a
 curve does the job a line used to.
+
+## The hero is swappable
+
+**Context.** The planet is the most literal thing on the page, and literal is a
+commitment: it says the studio is about the world rather than about the work.
+That is worth testing against alternatives rather than defending.
+
+**Decision.** Split the effect in two. Everything about hosting one — canvas
+sizing, pausing off-screen, reduced motion, fixed-step time, quality governing —
+is the same whatever is drawn, so it moved to `SceneHost`. A scene is three
+methods. Three alternatives then cost a file each.
+
+**Consequence.** The comparison can be made by looking, at `?hero=`, instead of
+in the abstract. The registry is also the deletion plan: when one wins, the
+other three go in a single commit and the host stays.
+
+A query string is user input, not configuration, so an unknown name falls back
+to the default — and the lookup uses `Object.hasOwn` rather than `in`, because
+`?hero=constructor` otherwise resolves through the prototype chain and gets
+`Object` called as a scene factory. A test covers exactly that.

@@ -26,6 +26,27 @@ npm install && npm run dev
 | **One source of truth for the horizon** | `--horizon` is declared once in CSS. The gradient, the rule, and the globe's placement all read that value; the canvas asks the cascade rather than restating the breakpoints in JavaScript.                                                                                                                    |
 | **Platform first**                      | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync.                                                                    |
 
+## Four heroes, one page
+
+The hero is swappable. `?hero=planet|eclipse|aurora|nebula` picks the treatment,
+and the choice is meant to be made by looking:
+
+|           |                                                                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `planet`  | The heat-map globe. Literal, informational, the most to say.                                                              |
+| `eclipse` | A black body with a corona burning around it. Four gradients and a filled circle — the whole scene is about thirty lines. |
+| `aurora`  | Curtains of light low in the frame, each one filled path whose edge is a sum of three sines.                              |
+| `nebula`  | Domain-warped noise through the same colour ramp the planet uses, drifting.                                               |
+
+Four is three too many for a finished site. The registry exists so the losers
+can be deleted in one commit once the choice is made.
+
+Everything about _hosting_ an effect is shared and lives in `hero/host.ts`:
+sizing for the device pixel ratio, pausing off-screen and on a hidden tab,
+honouring reduced motion, fixed-step time, and backing off when frames run long.
+A scene is only `layout`, `step` and `draw` — which is why the three
+alternatives are small.
+
 ## Architecture
 
 ```
@@ -41,6 +62,11 @@ src/
   features/
     nav.ts              Sticky header + scrollspy, both IntersectionObserver
     reveal.ts           Scroll-in transitions
+    hero/
+      host.ts           Canvas, events, timing, quality — everything but drawing
+      scene.ts          What a hero has to implement: layout, step, draw
+      noise.ts          Pure: seeded value noise and fBm
+      scenes/           planet, eclipse, aurora, nebula
     globe/
       geo.ts            Pure: sphere coordinates, rotation, projection, slerp
       land.ts           Pure: bitmask lookup -> the points that are on land
@@ -94,8 +120,8 @@ Measured from `npm run build` (gzipped where it matters):
 | Fonts (2 latin subsets) | 105 kB  | —      |
 
 Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
-request on first paint, no layout shift from a late stylesheet. Everything else
-the page needs is about 16 kB on the wire.
+request on first paint, no layout shift from a late stylesheet. Everything else the page needs is about 18 kB on the wire — and roughly 2 kB of
+that is the three hero variants that will not survive the choice.
 
 Stars are generated once per resize and then only read — a frame costs one
 `fillRect` and one sine each.
@@ -114,7 +140,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 169 tests, no browser required.
+`npm test` — 172 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long

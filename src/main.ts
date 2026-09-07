@@ -3,7 +3,7 @@ import './styles/index.css';
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
 import { query } from './lib/dom.ts';
-import { GlobeField } from './features/globe/index.ts';
+import { SceneHost, resolveScene } from './features/hero/index.ts';
 
 /**
  * Entry point.
@@ -29,7 +29,11 @@ enhance('reveal', () => {
   initReveal();
 });
 
-enhance('globe', () => {
+enhance('hero', () => {
   const canvas = query<HTMLCanvasElement>('#globe');
-  if (canvas) new GlobeField(canvas);
+  if (!canvas) return;
+
+  const { name, scene } = resolveScene(window.location.search);
+  document.documentElement.setAttribute('data-hero', name);
+  new SceneHost(canvas, scene);
 });

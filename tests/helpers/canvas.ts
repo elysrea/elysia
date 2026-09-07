@@ -67,6 +67,7 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     createRadialGradient: () => gradient,
     createLinearGradient: () => gradient,
     beginPath: () => {},
+    closePath: () => {},
     moveTo: () => {},
     lineTo: () => {},
     arc: () => {},
