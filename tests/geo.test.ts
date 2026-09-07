@@ -4,7 +4,6 @@ import {
   angleBetween,
   arcPoint,
   dot,
-  fibonacciSphere,
   isOccluded,
   normalize,
   orient,
@@ -157,32 +156,6 @@ describe('arcPoint', () => {
     for (let t = 0; t <= 1; t += 0.05) {
       expect(length(arcPoint(a, b, t, 0.2))).toBeGreaterThanOrEqual(1 - 1e-9);
     }
-  });
-});
-
-describe('fibonacciSphere', () => {
-  it('returns the requested number of points', () => {
-    expect(fibonacciSphere(500)).toHaveLength(500);
-    expect(fibonacciSphere(0)).toHaveLength(0);
-    expect(fibonacciSphere(1)).toHaveLength(1);
-  });
-
-  it('produces real coordinates', () => {
-    for (const { lat, lon } of fibonacciSphere(2000)) {
-      expect(lat).toBeGreaterThanOrEqual(-90);
-      expect(lat).toBeLessThanOrEqual(90);
-      expect(lon).toBeGreaterThanOrEqual(-180);
-      expect(lon).toBeLessThan(180);
-    }
-  });
-
-  it('spreads evenly instead of bunching at the poles', () => {
-    // A naive lat/lon grid fails this: it crowds points where meridians meet.
-    const points = fibonacciSphere(4000);
-    const tropics = points.filter((p) => Math.abs(p.lat) < 30).length;
-
-    // Half the surface of a sphere lies within 30 degrees of the equator.
-    expect(tropics / points.length).toBeCloseTo(0.5, 1);
   });
 });
 

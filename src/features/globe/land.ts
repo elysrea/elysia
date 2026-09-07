@@ -1,5 +1,5 @@
 import { LAND_MASK_BASE64, LAND_MASK_HEIGHT, LAND_MASK_WIDTH } from './land-mask.ts';
-import { fibonacciSphere, toVector, type GeoPoint, type Vec3 } from './geo.ts';
+import type { GeoPoint } from './geo.ts';
 
 /**
  * Land lookup over the generated bitmask.
@@ -32,21 +32,4 @@ export function isLand(mask: LandMask, { lat, lon }: GeoPoint): boolean {
 
   const bit = y * mask.width + x;
   return ((mask.bits[bit >> 3] ?? 0) >> (7 - (bit & 7))) % 2 === 1;
-}
-
-/**
- * Land points for a globe of roughly `target` dots.
- *
- * Roughly a third of the sphere is land, so the lattice is oversampled and
- * filtered rather than solved for exactly — the count only needs to be close.
- */
-export function landPoints(target: number, mask: LandMask = decodeMask()): Vec3[] {
-  const candidates = fibonacciSphere(Math.round(target * 3));
-  const points: Vec3[] = [];
-
-  for (const point of candidates) {
-    if (isLand(mask, point)) points.push(toVector(point));
-  }
-
-  return points;
 }

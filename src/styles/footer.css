@@ -5,8 +5,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 20px 32px;
-    padding: 34px var(--edge);
-    border-top: 1px solid var(--rule);
+    padding: 44px var(--edge) 40px;
   }
 
   .foot nav {

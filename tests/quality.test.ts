@@ -13,6 +13,17 @@ describe('QualityGovernor', () => {
     expect(new QualityGovernor().scale).toBe(1);
   });
 
+  it('can open conservatively and climb from there', () => {
+    const governor = new QualityGovernor({ initial: 0.8, sampleSize: 4, targetMs: 20 });
+    expect(governor.scale).toBe(0.8);
+
+    expect(feed(governor, 6, 40)).toBe(1);
+  });
+
+  it('will not start below its own floor', () => {
+    expect(new QualityGovernor({ initial: 0.01, minScale: 0.4 }).scale).toBe(0.4);
+  });
+
   it('waits for a full sample window before changing anything', () => {
     const governor = new QualityGovernor({ sampleSize: 10 });
 

@@ -170,3 +170,60 @@ is a way of making plain type look designed. Replacing it with a display serif
 that has actual character meant the capitals were doing nothing but shouting —
 so the tracking dropped from 0.18em to 0.04em and the transforms came out,
 including on the city names drawn into the canvas.
+
+## The planet is a heat map, drawn per pixel
+
+**Context.** Dots read well but they are a diagram: one mark per place, evenly
+spaced, saying nothing about density. The site wanted a surface that shows where
+activity actually is.
+
+**Options.** Keep the dots and vary their size — still a diagram, and a busier
+one. Draw thousands of overlapping radial gradients — a heat map made of paint
+calls, and far too many of them. Or render the sphere per pixel.
+
+**Decision.** Per pixel, from a texture baked once: land from the mask, city
+activity screened on top, blurred to soften the two-degree coastlines, mapped
+through a ramp that stays violet until the very top of the range and then breaks
+warm.
+
+**Consequence.** It is cheap because almost none of it is per frame. For a given
+pixel the view-space normal never changes, so its latitude, its Lambert term and
+its coverage at the limb are computed once per resize; only longitude moves, and
+it moves by the same amount everywhere. The frame loop is an array read, a lerp
+and a lookup. Samples are coarser than pixels and drawn back scaled up, which is
+both why it is affordable and why it looks soft.
+
+The cost was measured rather than assumed — about 11ms a frame at full
+resolution, 3ms one step coarser — so the effect opens at the coarser setting
+and the governor has to earn the finer one.
+
+## Screened, not summed
+
+City hotspots are combined with `a + b(1 - a)` rather than `a + b`. Europe holds
+a dozen cities within a few degrees; added together they saturate the whole
+continent to flat white and the coastline disappears underneath. Screening lets
+a cluster read as hot while keeping the shape beneath it.
+
+The scale is fixed rather than normalised against the hottest cell, too.
+Normalising would drag every city down to whatever the busiest one happened to
+be, and nothing would ever read as hot.
+
+## No hairlines
+
+The first version separated everything with one-pixel rules: between sections,
+under every label, between every row, above every list item. It is an easy way
+to make a layout look structured, and at some density it stops reading as
+structure and starts reading as ruled paper.
+
+They are all gone. Structure now comes from ground and space — a raised deck for
+the page body, soft cards for lists, a hover surface for rows, and a dot instead
+of an underline for a section label. The only borders left describe a shape
+rather than divide a space.
+
+## The seam is a shape, not an edge
+
+The hero and the page meet at a tab that rises out of the deck's top edge, with
+a concave flare either side. The flares are two small squares masked by a
+circle, which is what makes the tab look cut from the same sheet as the deck
+rather than stuck on top of it — and it is the one place in the page where a
+curve does the job a line used to.

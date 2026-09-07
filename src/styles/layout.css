@@ -7,7 +7,6 @@
 
   .section {
     padding: var(--section-gap) var(--edge);
-    border-top: 1px solid var(--rule);
   }
 
   .split {
@@ -57,13 +56,19 @@
   .index-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--index-min, 220px), 1fr));
-    gap: 0 clamp(24px, 4vw, 64px);
+    gap: 10px;
     margin-top: clamp(32px, 5vh, 56px);
   }
 
   .index-list li {
-    padding: 15px 0;
-    border-top: 1px solid var(--rule);
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: var(--surface-raised);
+    transition: background var(--dur-fast) ease;
+  }
+
+  .index-list li:hover {
+    background: var(--surface-hover);
   }
 
   .index-list b {
@@ -110,12 +115,22 @@
     letter-spacing: var(--track-mono);
   }
 
+  /* A mark, not a rule: the label is announced by a dot rather than by a line
+     drawn across the page. */
   .eyebrow {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     margin-bottom: clamp(28px, 4vh, 52px);
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--rule);
     color: var(--text-dim);
+  }
+
+  .eyebrow::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .visually-hidden {

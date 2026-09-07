@@ -59,28 +59,6 @@
     height: 100%;
   }
 
-  .horizon {
-    position: absolute;
-    inset: var(--horizon) 0 auto;
-    height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent 0%,
-      rgb(var(--halo-rgb) / 0.07) 22%,
-      rgb(var(--halo-rgb) / 0.34) 72%,
-      rgb(var(--halo-rgb) / 0.14) 100%
-    );
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    animation: horizon-draw 2000ms var(--ease-out) 300ms forwards;
-  }
-
-  @keyframes horizon-draw {
-    to {
-      transform: scaleX(1);
-    }
-  }
-
   .hero-name {
     position: absolute;
     inset: 0 var(--edge) auto;
@@ -178,21 +156,6 @@
     animation: surface 1500ms ease-out 1900ms forwards;
   }
 
-  .hero-cue {
-    position: absolute;
-    left: var(--edge);
-    bottom: var(--edge);
-    color: var(--text-faint);
-    text-decoration: none;
-    opacity: 0;
-    animation: surface 1500ms ease-out 2300ms forwards;
-    transition: color var(--dur-fast) ease;
-  }
-
-  .hero-cue:hover {
-    color: var(--halo);
-  }
-
   @keyframes surface {
     to {
       opacity: 1;
@@ -206,18 +169,10 @@
     }
   }
 
-  @media (max-height: 520px) {
-    .hero-cue {
-      display: none;
-    }
-  }
-
   /* Nothing animates in; everything is simply present. */
   @media (prefers-reduced-motion: reduce) {
-    .horizon,
     .wordmark,
     .hero-sub,
-    .hero-cue,
     .announce {
       opacity: 1;
       transform: none;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { decodeMask, isLand, landPoints } from '../src/features/globe/land.ts';
+import { decodeMask, isLand } from '../src/features/globe/land.ts';
 import { LAND_MASK_HEIGHT, LAND_MASK_WIDTH } from '../src/features/globe/land-mask.ts';
 
 const mask = decodeMask();
@@ -52,28 +52,5 @@ describe('isLand', () => {
   it('clamps rather than reading outside the mask', () => {
     expect(() => isLand(mask, { lat: 95, lon: 200 })).not.toThrow();
     expect(() => isLand(mask, { lat: -95, lon: -200 })).not.toThrow();
-  });
-});
-
-describe('landPoints', () => {
-  it('returns roughly the requested number of points', () => {
-    const points = landPoints(1500);
-
-    expect(points.length).toBeGreaterThan(1100);
-    expect(points.length).toBeLessThan(1900);
-  });
-
-  it('returns unit vectors only', () => {
-    for (const point of landPoints(300)) {
-      expect(Math.hypot(point.x, point.y, point.z)).toBeCloseTo(1);
-    }
-  });
-
-  it('is deterministic, so the globe looks the same on every load', () => {
-    expect(landPoints(400)).toEqual(landPoints(400));
-  });
-
-  it('handles a request for nothing', () => {
-    expect(landPoints(0)).toEqual([]);
   });
 });

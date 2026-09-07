@@ -120,27 +120,3 @@ export function arcPoint(a: Vec3, b: Vec3, t: number, lift: number): Vec3 {
 export function angleBetween(a: Vec3, b: Vec3): number {
   return Math.acos(Math.min(1, Math.max(-1, dot(a, b))));
 }
-
-/**
- * Evenly spaced points on a sphere, by the Fibonacci lattice.
- *
- * A naive lat/lon grid bunches points at the poles; this keeps the spacing
- * even, which is what makes the dot field read as a surface rather than a mesh.
- */
-export function fibonacciSphere(count: number): GeoPoint[] {
-  if (count <= 0) return [];
-
-  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-  const points: GeoPoint[] = [];
-
-  for (let i = 0; i < count; i++) {
-    const y = count === 1 ? 0 : 1 - (i / (count - 1)) * 2;
-    const theta = goldenAngle * i;
-
-    // Wrap into [-180, 180) so the value is a real longitude, not a winding.
-    const lon = ((((theta / DEG + 180) % 360) + 360) % 360) - 180;
-    points.push({ lat: Math.asin(Math.min(1, Math.max(-1, y))) / DEG, lon });
-  }
-
-  return points;
-}

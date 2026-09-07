@@ -15,6 +15,8 @@ export interface RecordingContext {
   readonly texts: string[];
   /** Each label with the x it was drawn at, for clipping checks. */
   readonly textPositions: [string, number][];
+  /** Scaled bitmaps: the heat map is drawn as one per frame. */
+  readonly images: number;
   readonly transforms: [number, number, number, number, number, number][];
 }
 
@@ -28,6 +30,7 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     clears: 0,
     texts: [] as string[],
     textPositions: [] as [string, number][],
+    images: 0,
     transforms: [] as RecordingContext['transforms'],
   };
 
@@ -52,6 +55,15 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
       record.textPositions.push([text, x]);
     },
     measureText: (text: string) => ({ width: text.length * 6 }),
+    createImageData: (w: number, h: number) => ({
+      width: w,
+      height: h,
+      data: new Uint8ClampedArray(w * h * 4),
+    }),
+    putImageData: () => {},
+    drawImage: () => {
+      record.images++;
+    },
     createRadialGradient: () => gradient,
     createLinearGradient: () => gradient,
     beginPath: () => {},
@@ -66,6 +78,7 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     font: '',
     textBaseline: 'alphabetic',
     letterSpacing: '',
+    imageSmoothingEnabled: true,
   };
 
   // eslint-disable-next-line @typescript-eslint/unbound-method -- stashed to restore, never called

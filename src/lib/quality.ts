@@ -13,6 +13,12 @@ export interface QualityGovernorOptions {
   readonly minScale?: number;
   readonly decrement?: number;
   readonly increment?: number;
+  /**
+   * Where to start, 0-1. Below 1 the effect opens conservatively and has to
+   * earn its way up, which is the right default for anything whose full
+   * quality costs a real slice of a frame.
+   */
+  readonly initial?: number;
 }
 
 export class QualityGovernor {
@@ -23,7 +29,7 @@ export class QualityGovernor {
   readonly #increment: number;
 
   #samples: number[] = [];
-  #scale = 1;
+  #scale: number;
 
   constructor(options: QualityGovernorOptions = {}) {
     this.#targetMs = options.targetMs ?? 20;
@@ -31,6 +37,7 @@ export class QualityGovernor {
     this.#minScale = options.minScale ?? 0.35;
     this.#decrement = options.decrement ?? 0.2;
     this.#increment = options.increment ?? 0.05;
+    this.#scale = Math.min(1, Math.max(this.#minScale, options.initial ?? 1));
   }
 
   get scale(): number {

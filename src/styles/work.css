@@ -3,8 +3,7 @@
     display: grid;
     grid-template-columns: var(--work-cols);
     gap: 24px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--rule);
+    padding: 0 20px 12px;
     color: var(--text-faint);
   }
 
@@ -13,7 +12,13 @@
   }
 
   .work-item {
-    border-bottom: 1px solid var(--rule);
+    border-radius: 18px;
+    transition: background var(--dur-fast) ease;
+  }
+
+  .work-item:hover,
+  .work-item[open] {
+    background: var(--surface-raised);
   }
 
   /* Native disclosure: keyboard, screen-reader semantics and one-open-at-a-time
@@ -24,31 +29,13 @@
     grid-template-columns: var(--work-cols);
     gap: 24px;
     align-items: baseline;
-    padding: clamp(20px, 2.6vh, 30px) 0;
+    padding: clamp(20px, 2.6vh, 30px) 20px;
     cursor: pointer;
     list-style: none;
   }
 
   .work-row::-webkit-details-marker {
     display: none;
-  }
-
-  /* The horizon, repeated: each row's rule sweeps in from the left. */
-  .work-row::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 -1px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--rule-lit));
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    transition: transform 0.75s var(--ease-out);
-  }
-
-  .work-item:hover .work-row::after,
-  .work-row:focus-visible::after,
-  .work-item[open] .work-row::after {
-    transform: scaleX(1);
   }
 
   .work-name {
@@ -92,7 +79,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.9fr);
     gap: 24px clamp(24px, 4vw, 64px);
-    padding: 4px 0 clamp(28px, 3.4vh, 42px);
+    padding: 4px 20px clamp(28px, 3.4vh, 42px);
   }
 
   .work-detail {
@@ -121,9 +108,9 @@
   }
 
   .work-stack li {
-    padding: 6px 11px;
-    border: 1px solid var(--rule);
+    padding: 7px 13px;
     border-radius: 999px;
+    background: var(--surface-hover);
     color: var(--text-dim);
   }
 

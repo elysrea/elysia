@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { anchors } from '../src/features/globe/cities.ts';
-import { GlobeField, dotsFor, layoutFor } from '../src/features/globe/globe-field.ts';
+import { GlobeField, layoutFor, sampleScaleFor } from '../src/features/globe/globe-field.ts';
 import { installCanvas, sizeElement, type RecordingContext } from './helpers/canvas.ts';
 import { installFrameClock, type FrameClock } from './helpers/frames.ts';
 import {
@@ -34,13 +34,18 @@ describe('layoutFor', () => {
   });
 });
 
-describe('dotsFor', () => {
-  it('scales with the globe, not the viewport, within bounds', () => {
-    // A cropped, oversized planet shows more surface per pixel of frame, so
-    // the budget follows the sphere's own area.
-    expect(dotsFor(180)).toBeLessThan(dotsFor(420));
-    expect(dotsFor(40)).toBe(900);
-    expect(dotsFor(4000)).toBe(6000);
+describe('sampleScaleFor', () => {
+  it('trades resolution for frame time, never the other way round', () => {
+    // Quality is a sample size here, not a count: a slower machine gets a
+    // softer heat map rather than a sparser one.
+    expect(sampleScaleFor(1)).toBeLessThan(sampleScaleFor(0.5));
+    expect(sampleScaleFor(1)).toBe(3);
+    expect(sampleScaleFor(0.35)).toBe(6);
+  });
+
+  it('clamps a nonsense quality', () => {
+    expect(sampleScaleFor(4)).toBe(3);
+    expect(sampleScaleFor(-1)).toBe(6);
   });
 });
 
@@ -122,7 +127,7 @@ describe('GlobeField', () => {
 
     clock.tick();
 
-    expect(context.rects).toBeGreaterThan(100);
+    expect(context.images).toBeGreaterThan(0);
     expect(context.clears).toBeGreaterThan(0);
   });
 
@@ -171,22 +176,22 @@ describe('GlobeField', () => {
     for (let i = 0; i < 30; i++) clock.tick();
 
     observers.observing(canvas)?.emit([{ target: canvas, isIntersecting: false }]);
-    const drawn = context.rects;
+    const drawn = context.images;
     for (let i = 0; i < 20; i++) clock.tick();
 
-    expect(context.rects).toBe(drawn);
+    expect(context.images).toBe(drawn);
 
     observers.observing(canvas)?.emit([{ target: canvas, isIntersecting: true }]);
     clock.tick();
 
-    expect(context.rects).toBeGreaterThan(drawn);
+    expect(context.images).toBeGreaterThan(drawn);
   });
 
   it('paints a still frame and never starts a loop when motion is reduced', () => {
     stubEnvironment(true);
     field = new GlobeField(canvas);
 
-    expect(context.rects).toBeGreaterThan(100);
+    expect(context.images).toBeGreaterThan(0);
     expect(clock.pending).toBe(0);
   });
 
@@ -216,6 +221,6 @@ describe('GlobeField', () => {
 
     clock.tick();
 
-    expect(context.rects).toBe(0);
+    expect(context.images).toBe(0);
   });
 });

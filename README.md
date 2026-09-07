@@ -2,9 +2,9 @@
 
 A studio site built as a front-end engineering exercise: no framework, typed
 content rendered to static HTML at build time, and a planet over the hero —
-real continents in dots, a starfield, traffic arcing between named cities —
-that is deterministic, frame-rate independent, and turns itself off when nobody
-is looking.
+real continents rendered as a heat map, a starfield, traffic arcing between
+named cities — that is deterministic, frame-rate independent, and turns itself
+off when nobody is looking.
 
 **Elysia is not a real studio.** The copy and the case studies are invented so
 that a realistic content model had something to model. The engineering is the
@@ -46,6 +46,8 @@ src/
       land.ts           Pure: bitmask lookup -> the points that are on land
       land-mask.ts      Generated: Natural Earth land as one bit per cell
       cities.ts         The named places arcs travel between
+      heat.ts           Pure: land + city activity -> a heat texture and ramp
+      surface.ts        Pure: the per-pixel renderer and its lookup tables
       stars.ts          Pure: the starfield and its twinkle
       arcs.ts           The travelling connections and their lifecycle
       globe-field.ts    Canvas, browser events, and when not to run
@@ -93,11 +95,16 @@ Measured from `npm run build` (gzipped where it matters):
 
 Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
 request on first paint, no layout shift from a late stylesheet. Everything else
-the page needs is under 15 kB on the wire.
+the page needs is about 16 kB on the wire.
 
 Stars are generated once per resize and then only read — a frame costs one
-`fillRect` and one sine each — and the far hemisphere of the planet is culled
-entirely, since an opaque body is in front of it.
+`fillRect` and one sine each.
+
+The heat map is measured, not assumed. At full resolution it costs about 11ms a
+frame on this machine and at one step coarser about 3ms, so it opens at the
+coarser setting and the quality governor moves it up only if the frames allow
+it. Quality here is a sample size rather than a count: a slower machine gets a
+softer map, not a broken one.
 
 The canvas pauses when the hero scrolls away, when the tab is hidden, and when
 motion is reduced. Resizes are coalesced, and the device pixel ratio is capped
@@ -107,7 +114,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 149 tests, no browser required.
+`npm test` — 169 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
@@ -154,6 +161,15 @@ npm run land:sync    # regenerate the land mask from Natural Earth
 `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages on every push
 to `main`. A project page is served from a subpath, so the workflow passes
 `BASE_PATH=/<repo>/`; the same source builds for a domain root with no change.
+
+## Surfaces, not rules
+
+There is not a hairline in the page. Sections are separated by ground and space:
+everything below the hero sits on a raised deck with a tab cut into its top
+edge, list items are soft cards, work rows light up on hover, and a section
+label is announced by a dot rather than by a rule drawn across the page. The
+only borders left are the ones that describe a shape — the header capsule and
+the availability badge.
 
 ## Type
 

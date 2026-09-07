@@ -14,10 +14,10 @@ import {
   type Arc,
 } from './arcs.ts';
 import { anchors } from './cities.ts';
+import { buildHeat, buildRamp, type HeatField } from './heat.ts';
+import { buildTables, paintSurface, type SurfaceTables } from './surface.ts';
 import {
   arcPoint,
-  dot,
-  toVector,
   isOccluded,
   normalize,
   orient,
@@ -25,7 +25,7 @@ import {
   type Vec3,
   type Viewport,
 } from './geo.ts';
-import { landPoints } from './land.ts';
+import { decodeMask } from './land.ts';
 import { createStars, twinkle, type Star } from './stars.ts';
 
 export interface GlobeFieldOptions {
@@ -81,14 +81,15 @@ export function layoutFor(width: number, height: number, horizon: number): Globe
 }
 
 /**
- * Dot budget for a globe of this radius, before quality scaling.
+ * Canvas pixels per heat sample for a given quality, 1 being best.
  *
- * It scales with the sphere's own area rather than the viewport's: an oversized
- * planet cropped by the frame needs far more points to keep its coastlines
- * legible, and a small one would waste them.
+ * The heat map is rendered coarser than the screen and drawn back scaled up,
+ * so quality is a resolution rather than a count: when frames run long the
+ * governor makes the samples bigger, which is cheaper and only softer.
  */
-export function dotsFor(radius: number): number {
-  return Math.round(Math.min(6000, Math.max(900, (radius * radius) / 45)));
+export function sampleScaleFor(quality: number): number {
+  const clamped = Math.min(1, Math.max(0.35, quality));
+  return Math.round(3 + (1 - clamped) * 5);
 }
 
 /**
@@ -102,18 +103,27 @@ export class GlobeField {
   readonly #canvas: HTMLCanvasElement;
   readonly #context: CanvasRenderingContext2D;
   readonly #options: GlobeFieldOptions;
-  readonly #governor = new QualityGovernor();
+  // Opens one step coarser than best and improves if the frames allow it: at
+  // full resolution the heat map costs a real slice of a frame, and starting
+  // there means stuttering through the first second to find that out.
+  readonly #governor = new QualityGovernor({ initial: 0.8 });
   readonly #loop: RenderLoop;
   readonly #teardown: (() => void)[] = [];
 
   #layout: GlobeLayout = { width: 0, height: 0, cx: 0, cy: 0, radius: 0 };
-  #points: Vec3[] = [];
   #stars: Star[] = [];
+  #heat: HeatField;
+  #ramp: Uint8Array;
+  #tables: SurfaceTables | null = null;
+  #buffer: ImageData | null = null;
+  #offscreen: HTMLCanvasElement;
+  #offscreenContext: CanvasRenderingContext2D | null = null;
+  /** Canvas pixels per heat sample; raised when frames run long. */
+  #sampleScale = sampleScaleFor(0.8);
   #arcs: ArcSystem;
   #spin = 0;
   #seconds = 0;
   #rise = 0;
-  #quality = 1;
   #onScreen = true;
   #reduced: boolean;
   #resizeTimer: number | undefined;
@@ -127,6 +137,9 @@ export class GlobeField {
     this.#options = options;
     this.#reduced = prefersReducedMotion();
     this.#arcs = new ArcSystem(anchors, mulberry32(options.seed ?? 0x1d0e));
+    this.#heat = buildHeat(decodeMask(), anchors);
+    this.#ramp = buildRamp();
+    this.#offscreen = document.createElement('canvas');
 
     this.#loop = new RenderLoop({
       onStep: () => this.#advance(1),
@@ -224,10 +237,26 @@ export class GlobeField {
     this.#context.clearRect(0, 0, width, height);
   }
 
-  /** Rebuilds the dot field and the sky. Arc endpoints are cities and fixed. */
+  /** Rebuilds the sample tables and the sky. Arc endpoints never change. */
   #rebuild(): void {
-    const target = Math.round(dotsFor(this.#layout.radius) * this.#quality);
-    this.#points = landPoints(target);
+    this.#tables = buildTables(this.#layout, TILT, LIGHT, this.#heat, {
+      scale: this.#sampleScale,
+      clipWidth: this.#layout.width,
+      clipHeight: this.#layout.height,
+    });
+
+    const { cols, rows } = this.#tables;
+    const context = this.#offscreenContext ?? this.#offscreen.getContext('2d');
+    this.#offscreenContext = context;
+
+    if (context && cols > 0 && rows > 0) {
+      this.#offscreen.width = cols;
+      this.#offscreen.height = rows;
+      this.#buffer = context.createImageData(cols, rows);
+    } else {
+      this.#buffer = null;
+    }
+
     this.#stars = createStars(
       this.#layout.width,
       this.#layout.height,
@@ -236,9 +265,10 @@ export class GlobeField {
   }
 
   #applyQuality(scale: number): void {
-    // Rebuilding the lattice is not free, so ignore trivial adjustments.
-    if (Math.abs(scale - this.#quality) < 0.05) return;
-    this.#quality = scale;
+    const next = sampleScaleFor(scale);
+    if (next === this.#sampleScale) return;
+
+    this.#sampleScale = next;
     this.#rebuild();
   }
 
@@ -256,12 +286,10 @@ export class GlobeField {
     this.#drawHalo(cx, cy, radius);
 
     context.globalCompositeOperation = 'source-over';
-    this.#drawBody(cx, cy, radius);
+    this.#drawHeat();
 
     context.globalCompositeOperation = 'lighter';
-    this.#drawGraticule();
     this.#drawRim(cx, cy, radius);
-    this.#drawSurface();
     this.#drawArcs();
 
     // Text is drawn normally: additive type on a bright sky turns to mush.
@@ -282,58 +310,6 @@ export class GlobeField {
     }
   }
 
-  /**
-   * Meridians and parallels, very faint.
-   *
-   * The dots say where the land is; the graticule says the thing is a sphere
-   * being turned. Without it the surface reads as a pattern printed on a disc.
-   */
-  #drawGraticule(): void {
-    const context = this.#context;
-    const alpha = 0.05 * this.#rise;
-    if (alpha <= 0.004) return;
-
-    context.strokeStyle = `rgba(190,170,240,${alpha.toFixed(3)})`;
-    context.lineWidth = Math.max(0.5, this.#layout.radius * 0.0016);
-
-    for (let meridian = 0; meridian < 12; meridian++) {
-      this.#strokeCircle((t) => {
-        const lon = (meridian / 12) * 360 - 180;
-        return toVector({ lat: t * 180 - 90, lon });
-      });
-    }
-
-    // Parallels stop short of the poles, where they collapse to a point.
-    for (let parallel = 1; parallel < 6; parallel++) {
-      this.#strokeCircle((t) => {
-        const lat = (parallel / 6) * 180 - 90;
-        return toVector({ lat, lon: t * 360 - 180 });
-      });
-    }
-  }
-
-  /** Strokes a curve on the sphere, skipping the parts behind it. */
-  #strokeCircle(pointAt: (t: number) => Vec3, segments = 72): void {
-    const context = this.#context;
-    let drawing = false;
-
-    context.beginPath();
-    for (let i = 0; i <= segments; i++) {
-      const v = orient(pointAt(i / segments), this.#spin, TILT);
-
-      if (v.z <= 0) {
-        drawing = false;
-        continue;
-      }
-
-      const { x, y } = project(v, this.#layout);
-      if (drawing) context.lineTo(x, y);
-      else context.moveTo(x, y);
-      drawing = true;
-    }
-    context.stroke();
-  }
-
   /** A soft glow around the limb, so the globe sits in the sky, not on it. */
   #drawHalo(cx: number, cy: number, radius: number): void {
     const context = this.#context;
@@ -349,31 +325,30 @@ export class GlobeField {
   }
 
   /**
-   * The body of the planet: an opaque, shaded disc.
-   *
-   * Without it the sky gradient shows straight through and the globe reads as a
-   * wire sphere. The gradient is centred on the light rather than the middle of
-   * the disc, which is what makes a flat circle look round.
+   * The planet itself: one `putImageData` into a small offscreen canvas, then
+   * one `drawImage` to scale it up. The browser's own smoothing does the
+   * blurring that makes a coarse sample grid read as a soft heat map.
    */
-  #drawBody(cx: number, cy: number, radius: number): void {
-    const context = this.#context;
-    const lit = context.createRadialGradient(
-      cx + LIGHT.x * radius * 0.68,
-      cy - LIGHT.y * radius * 0.68,
-      radius * 0.04,
-      cx,
-      cy,
-      radius * 1.04,
-    );
-    lit.addColorStop(0, `rgba(52,30,92,${(0.92 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(0.22, `rgba(28,15,56,${(0.95 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(0.55, `rgba(12,6,27,${(0.97 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(1, `rgba(3,2,8,${(0.99 * this.#rise).toFixed(3)})`);
+  #drawHeat(): void {
+    const tables = this.#tables;
+    const buffer = this.#buffer;
+    const offscreen = this.#offscreenContext;
+    if (!tables || !buffer || !offscreen || tables.cols === 0) return;
 
-    context.fillStyle = lit;
-    context.beginPath();
-    context.arc(cx, cy, radius, 0, Math.PI * 2);
-    context.fill();
+    paintSurface(tables, this.#heat, this.#ramp, buffer.data, {
+      spin: this.#spin,
+      rise: this.#rise,
+    });
+    offscreen.putImageData(buffer, 0, 0);
+
+    this.#context.imageSmoothingEnabled = true;
+    this.#context.drawImage(
+      this.#offscreen,
+      tables.left,
+      tables.top,
+      tables.cols * tables.scale,
+      tables.rows * tables.scale,
+    );
   }
 
   /** The lit edge, brightest where the sky's own light falls. */
@@ -389,32 +364,6 @@ export class GlobeField {
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.stroke();
-  }
-
-  /**
-   * The landmasses, as dots.
-   *
-   * Only the near hemisphere is drawn: the body is opaque now, so a far-side
-   * point would be behind a planet. That halves the work as well.
-   */
-  #drawSurface(): void {
-    const context = this.#context;
-    const { radius } = this.#layout;
-    const size = Math.max(1, radius * 0.0044 + 0.5);
-
-    for (const point of this.#points) {
-      const v = orient(point, this.#spin, TILT);
-      if (v.z <= 0) continue;
-
-      const { x, y, depth } = project(v, this.#layout);
-      const light = Math.max(0, dot(v, LIGHT));
-      const alpha = (0.26 + light * 0.62) * this.#rise;
-      if (alpha <= 0.004) continue;
-
-      const s = size * (0.74 + depth * 0.36);
-      context.fillStyle = `rgba(233,221,255,${alpha.toFixed(3)})`;
-      context.fillRect(x - s / 2, y - s / 2, s, s);
-    }
   }
 
   #drawArcs(): void {

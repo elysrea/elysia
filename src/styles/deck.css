@@ -1,0 +1,78 @@
+@layer components {
+  /*
+   * The seam between the hero and the page.
+   *
+   * Everything below the hero sits on a raised surface that overlaps the sky,
+   * with a tab rising out of its top edge. The two small squares either side of
+   * the tab are masked by a circle, which is what turns a hard corner into the
+   * concave flare that makes the tab look cut from the same sheet as the deck
+   * rather than stuck on top of it.
+   */
+  .deck {
+    --tab-height: 46px;
+    --notch: 22px;
+
+    position: relative;
+    z-index: 2;
+    margin-top: calc(var(--tab-height) * -1);
+    border-radius: var(--deck-radius) var(--deck-radius) 0 0;
+    background: var(--surface);
+  }
+
+  .deck-tab {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--tab-height);
+    padding: 0 22px;
+    border-radius: 18px 18px 0 0;
+    background: var(--surface);
+    color: var(--text-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-fast) ease;
+  }
+
+  .deck-tab:hover {
+    color: var(--halo);
+  }
+
+  .deck-tab::before,
+  .deck-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: var(--notch);
+    height: var(--notch);
+    background: var(--surface);
+  }
+
+  .deck-tab::before {
+    right: 100%;
+    -webkit-mask: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000 100%);
+    mask: radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000 100%);
+  }
+
+  .deck-tab::after {
+    left: 100%;
+    -webkit-mask: radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000 100%);
+    mask: radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000 100%);
+  }
+
+  .deck-tab-arrow {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .deck-tab:hover .deck-tab-arrow {
+    transform: translateY(2px);
+  }
+
+  /* The first section starts under the tab, so it needs room for it. */
+  .deck > .section:first-child {
+    padding-top: calc(var(--section-gap) * 0.72);
+  }
+}
