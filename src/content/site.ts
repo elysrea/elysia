@@ -55,10 +55,29 @@ export const meta: SiteMeta = {
 };
 
 export const navLinks: readonly NavLink[] = [
+  { href: '#practice', label: 'Practice' },
   { href: '#work', label: 'Work' },
   { href: '#studio', label: 'Studio' },
-  { href: '#contact', label: 'Contact' },
 ];
+
+/** The one action in the header. Contact is a call to action, not a page. */
+export const navCta = {
+  href: '#contact',
+  label: 'Start a project',
+  /** Shown instead of the full label where the header has no room. */
+  short: 'Start',
+} as const;
+
+/** The standing note above the wordmark. Null hides it entirely. */
+export const announcement: {
+  readonly tag: string;
+  readonly text: string;
+  readonly href: string;
+} | null = {
+  tag: 'Now',
+  text: 'Booking projects for Q3',
+  href: '#contact',
+};
 
 export const practice = {
   lede: 'We design the parts of a product people actually touch.',

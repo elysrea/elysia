@@ -2,23 +2,31 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ArcSystem,
+  HOLD,
   TAIL,
   arcHead,
   arcTail,
   arrivalRing,
   departureRing,
   isFinished,
+  labelOpacity,
   type Arc,
 } from '../src/features/globe/arcs.ts';
 import { toVector } from '../src/features/globe/geo.ts';
+import type { Anchor } from '../src/features/globe/cities.ts';
 import { mulberry32 } from '../src/lib/random.ts';
 
-const points = [
-  toVector({ lat: 51, lon: 0 }),
-  toVector({ lat: -34, lon: 151 }),
-  toVector({ lat: 35, lon: 139 }),
-  toVector({ lat: -23, lon: -46 }),
-  toVector({ lat: 37, lon: -122 }),
+const at = (name: string, lat: number, lon: number): Anchor => ({
+  name,
+  vector: toVector({ lat, lon }),
+});
+
+const points: Anchor[] = [
+  at('London', 51, 0),
+  at('Sydney', -34, 151),
+  at('Tokyo', 35, 139),
+  at('Sao Paulo', -23, -46),
+  at('San Francisco', 37, -122),
 ];
 
 const arc = (progress: number): Arc => ({
@@ -43,9 +51,10 @@ describe('arc geometry', () => {
     expect(arcTail(arc(0.05))).toBe(0);
   });
 
-  it('finishes only once the trail has caught up with the head', () => {
+  it('lingers after the trail has gone, so the label can be read', () => {
     expect(isFinished(arc(1))).toBe(false);
-    expect(isFinished(arc(1 + TAIL))).toBe(true);
+    expect(isFinished(arc(1 + TAIL))).toBe(false);
+    expect(isFinished(arc(1 + TAIL + HOLD))).toBe(true);
   });
 });
 
@@ -60,6 +69,32 @@ describe('rings', () => {
     expect(arrivalRing(arc(0.5))).toBeNull();
     expect(arrivalRing(arc(1))).toBe(0);
     expect(arrivalRing(arc(1.1))).toBeGreaterThan(0);
+  });
+});
+
+describe('labelOpacity', () => {
+  it('is silent until the head lands', () => {
+    expect(labelOpacity(arc(0))).toBe(0);
+    expect(labelOpacity(arc(0.99))).toBe(0);
+  });
+
+  it('fades up, holds, and fades out before the arc retires', () => {
+    const early = labelOpacity(arc(1.1));
+    const middle = labelOpacity(arc(1 + (TAIL + HOLD) * 0.5));
+    const late = labelOpacity(arc(1 + (TAIL + HOLD) * 0.95));
+
+    expect(early).toBeGreaterThan(0);
+    expect(middle).toBe(1);
+    expect(late).toBeLessThan(0.3);
+    expect(labelOpacity(arc(1 + TAIL + HOLD))).toBe(0);
+  });
+
+  it('stays within range across an entire arc lifetime', () => {
+    for (let progress = 0; progress < 2.5; progress += 0.01) {
+      const value = labelOpacity(arc(progress));
+      expect(value).toBeGreaterThanOrEqual(0);
+      expect(value).toBeLessThanOrEqual(1);
+    }
   });
 });
 
@@ -123,6 +158,17 @@ describe('ArcSystem', () => {
     halves.step(0.5);
 
     expect(halves.arcs[0]?.progress).toBeCloseTo(whole.arcs[0]?.progress ?? -1);
+  });
+
+  it('connects named places, so a label always has something to say', () => {
+    const system = build({ interval: 1 });
+    for (let i = 0; i < 200; i++) system.step();
+
+    expect(system.arcs.length).toBeGreaterThan(0);
+    for (const item of system.arcs) {
+      expect(item.from.name).not.toBe('');
+      expect(item.to.name).not.toBe(item.from.name);
+    }
   });
 
   it('does nothing when there is nowhere to travel', () => {

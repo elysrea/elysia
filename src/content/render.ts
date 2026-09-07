@@ -8,11 +8,13 @@
  */
 
 import {
+  announcement,
   capabilities,
   contact,
   facts,
   footerLinks,
   meta,
+  navCta,
   navLinks,
   practice,
   projects,
@@ -40,6 +42,27 @@ export function renderNavLinks(): string {
   return navLinks
     .map(({ href, label }) => `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`)
     .join('\n      ');
+}
+
+export function renderNavCta(): string {
+  return `<a class="nav-cta mono" href="${escapeHtml(navCta.href)}">
+        <span class="nav-cta-long">${escapeHtml(navCta.label)}</span>
+        <span class="nav-cta-short" aria-hidden="true">${escapeHtml(navCta.short)}</span>
+      </a>`;
+}
+
+/**
+ * The standing note above the wordmark. It is a link, not a banner: it says
+ * one true thing about availability and goes where that leads.
+ */
+export function renderAnnouncement(): string {
+  if (!announcement) return '';
+
+  return `<a class="announce mono" href="${escapeHtml(announcement.href)}">
+          <span class="announce-tag">${escapeHtml(announcement.tag)}</span>
+          <span class="announce-text">${escapeHtml(announcement.text)}</span>
+          <span class="announce-arrow" aria-hidden="true">&rarr;</span>
+        </a>`;
 }
 
 export function renderPractice(): string {
@@ -136,6 +159,8 @@ export function renderStructuredData(): string {
 /** Every content slot the HTML shell can ask for, keyed by placeholder name. */
 export const slots: Readonly<Record<string, () => string>> = {
   'nav-links': renderNavLinks,
+  'nav-cta': renderNavCta,
+  announcement: renderAnnouncement,
   practice: renderPractice,
   capabilities: renderCapabilities,
   work: renderWork,

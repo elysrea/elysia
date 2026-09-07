@@ -3,7 +3,17 @@ import { RenderLoop } from '../../lib/loop.ts';
 import { onReducedMotionChange, prefersReducedMotion } from '../../lib/motion.ts';
 import { QualityGovernor } from '../../lib/quality.ts';
 import { mulberry32 } from '../../lib/random.ts';
-import { ArcSystem, RING, arcHead, arcTail, arrivalRing, departureRing, type Arc } from './arcs.ts';
+import {
+  ArcSystem,
+  RING,
+  arcHead,
+  arcTail,
+  arrivalRing,
+  departureRing,
+  labelOpacity,
+  type Arc,
+} from './arcs.ts';
+import { anchors } from './cities.ts';
 import {
   arcPoint,
   dot,
@@ -106,7 +116,7 @@ export class GlobeField {
     this.#context = context;
     this.#options = options;
     this.#reduced = prefersReducedMotion();
-    this.#arcs = new ArcSystem([], mulberry32(options.seed ?? 0x1d0e));
+    this.#arcs = new ArcSystem(anchors, mulberry32(options.seed ?? 0x1d0e));
 
     this.#loop = new RenderLoop({
       onStep: () => this.#advance(1),
@@ -203,11 +213,10 @@ export class GlobeField {
     this.#context.clearRect(0, 0, width, height);
   }
 
-  /** Rebuilds the dot field and rewires the arcs to the new points. */
+  /** Rebuilds the dot field. Arc endpoints are cities and never change. */
   #rebuild(): void {
     const target = Math.round(dotsFor(this.#layout.width, this.#layout.height) * this.#quality);
     this.#points = landPoints(target);
-    this.#arcs = new ArcSystem(this.#points, mulberry32(this.#options.seed ?? 0x1d0e));
   }
 
   #applyQuality(scale: number): void {
@@ -223,38 +232,77 @@ export class GlobeField {
     if (width === 0 || height === 0) return;
 
     context.clearRect(0, 0, width, height);
-    context.globalCompositeOperation = 'lighter';
 
-    this.#drawAtmosphere(cx, cy, radius);
+    // The halo adds light to the sky; the body has to cover it, so the two
+    // cannot share a composite mode.
+    context.globalCompositeOperation = 'lighter';
+    this.#drawHalo(cx, cy, radius);
+
+    context.globalCompositeOperation = 'source-over';
+    this.#drawBody(cx, cy, radius);
+
+    context.globalCompositeOperation = 'lighter';
+    this.#drawRim(cx, cy, radius);
     this.#drawSurface();
     this.#drawArcs();
 
+    // Text is drawn normally: additive type on a bright sky turns to mush.
     context.globalCompositeOperation = 'source-over';
+    this.#drawLabels();
   }
 
-  /** A soft halo, so the globe sits in the sky rather than on top of it. */
-  #drawAtmosphere(cx: number, cy: number, radius: number): void {
+  /** A soft glow around the limb, so the globe sits in the sky, not on it. */
+  #drawHalo(cx: number, cy: number, radius: number): void {
     const context = this.#context;
-    const halo = context.createRadialGradient(cx, cy, radius * 0.72, cx, cy, radius * 1.32);
-    halo.addColorStop(0, `rgba(150,120,210,${(0.1 * this.#rise).toFixed(3)})`);
-    halo.addColorStop(0.55, `rgba(120,96,185,${(0.042 * this.#rise).toFixed(3)})`);
+    const halo = context.createRadialGradient(cx, cy, radius * 0.92, cx, cy, radius * 1.34);
+    halo.addColorStop(0, `rgba(150,120,210,${(0.13 * this.#rise).toFixed(3)})`);
+    halo.addColorStop(0.5, `rgba(120,96,185,${(0.05 * this.#rise).toFixed(3)})`);
     halo.addColorStop(1, 'rgba(120,96,185,0)');
 
     context.fillStyle = halo;
     context.beginPath();
-    context.arc(cx, cy, radius * 1.32, 0, Math.PI * 2);
+    context.arc(cx, cy, radius * 1.34, 0, Math.PI * 2);
     context.fill();
+  }
 
-    // A rim along the limb. Without it the unlit side has no edge and the dot
-    // field reads as a scatter rather than a sphere; the gradient keeps the
-    // edge brightest where the sky's own light falls.
+  /**
+   * The body of the planet: an opaque, shaded disc.
+   *
+   * Without it the sky gradient shows straight through and the globe reads as a
+   * wire sphere. The gradient is centred on the light rather than the middle of
+   * the disc, which is what makes a flat circle look round.
+   */
+  #drawBody(cx: number, cy: number, radius: number): void {
+    const context = this.#context;
+    const lit = context.createRadialGradient(
+      cx + LIGHT.x * radius * 0.52,
+      cy - LIGHT.y * radius * 0.52,
+      radius * 0.04,
+      cx,
+      cy,
+      radius * 1.04,
+    );
+    lit.addColorStop(0, `rgba(96,60,156,${(0.86 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(0.34, `rgba(48,26,88,${(0.9 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(0.72, `rgba(20,10,40,${(0.93 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(1, `rgba(7,3,15,${(0.95 * this.#rise).toFixed(3)})`);
+
+    context.fillStyle = lit;
+    context.beginPath();
+    context.arc(cx, cy, radius, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  /** The lit edge, brightest where the sky's own light falls. */
+  #drawRim(cx: number, cy: number, radius: number): void {
+    const context = this.#context;
     const rim = context.createLinearGradient(cx - radius, cy + radius, cx + radius, cy - radius);
-    rim.addColorStop(0, `rgba(233,221,255,${(0.02 * this.#rise).toFixed(3)})`);
-    rim.addColorStop(0.55, `rgba(233,221,255,${(0.06 * this.#rise).toFixed(3)})`);
-    rim.addColorStop(1, `rgba(233,221,255,${(0.16 * this.#rise).toFixed(3)})`);
+    rim.addColorStop(0, `rgba(233,221,255,${(0.03 * this.#rise).toFixed(3)})`);
+    rim.addColorStop(0.55, `rgba(233,221,255,${(0.1 * this.#rise).toFixed(3)})`);
+    rim.addColorStop(1, `rgba(233,221,255,${(0.26 * this.#rise).toFixed(3)})`);
 
     context.strokeStyle = rim;
-    context.lineWidth = Math.max(0.7, radius * 0.0035);
+    context.lineWidth = Math.max(0.8, radius * 0.004);
     context.beginPath();
     context.arc(cx, cy, radius, 0, Math.PI * 2);
     context.stroke();
@@ -263,25 +311,24 @@ export class GlobeField {
   /**
    * The landmasses, as dots.
    *
-   * Points on the far side are drawn too, at a fraction of the brightness: it
-   * costs one more `fillRect` each and turns a flat disc into something with a
-   * volume you can read.
+   * Only the near hemisphere is drawn: the body is opaque now, so a far-side
+   * point would be behind a planet. That halves the work as well.
    */
   #drawSurface(): void {
     const context = this.#context;
     const { radius } = this.#layout;
-    const size = Math.max(1, radius * 0.0042 + 0.42);
+    const size = Math.max(1, radius * 0.0044 + 0.5);
 
     for (const point of this.#points) {
       const v = orient(point, this.#spin, TILT);
-      const { x, y, depth } = project(v, this.#layout);
+      if (v.z <= 0) continue;
 
-      const facing = depth > 0;
+      const { x, y, depth } = project(v, this.#layout);
       const light = Math.max(0, dot(v, LIGHT));
-      const alpha = (facing ? 0.19 + light * 0.58 : 0.06 + light * 0.07) * this.#rise;
+      const alpha = (0.26 + light * 0.62) * this.#rise;
       if (alpha <= 0.004) continue;
 
-      const s = facing ? size * (0.72 + depth * 0.38) : size * 0.7;
+      const s = size * (0.74 + depth * 0.36);
       context.fillStyle = `rgba(233,221,255,${alpha.toFixed(3)})`;
       context.fillRect(x - s / 2, y - s / 2, s, s);
     }
@@ -310,7 +357,7 @@ export class GlobeField {
 
     for (let i = 0; i <= ARC_SEGMENTS; i++) {
       const t = tail + ((head - tail) * i) / ARC_SEGMENTS;
-      const v = orient(arcPoint(arc.from, arc.to, t, lift), this.#spin, TILT);
+      const v = orient(arcPoint(arc.from.vector, arc.to.vector, t, lift), this.#spin, TILT);
 
       if (isOccluded(v)) {
         previous = null;
@@ -355,8 +402,8 @@ export class GlobeField {
   /** Expanding rings at departure and arrival. */
   #drawRings(arc: Arc): void {
     const rings: [Vec3, number | null][] = [
-      [arc.from, departureRing(arc)],
-      [arc.to, arrivalRing(arc)],
+      [arc.from.vector, departureRing(arc)],
+      [arc.to.vector, arrivalRing(arc)],
     ];
 
     for (const [anchor, t] of rings) {
@@ -374,6 +421,62 @@ export class GlobeField {
       this.#context.beginPath();
       this.#context.arc(x, y, t * this.#layout.radius * RING * 0.5, 0, Math.PI * 2);
       this.#context.stroke();
+    }
+  }
+
+  /**
+   * Names the place an arc just reached.
+   *
+   * The label is what turns the animation from decoration into information:
+   * something arrived, and here is where. It is skipped near the limb, where
+   * the anchor is about to rotate out of view and the text would be orphaned.
+   */
+  #drawLabels(): void {
+    const context = this.#context;
+    const { radius } = this.#layout;
+    const size = Math.max(10, Math.min(14, radius * 0.046));
+
+    // Two arcs can land on the same city at once. Drawing its name twice
+    // doubles the alpha and reads as a bolder, misaligned label.
+    const drawn = new Set<string>();
+
+    for (const arc of this.#arcs.arcs) {
+      const alpha = labelOpacity(arc) * this.#rise;
+      if (alpha <= 0.02 || drawn.has(arc.to.name)) continue;
+      drawn.add(arc.to.name);
+
+      const v = orient(arc.to.vector, this.#spin, TILT);
+      if (v.z <= 0.12) continue;
+
+      const { x, y } = project(v, this.#layout);
+      const offset = Math.max(9, radius * 0.045);
+      const label = arc.to.name.toUpperCase();
+
+      context.font = `${size.toFixed(1)}px "IBM Plex Mono", ui-monospace, monospace`;
+      context.textBaseline = 'middle';
+      // Not supported everywhere; where it is, it matches the mono type
+      // elsewhere on the page.
+      context.letterSpacing = '0.14em';
+
+      // A label on the right of the globe would run off a narrow screen, so it
+      // flips to the other side of its anchor rather than being clipped.
+      const textWidth = context.measureText(label).width;
+      const margin = 12;
+      const flip = x + offset + textWidth > this.#layout.width - margin;
+      const textX = flip ? x - offset - textWidth : x + offset;
+
+      context.fillStyle = `rgba(233,221,255,${(alpha * 0.95).toFixed(3)})`;
+      context.fillText(label, textX, y);
+      context.letterSpacing = '0px';
+
+      // A short leader line, so the name belongs to the point and not the sky.
+      const reach = flip ? -offset : offset;
+      context.strokeStyle = `rgba(233,221,255,${(alpha * 0.3).toFixed(3)})`;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(x + reach * 0.32, y);
+      context.lineTo(x + reach * 0.82, y);
+      context.stroke();
     }
   }
 

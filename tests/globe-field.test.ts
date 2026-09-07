@@ -134,6 +134,34 @@ describe('GlobeField', () => {
     expect(context.strokes).toBeGreaterThan(before);
   });
 
+  it('names the city an arc has reached', () => {
+    stubEnvironment(false);
+    field = new GlobeField(canvas);
+
+    for (let i = 0; i < 400; i++) clock.tick();
+
+    expect(context.texts.length).toBeGreaterThan(0);
+    // Labels are drawn upper-cased, from the city table.
+    expect(context.texts.every((text) => text === text.toUpperCase())).toBe(true);
+  });
+
+  it('keeps labels inside the canvas on a narrow screen', () => {
+    stubEnvironment(false);
+    sizeElement(canvas, 390, 844);
+    field = new GlobeField(canvas);
+
+    for (let i = 0; i < 900; i++) clock.tick();
+
+    // Every label that was drawn has to fit; the renderer flips a label to the
+    // other side of its anchor rather than letting it run off the edge.
+    expect(context.texts.length).toBeGreaterThan(0);
+    for (const [text, x] of context.textPositions) {
+      const width = text.length * 6;
+      expect(x, text).toBeGreaterThanOrEqual(0);
+      expect(x + width, text).toBeLessThanOrEqual(390);
+    }
+  });
+
   it('stops drawing when the hero scrolls away, and resumes when it returns', () => {
     stubEnvironment(false);
     field = new GlobeField(canvas);

@@ -41,10 +41,18 @@
     <a class="skip-link mono" href="#practice">Skip to content</a>
 
     <header class="nav" id="nav">
-      <a class="nav-mark" href="#top"><!--@site-name--></a>
-      <nav class="nav-links mono" aria-label="Primary">
-        <!--@nav-links-->
-      </nav>
+      <div class="nav-shell">
+        <a class="nav-mark" href="#top" aria-label="Elysia — back to top">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path d="M2.4 15.2h19.2" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </a>
+        <nav class="nav-links mono" aria-label="Primary">
+          <!--@nav-links-->
+        </nav>
+        <!--@nav-cta-->
+      </div>
     </header>
 
     <main id="top">
@@ -54,6 +62,7 @@
         <div class="horizon" role="presentation"></div>
 
         <div class="hero-name">
+          <!--@announcement-->
           <h1 class="wordmark" id="wordmark"><!--@site-name--></h1>
         </div>
         <p class="hero-sub mono"><!--@tagline--></p>

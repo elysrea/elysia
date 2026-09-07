@@ -11,6 +11,10 @@ export interface RecordingContext {
   readonly strokes: number;
   readonly fills: number;
   readonly clears: number;
+  /** City labels, in the order they were drawn. */
+  readonly texts: string[];
+  /** Each label with the x it was drawn at, for clipping checks. */
+  readonly textPositions: [string, number][];
   readonly transforms: [number, number, number, number, number, number][];
 }
 
@@ -22,6 +26,8 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     strokes: 0,
     fills: 0,
     clears: 0,
+    texts: [] as string[],
+    textPositions: [] as [string, number][],
     transforms: [] as RecordingContext['transforms'],
   };
 
@@ -41,6 +47,11 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     fill: () => {
       record.fills++;
     },
+    fillText: (text: string, x: number) => {
+      record.texts.push(text);
+      record.textPositions.push([text, x]);
+    },
+    measureText: (text: string) => ({ width: text.length * 6 }),
     createRadialGradient: () => gradient,
     createLinearGradient: () => gradient,
     beginPath: () => {},
@@ -52,6 +63,9 @@ export function installCanvas(): { context: RecordingContext; restore: () => voi
     strokeStyle: '' as unknown,
     lineWidth: 0,
     lineCap: 'butt',
+    font: '',
+    textBaseline: 'alphabetic',
+    letterSpacing: '',
   };
 
   // eslint-disable-next-line @typescript-eslint/unbound-method -- stashed to restore, never called

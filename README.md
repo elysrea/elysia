@@ -44,6 +44,7 @@ src/
       geo.ts            Pure: sphere coordinates, rotation, projection, slerp
       land.ts           Pure: bitmask lookup -> the points that are on land
       land-mask.ts      Generated: Natural Earth land as one bit per cell
+      cities.ts         The named places arcs travel between
       arcs.ts           The travelling connections and their lifecycle
       globe-field.ts    Canvas, browser events, and when not to run
   lib/
@@ -70,8 +71,12 @@ cannot take the rest of the page down with it.
   open.
 - `prefers-contrast: more` raises the ink and rule opacities, rather than leaving
   the design sitting at 44% alpha for people who asked for more contrast.
-- Skip link, visible focus rings, `scroll-padding-top` so the fixed header never
-  covers an in-page target, `aria-current` on the section being read.
+- `prefers-reduced-transparency` turns the glass header and the availability
+  badge solid, because the blur is decoration and some readers cannot use it.
+- Skip link, visible focus rings, `scroll-padding-top` so the floating header
+  never covers an in-page target, `aria-current` on the section being read.
+- Header link colour is set from a contrast measurement, not by eye: at 10.5px
+  uppercase, the muted ink used elsewhere sits under 4.5:1 on the capsule.
 
 ## Performance
 
@@ -86,7 +91,7 @@ Measured from `npm run build` (gzipped where it matters):
 
 Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
 request on first paint, no layout shift from a late stylesheet. Everything else
-the page needs is a little over 12 kB on the wire.
+the page needs is under 14 kB on the wire.
 
 The canvas pauses when the hero scrolls away, when the tab is hidden, and when
 motion is reduced. Resizes are coalesced, and the device pixel ratio is capped
@@ -96,7 +101,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 132 tests, no browser required.
+`npm test` — 143 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
@@ -110,6 +115,12 @@ The land mask gets its own tests, and they are the ones worth stealing: they
 assert that the Sahara, Greenland, Siberia, Australia and Antarctica are land
 while the mid-Pacific and the Arctic Ocean are not. A flipped row order or an
 off-by-one in the projection fails all of them at once.
+
+The city table is checked against that same mask — but within one cell, not
+exactly on it. Nine of the cities are coastal, and at two degrees to a side
+their own cell centre is legitimately offshore; asserting otherwise would be
+asserting something false. The looser check still catches what matters, and a
+companion test proves it can fail.
 
 DOM behaviour is tested against controllable stand-ins rather than a real
 browser: an `IntersectionObserver` the test drives by hand, a manually advanced

@@ -1,5 +1,6 @@
 import type { Random } from '../../lib/random.ts';
-import { angleBetween, type Vec3 } from './geo.ts';
+import type { Anchor } from './cities.ts';
+import { angleBetween } from './geo.ts';
 
 /**
  * Connections travelling between points on the globe.
@@ -10,8 +11,8 @@ import { angleBetween, type Vec3 } from './geo.ts';
  * to keep in sync with the animation.
  */
 export interface Arc {
-  readonly from: Vec3;
-  readonly to: Vec3;
+  readonly from: Anchor;
+  readonly to: Anchor;
   /** Great-circle separation in radians; drives both lift and duration. */
   readonly span: number;
   /** 0 at departure, 1 on arrival, up to 1 + TAIL while the trail whips out. */
@@ -25,6 +26,12 @@ export const TAIL = 0.32;
 /** Rings expand over this much progress after departure and arrival. */
 export const RING = 0.22;
 
+/**
+ * Extra life after the trail has gone, so the destination label can be read.
+ * Without it the name flashes for a fifth of a second and means nothing.
+ */
+export const HOLD = 1;
+
 export interface ArcSystemOptions {
   readonly maxArcs?: number;
   /** Steps between spawn attempts. */
@@ -35,7 +42,20 @@ export interface ArcSystemOptions {
 
 export const arcHead = (arc: Arc): number => Math.min(1, arc.progress);
 export const arcTail = (arc: Arc): number => Math.max(0, arc.progress - TAIL);
-export const isFinished = (arc: Arc): boolean => arc.progress >= 1 + TAIL;
+export const isFinished = (arc: Arc): boolean => arc.progress >= 1 + TAIL + HOLD;
+
+/**
+ * Opacity of the destination label: it fades up as the head lands, holds, and
+ * fades out as the arc retires.
+ */
+export function labelOpacity(arc: Arc): number {
+  const t = (arc.progress - 1) / (TAIL + HOLD);
+  if (t <= 0 || t >= 1) return 0;
+
+  const rising = Math.min(1, t / 0.12);
+  const falling = t > 0.72 ? Math.max(0, 1 - (t - 0.72) / 0.28) : 1;
+  return rising * falling;
+}
 
 /** Departure ring size, 0 to 1, or null once it has finished expanding. */
 export function departureRing(arc: Arc): number | null {
@@ -50,7 +70,7 @@ export function arrivalRing(arc: Arc): number | null {
 }
 
 export class ArcSystem {
-  readonly #points: readonly Vec3[];
+  readonly #points: readonly Anchor[];
   readonly #random: Random;
   readonly #maxArcs: number;
   readonly #interval: number;
@@ -59,7 +79,7 @@ export class ArcSystem {
   #arcs: Arc[] = [];
   #sinceSpawn = 0;
 
-  constructor(points: readonly Vec3[], random: Random, options: ArcSystemOptions = {}) {
+  constructor(points: readonly Anchor[], random: Random, options: ArcSystemOptions = {}) {
     this.#points = points;
     this.#random = random;
     this.#maxArcs = options.maxArcs ?? 6;
@@ -94,7 +114,7 @@ export class ArcSystem {
       const to = this.#points[Math.floor(this.#random() * this.#points.length)];
       if (!from || !to || from === to) continue;
 
-      const span = angleBetween(from, to);
+      const span = angleBetween(from.vector, to.vector);
       if (span < this.#minSpan) continue;
 
       // Long journeys take longer, but not proportionally — a route across the

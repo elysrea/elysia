@@ -100,3 +100,33 @@ large decrements and recovers in small ones, so the field never visibly pulses.
 Turning the effect off entirely would leave the hero with a flat gradient and
 lose the composition. Instead the same simulation is run forward until arcs are
 in flight and then drawn once: the animation, paused.
+
+## The header is a capsule, not a bar
+
+A full-width bar draws a line across the top of the page and divides the hero
+in two. A floating capsule sits _over_ the page instead, which is what lets the
+globe run behind it. The trade is width: the capsule has to hold everything it
+carries on one line, so below 640px the mark is dropped and the call to action
+shortens to a single word rather than wrapping into a second row.
+
+`pointer-events: none` on the header with `auto` on the capsule keeps the rest
+of the hero clickable around it, which a full-width fixed bar would swallow.
+
+## Arcs end somewhere named
+
+An arc between two arbitrary points on a dot field looks like traffic and means
+nothing. Anchoring both ends to a table of cities and labelling the destination
+as the head lands turns the animation into a sentence: something arrived, and
+here is where.
+
+The label needs longer on screen than the arc does, so an arc holds after its
+trail has gone rather than retiring on arrival — which is why the lifecycle has
+a `HOLD` phase that draws nothing but the name.
+
+## The globe is opaque
+
+The first version drew the far-side dots faintly, which gave the sphere volume
+but read as a glass ball rather than a planet. It now paints a shaded, opaque
+body and culls the far hemisphere: the shading is a radial gradient centred on
+the light rather than on the disc, which is the difference between a flat circle
+and something round. Culling half the points pays for the extra fill.
