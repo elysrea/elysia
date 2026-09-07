@@ -14,14 +14,16 @@ const out = resolve(root, 'src/assets/fonts');
 
 const files = [
   [
-    '@fontsource-variable/archivo/files/archivo-latin-standard-normal.woff2',
-    'archivo-latin-variable.woff2',
+    '@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2',
+    'instrument-serif-latin-400.woff2',
   ],
+  ['@fontsource-variable/inter/files/inter-latin-wght-normal.woff2', 'inter-latin-variable.woff2'],
   [
     '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2',
     'ibm-plex-mono-latin-400.woff2',
   ],
-  ['@fontsource-variable/archivo/LICENSE', 'Archivo-OFL.txt'],
+  ['@fontsource/instrument-serif/LICENSE', 'InstrumentSerif-OFL.txt'],
+  ['@fontsource-variable/inter/LICENSE', 'Inter-OFL.txt'],
   ['@fontsource/ibm-plex-mono/LICENSE', 'IBMPlexMono-OFL.txt'],
 ];
 

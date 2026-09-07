@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { anchors } from '../src/features/globe/cities.ts';
 import { GlobeField, dotsFor, layoutFor } from '../src/features/globe/globe-field.ts';
 import { installCanvas, sizeElement, type RecordingContext } from './helpers/canvas.ts';
 import { installFrameClock, type FrameClock } from './helpers/frames.ts';
@@ -9,24 +10,23 @@ import {
 } from './helpers/intersection-observer.ts';
 
 describe('layoutFor', () => {
-  it('keeps the globe clear of the wordmark on a wide screen', () => {
+  it('crops the planet against the left edge on a wide screen', () => {
     const layout = layoutFor(1440, 900, 0.66);
 
-    expect(layout.cx).toBeLessThan(1440 * 0.4);
-    expect(layout.cx + layout.radius).toBeLessThan(1440 * 0.62);
+    // Bigger than the frame and anchored left: the viewer sees a curve, not a
+    // marble, and the right of the frame stays clear for the wordmark.
+    expect(layout.radius * 2).toBeGreaterThan(900);
+    expect(layout.cx).toBeLessThan(1440 * 0.2);
+    expect(layout.cx + layout.radius).toBeLessThan(1440 * 0.72);
   });
 
-  it('lifts the globe above the horizon, where the sky is dark enough to read', () => {
-    const layout = layoutFor(1280, 720, 0.66);
-
-    expect(layout.cy).toBeLessThan(720 * 0.66);
-  });
-
-  it('centres and shrinks on a phone', () => {
+  it('crops against the bottom on a phone, leaving the type on open sky', () => {
     const layout = layoutFor(375, 812, 0.6);
 
-    expect(layout.cx).toBe(375 / 2);
-    expect(layout.radius * 2).toBeLessThanOrEqual(375);
+    // Only a curve of the planet crosses the bottom of the frame: its top edge
+    // has to clear the wordmark and the line under it.
+    expect(layout.cy - layout.radius).toBeGreaterThan(812 * 0.68);
+    expect(layout.cy - layout.radius).toBeLessThan(812);
   });
 
   it('never collapses to nothing', () => {
@@ -35,10 +35,12 @@ describe('layoutFor', () => {
 });
 
 describe('dotsFor', () => {
-  it('scales with the viewport, within bounds', () => {
-    expect(dotsFor(375, 700)).toBeLessThan(dotsFor(2560, 1440));
-    expect(dotsFor(200, 200)).toBe(900);
-    expect(dotsFor(5000, 5000)).toBe(3000);
+  it('scales with the globe, not the viewport, within bounds', () => {
+    // A cropped, oversized planet shows more surface per pixel of frame, so
+    // the budget follows the sphere's own area.
+    expect(dotsFor(180)).toBeLessThan(dotsFor(420));
+    expect(dotsFor(40)).toBe(900);
+    expect(dotsFor(4000)).toBe(6000);
   });
 });
 
@@ -141,8 +143,9 @@ describe('GlobeField', () => {
     for (let i = 0; i < 400; i++) clock.tick();
 
     expect(context.texts.length).toBeGreaterThan(0);
-    // Labels are drawn upper-cased, from the city table.
-    expect(context.texts.every((text) => text === text.toUpperCase())).toBe(true);
+    // Names are drawn as they are written in the city table, not shouted.
+    expect(context.texts.every((text) => text !== text.toUpperCase())).toBe(true);
+    expect(context.texts.every((text) => anchors.some((a) => a.name === text))).toBe(true);
   });
 
   it('keeps labels inside the canvas on a narrow screen', () => {
@@ -152,8 +155,8 @@ describe('GlobeField', () => {
 
     for (let i = 0; i < 900; i++) clock.tick();
 
-    // Every label that was drawn has to fit; the renderer flips a label to the
-    // other side of its anchor rather than letting it run off the edge.
+    // Every label that was drawn has to fit. The renderer takes whichever side
+    // of its anchor has room, and nudges the label back in when neither does.
     expect(context.texts.length).toBeGreaterThan(0);
     for (const [text, x] of context.textPositions) {
       const width = text.length * 6;

@@ -1,19 +1,19 @@
 @layer tokens {
   :root {
     /* Palette: civil twilight, one hue held across values. */
-    --void: #0b0616;
-    --deep: #170b2c;
-    --iris: #40206f;
+    --void: #05030c;
+    --deep: #100823;
+    --iris: #3a1d68;
     --halo: #e9ddff;
     --halo-rgb: 233 221 255;
 
     /* Semantic ink. Everything is the halo at a different presence. */
     --text: rgb(var(--halo-rgb) / 0.76);
-    --text-dim: rgb(var(--halo-rgb) / 0.44);
-    --text-faint: rgb(var(--halo-rgb) / 0.26);
+    --text-dim: rgb(var(--halo-rgb) / 0.5);
+    --text-faint: rgb(var(--halo-rgb) / 0.32);
     --rule: rgb(var(--halo-rgb) / 0.13);
     --rule-lit: rgb(var(--halo-rgb) / 0.55);
-    --veil: rgb(11 6 22 / 0.72);
+    --veil: rgb(5 3 12 / 0.74);
 
     /* The horizon is a shared constant: the CSS gradient, the rule, and the
        canvas particle field all read this one value. */
@@ -24,15 +24,18 @@
     --section-gap: clamp(64px, 11vh, 148px);
     --wrap: 1240px;
 
-    /* Type */
-    --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+    /* Type. A display serif carries the voice, a grotesk carries the reading,
+       a mono carries the small technical labels. Nothing is set in capitals:
+       the type has enough character without shouting. */
+    --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+    --font-sans: 'Inter Variable', 'Helvetica Neue', Arial, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-    --size-wordmark: clamp(2.6rem, 12.4vw, 10.5rem);
-    --size-lede: clamp(1.4rem, 2.9vw, 2.35rem);
-    --size-work: clamp(1.15rem, 2.1vw, 1.6rem);
-    --size-contact: clamp(1.6rem, 5.4vw, 4rem);
-    --size-mono: 10.5px;
-    --track-mono: 0.18em;
+    --size-wordmark: clamp(3.4rem, 15vw, 12rem);
+    --size-lede: clamp(1.6rem, 3.4vw, 2.9rem);
+    --size-work: clamp(1.25rem, 2.3vw, 1.85rem);
+    --size-contact: clamp(1.9rem, 6vw, 4.6rem);
+    --size-mono: 11.5px;
+    --track-mono: 0.04em;
 
     /* Motion */
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -45,14 +48,14 @@
   @media (max-width: 720px) {
     :root {
       --horizon: 60%;
-      --size-wordmark: clamp(2.4rem, 17vw, 5rem);
+      --size-wordmark: clamp(3rem, 19vw, 6rem);
     }
   }
 
   @media (max-height: 520px) {
     :root {
       --horizon: 58%;
-      --size-wordmark: clamp(2rem, 8vh, 4rem);
+      --size-wordmark: clamp(2.4rem, 10vh, 4.6rem);
     }
   }
 

@@ -1,5 +1,5 @@
 import { readRatioToken } from '../../lib/dom.ts';
-import { RenderLoop } from '../../lib/loop.ts';
+import { FIXED_STEP_MS, RenderLoop } from '../../lib/loop.ts';
 import { onReducedMotionChange, prefersReducedMotion } from '../../lib/motion.ts';
 import { QualityGovernor } from '../../lib/quality.ts';
 import { mulberry32 } from '../../lib/random.ts';
@@ -17,6 +17,7 @@ import { anchors } from './cities.ts';
 import {
   arcPoint,
   dot,
+  toVector,
   isOccluded,
   normalize,
   orient,
@@ -25,6 +26,7 @@ import {
   type Viewport,
 } from './geo.ts';
 import { landPoints } from './land.ts';
+import { createStars, twinkle, type Star } from './stars.ts';
 
 export interface GlobeFieldOptions {
   readonly seed?: number;
@@ -52,35 +54,41 @@ export interface GlobeLayout extends Viewport {
 }
 
 /**
- * Places the globe rising over the horizon on the left, leaving the right of
- * the frame to the wordmark.
+ * Places the planet.
  *
- * It sits above the horizon rather than centred on it: below that line the sky
- * is at its brightest, and low-opacity dots drawn there simply disappear. A
- * narrow screen has no room for the conversation, so the globe centres and
- * shrinks instead.
+ * It is deliberately larger than the frame and anchored off the left edge, so
+ * the viewer sees a curve rather than a ball: a body you are near, not a
+ * marble you are holding. The right of the frame stays clear for the wordmark.
+ *
+ * On a narrow screen the same idea is rotated — the planet is cropped by the
+ * bottom instead, and the wordmark sits over open sky above it.
  */
 export function layoutFor(width: number, height: number, horizon: number): GlobeLayout {
   const narrow = width < 720;
+
   const radius = Math.max(
-    60,
-    narrow ? Math.min(width * 0.4, height * 0.26) : Math.min(width * 0.25, height * 0.4),
+    80,
+    narrow ? Math.min(width * 1.15, height * 0.55) : Math.min(width * 0.52, height * 0.95),
   );
 
-  return {
-    width,
-    height,
-    cx: width * (narrow ? 0.5 : 0.29),
-    // Side by side on a wide screen; stacked above the wordmark on a narrow
-    // one, where there is no room to sit beside anything.
-    cy: height * horizon - radius * (narrow ? 1.45 : 0.45),
-    radius,
-  };
+  // Narrow: the planet is pushed down until only a curve of it crosses the
+  // bottom of the frame, which keeps the type off the continents. The top edge
+  // is placed directly rather than derived from the horizon, because it is the
+  // edge — not the centre — that has to clear the hero text.
+  const cy = narrow ? height * 0.72 + radius : height * horizon - radius * 0.1;
+
+  return { width, height, cx: width * (narrow ? 0.42 : 0.08), cy, radius };
 }
 
-/** Dot budget for a viewport, before quality scaling. */
-export function dotsFor(width: number, height: number): number {
-  return Math.round(Math.min(3000, Math.max(900, (width * height) / 420)));
+/**
+ * Dot budget for a globe of this radius, before quality scaling.
+ *
+ * It scales with the sphere's own area rather than the viewport's: an oversized
+ * planet cropped by the frame needs far more points to keep its coastlines
+ * legible, and a small one would waste them.
+ */
+export function dotsFor(radius: number): number {
+  return Math.round(Math.min(6000, Math.max(900, (radius * radius) / 45)));
 }
 
 /**
@@ -100,8 +108,10 @@ export class GlobeField {
 
   #layout: GlobeLayout = { width: 0, height: 0, cx: 0, cy: 0, radius: 0 };
   #points: Vec3[] = [];
+  #stars: Star[] = [];
   #arcs: ArcSystem;
   #spin = 0;
+  #seconds = 0;
   #rise = 0;
   #quality = 1;
   #onScreen = true;
@@ -190,6 +200,7 @@ export class GlobeField {
   }
 
   #advance(scale: number): void {
+    this.#seconds += (scale * FIXED_STEP_MS) / 1000;
     this.#spin += SPIN_RATE * scale;
     this.#rise = Math.min(1, this.#rise + RISE_RATE * scale);
     this.#arcs.step(scale);
@@ -213,10 +224,15 @@ export class GlobeField {
     this.#context.clearRect(0, 0, width, height);
   }
 
-  /** Rebuilds the dot field. Arc endpoints are cities and never change. */
+  /** Rebuilds the dot field and the sky. Arc endpoints are cities and fixed. */
   #rebuild(): void {
-    const target = Math.round(dotsFor(this.#layout.width, this.#layout.height) * this.#quality);
+    const target = Math.round(dotsFor(this.#layout.radius) * this.#quality);
     this.#points = landPoints(target);
+    this.#stars = createStars(
+      this.#layout.width,
+      this.#layout.height,
+      mulberry32((this.#options.seed ?? 0x1d0e) ^ 0x51a3),
+    );
   }
 
   #applyQuality(scale: number): void {
@@ -236,12 +252,14 @@ export class GlobeField {
     // The halo adds light to the sky; the body has to cover it, so the two
     // cannot share a composite mode.
     context.globalCompositeOperation = 'lighter';
+    this.#drawStars();
     this.#drawHalo(cx, cy, radius);
 
     context.globalCompositeOperation = 'source-over';
     this.#drawBody(cx, cy, radius);
 
     context.globalCompositeOperation = 'lighter';
+    this.#drawGraticule();
     this.#drawRim(cx, cy, radius);
     this.#drawSurface();
     this.#drawArcs();
@@ -251,17 +269,82 @@ export class GlobeField {
     this.#drawLabels();
   }
 
+  /** The sky behind everything. Drawn first; the opaque planet covers it. */
+  #drawStars(): void {
+    const context = this.#context;
+
+    for (const star of this.#stars) {
+      const alpha = twinkle(star, this.#seconds) * this.#rise;
+      if (alpha <= 0.01) continue;
+
+      context.fillStyle = `rgba(226,220,255,${alpha.toFixed(3)})`;
+      context.fillRect(star.x - star.size / 2, star.y - star.size / 2, star.size, star.size);
+    }
+  }
+
+  /**
+   * Meridians and parallels, very faint.
+   *
+   * The dots say where the land is; the graticule says the thing is a sphere
+   * being turned. Without it the surface reads as a pattern printed on a disc.
+   */
+  #drawGraticule(): void {
+    const context = this.#context;
+    const alpha = 0.05 * this.#rise;
+    if (alpha <= 0.004) return;
+
+    context.strokeStyle = `rgba(190,170,240,${alpha.toFixed(3)})`;
+    context.lineWidth = Math.max(0.5, this.#layout.radius * 0.0016);
+
+    for (let meridian = 0; meridian < 12; meridian++) {
+      this.#strokeCircle((t) => {
+        const lon = (meridian / 12) * 360 - 180;
+        return toVector({ lat: t * 180 - 90, lon });
+      });
+    }
+
+    // Parallels stop short of the poles, where they collapse to a point.
+    for (let parallel = 1; parallel < 6; parallel++) {
+      this.#strokeCircle((t) => {
+        const lat = (parallel / 6) * 180 - 90;
+        return toVector({ lat, lon: t * 360 - 180 });
+      });
+    }
+  }
+
+  /** Strokes a curve on the sphere, skipping the parts behind it. */
+  #strokeCircle(pointAt: (t: number) => Vec3, segments = 72): void {
+    const context = this.#context;
+    let drawing = false;
+
+    context.beginPath();
+    for (let i = 0; i <= segments; i++) {
+      const v = orient(pointAt(i / segments), this.#spin, TILT);
+
+      if (v.z <= 0) {
+        drawing = false;
+        continue;
+      }
+
+      const { x, y } = project(v, this.#layout);
+      if (drawing) context.lineTo(x, y);
+      else context.moveTo(x, y);
+      drawing = true;
+    }
+    context.stroke();
+  }
+
   /** A soft glow around the limb, so the globe sits in the sky, not on it. */
   #drawHalo(cx: number, cy: number, radius: number): void {
     const context = this.#context;
-    const halo = context.createRadialGradient(cx, cy, radius * 0.92, cx, cy, radius * 1.34);
-    halo.addColorStop(0, `rgba(150,120,210,${(0.13 * this.#rise).toFixed(3)})`);
-    halo.addColorStop(0.5, `rgba(120,96,185,${(0.05 * this.#rise).toFixed(3)})`);
-    halo.addColorStop(1, 'rgba(120,96,185,0)');
+    const halo = context.createRadialGradient(cx, cy, radius * 0.97, cx, cy, radius * 1.13);
+    halo.addColorStop(0, `rgba(158,126,224,${(0.16 * this.#rise).toFixed(3)})`);
+    halo.addColorStop(0.45, `rgba(120,96,195,${(0.06 * this.#rise).toFixed(3)})`);
+    halo.addColorStop(1, 'rgba(120,96,195,0)');
 
     context.fillStyle = halo;
     context.beginPath();
-    context.arc(cx, cy, radius * 1.34, 0, Math.PI * 2);
+    context.arc(cx, cy, radius * 1.13, 0, Math.PI * 2);
     context.fill();
   }
 
@@ -275,17 +358,17 @@ export class GlobeField {
   #drawBody(cx: number, cy: number, radius: number): void {
     const context = this.#context;
     const lit = context.createRadialGradient(
-      cx + LIGHT.x * radius * 0.52,
-      cy - LIGHT.y * radius * 0.52,
+      cx + LIGHT.x * radius * 0.68,
+      cy - LIGHT.y * radius * 0.68,
       radius * 0.04,
       cx,
       cy,
       radius * 1.04,
     );
-    lit.addColorStop(0, `rgba(96,60,156,${(0.86 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(0.34, `rgba(48,26,88,${(0.9 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(0.72, `rgba(20,10,40,${(0.93 * this.#rise).toFixed(3)})`);
-    lit.addColorStop(1, `rgba(7,3,15,${(0.95 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(0, `rgba(52,30,92,${(0.92 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(0.22, `rgba(28,15,56,${(0.95 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(0.55, `rgba(12,6,27,${(0.97 * this.#rise).toFixed(3)})`);
+    lit.addColorStop(1, `rgba(3,2,8,${(0.99 * this.#rise).toFixed(3)})`);
 
     context.fillStyle = lit;
     context.beginPath();
@@ -449,21 +532,50 @@ export class GlobeField {
       if (v.z <= 0.12) continue;
 
       const { x, y } = project(v, this.#layout);
+      const margin = 12;
+
+      // The planet is larger than the frame, so a point can face the viewer and
+      // still be off the edge of it. A label pointing outside the canvas has
+      // nothing to point at.
+      if (
+        x < margin ||
+        x > this.#layout.width - margin ||
+        y < margin ||
+        y > this.#layout.height - margin
+      ) {
+        continue;
+      }
+
       const offset = Math.max(9, radius * 0.045);
-      const label = arc.to.name.toUpperCase();
+      const label = arc.to.name;
 
       context.font = `${size.toFixed(1)}px "IBM Plex Mono", ui-monospace, monospace`;
       context.textBaseline = 'middle';
       // Not supported everywhere; where it is, it matches the mono type
       // elsewhere on the page.
-      context.letterSpacing = '0.14em';
+      context.letterSpacing = '0.04em';
 
-      // A label on the right of the globe would run off a narrow screen, so it
-      // flips to the other side of its anchor rather than being clipped.
+      // A label near either edge would be clipped, so it takes whichever side
+      // of its anchor it fits on. On a narrow screen with a large planet
+      // neither side may fit, and then it is nudged back into the frame.
       const textWidth = context.measureText(label).width;
-      const margin = 12;
-      const flip = x + offset + textWidth > this.#layout.width - margin;
-      const textX = flip ? x - offset - textWidth : x + offset;
+      const width = this.#layout.width;
+      const rightX = x + offset;
+      const leftX = x - offset - textWidth;
+
+      let flip: boolean;
+      let textX: number;
+
+      if (rightX + textWidth <= width - margin) {
+        flip = false;
+        textX = rightX;
+      } else if (leftX >= margin) {
+        flip = true;
+        textX = leftX;
+      } else {
+        flip = x > width / 2;
+        textX = Math.max(margin, Math.min(flip ? leftX : rightX, width - margin - textWidth));
+      }
 
       context.fillStyle = `rgba(233,221,255,${(alpha * 0.95).toFixed(3)})`;
       context.fillText(label, textX, y);

@@ -2,11 +2,11 @@
   .contact-link {
     display: inline-block;
     margin-top: clamp(24px, 4vh, 44px);
+    font-family: var(--font-display);
     font-size: var(--size-contact);
-    font-weight: 700;
-    font-stretch: 108%;
+    font-weight: 400;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
     color: var(--halo);
     text-decoration: none;
     background-image: linear-gradient(

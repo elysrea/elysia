@@ -1,9 +1,10 @@
 # Elysia
 
 A studio site built as a front-end engineering exercise: no framework, typed
-content rendered to static HTML at build time, and a dot globe over the hero —
-real continents, traffic arcing between them — that is deterministic,
-frame-rate independent, and turns itself off when nobody is looking.
+content rendered to static HTML at build time, and a planet over the hero —
+real continents in dots, a starfield, traffic arcing between named cities —
+that is deterministic, frame-rate independent, and turns itself off when nobody
+is looking.
 
 **Elysia is not a real studio.** The copy and the case studies are invented so
 that a realistic content model had something to model. The engineering is the
@@ -45,6 +46,7 @@ src/
       land.ts           Pure: bitmask lookup -> the points that are on land
       land-mask.ts      Generated: Natural Earth land as one bit per cell
       cities.ts         The named places arcs travel between
+      stars.ts          Pure: the starfield and its twinkle
       arcs.ts           The travelling connections and their lifecycle
       globe-field.ts    Canvas, browser events, and when not to run
   lib/
@@ -91,7 +93,11 @@ Measured from `npm run build` (gzipped where it matters):
 
 Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
 request on first paint, no layout shift from a late stylesheet. Everything else
-the page needs is under 14 kB on the wire.
+the page needs is under 15 kB on the wire.
+
+Stars are generated once per resize and then only read — a frame costs one
+`fillRect` and one sine each — and the far hemisphere of the planet is culled
+entirely, since an opaque body is in front of it.
 
 The canvas pauses when the hero scrolls away, when the tab is hidden, and when
 motion is reduced. Resizes are coalesced, and the device pixel ratio is capped
@@ -101,7 +107,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 143 tests, no browser required.
+`npm test` — 149 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
@@ -149,6 +155,14 @@ npm run land:sync    # regenerate the land mask from Natural Earth
 to `main`. A project page is served from a subpath, so the workflow passes
 `BASE_PATH=/<repo>/`; the same source builds for a domain root with no change.
 
+## Type
+
+Three faces, each with a job: **Instrument Serif** for the things that carry the
+voice, **Inter** for everything you read, **IBM Plex Mono** for small technical
+labels. Nothing is set in capitals — including the city names drawn on the
+canvas. The type has enough character without shouting, and lower case is easier
+to read at the sizes the labels actually use.
+
 ## Things deliberately not done
 
 - **No framework.** Nothing on this page has state worth a runtime. A framework
@@ -159,8 +173,9 @@ to `main`. A project page is served from a subpath, so the workflow passes
 
 ## Credits
 
-Typeset in [Archivo](https://fonts.google.com/specimen/Archivo) and
-[IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), both under the
+Typeset in [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif),
+[Inter](https://fonts.google.com/specimen/Inter) and
+[IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), all under the
 SIL Open Font License. Coastlines from
 [Natural Earth](https://www.naturalearthdata.com/) 110m physical land, public
 domain. Code is MIT — see [LICENSE](LICENSE).

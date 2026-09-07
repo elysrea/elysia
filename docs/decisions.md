@@ -130,3 +130,43 @@ but read as a glass ball rather than a planet. It now paints a shaded, opaque
 body and culls the far hemisphere: the shading is a radial gradient centred on
 the light rather than on the disc, which is the difference between a flat circle
 and something round. Culling half the points pays for the extra fill.
+
+## The planet is bigger than the frame
+
+A globe that fits inside the viewport is an object on a shelf: you see all of
+it, and it reads as an illustration. Drawing it at roughly twice the height of
+the frame and anchoring it off the left edge means the viewer only ever sees a
+curve, which is what makes it read as a body you are near.
+
+Two things had to follow. Dot density now scales with the sphere's radius rather
+than the viewport, because a cropped planet shows far more surface per pixel of
+frame. And a city can now face the viewer while sitting outside the canvas
+entirely, so labels for off-frame anchors are skipped — a label has to have
+something on screen to point at.
+
+## Space, in two layers
+
+The sky is CSS: a near-black ground with nebula blooms placed where the light
+is, which costs nothing per frame and scales with the viewport for free. The
+stars are canvas, because they twinkle and because they have to be painted
+_under_ the planet, which is opaque. Each star is generated once per resize and
+then only read, so a frame is one `fillRect` and one sine per star.
+
+Brightness is the cube of a uniform roll. A linear distribution gives an evenly
+scattered field that reads as dust; cubing it makes most stars faint and a few
+genuinely bright, which is what a sky looks like.
+
+## A graticule, faintly
+
+The dots say where the land is. They do not say that the thing is a sphere being
+turned — at a glance they could be a pattern printed on a disc. Twelve meridians
+and five parallels at 5% opacity settle it, and cost about a thousand projected
+points a frame.
+
+## Nothing is set in capitals
+
+The first version leaned on uppercase with wide tracking for every label, which
+is a way of making plain type look designed. Replacing it with a display serif
+that has actual character meant the capitals were doing nothing but shouting —
+so the tracking dropped from 0.18em to 0.04em and the transforms came out,
+including on the city names drawn into the canvas.
