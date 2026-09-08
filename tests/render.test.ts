@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   escapeHtml,
   renderBench,
+  renderCapabilities,
   renderBenchTabs,
   renderStructuredData,
   renderTypeNames,
@@ -148,5 +149,52 @@ describe('type sets', () => {
       if (name === DEFAULT_TYPE) continue;
       expect(tokens).toContain(`[data-type='${name}']`);
     }
+  });
+});
+
+describe('small type', () => {
+  it('sets labels in the reading face, not a monospace', () => {
+    // The label style stopped being monospace, so the class stopped saying it.
+    const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+
+    expect(html).toContain('class="nav-links label"');
+    expect(html).not.toContain('class="nav-links mono"');
+  });
+
+  it('keeps the monospace for things that are values', () => {
+    expect(renderWork()).toContain('class="work-year code"');
+    expect(renderBench()).toContain('class="code"');
+  });
+
+  it('tracks nothing', () => {
+    // Letter-spacing on small type is a way of making plain type look
+    // considered. The faces here have their own character.
+    const css = ['layout.css', 'hero.css', 'nav.css', 'tokens.css']
+      .map((file) => readFileSync(resolve(process.cwd(), 'src/styles', file), 'utf8'))
+      .join('\n');
+
+    const spacing = [...css.matchAll(/letter-spacing:\s*([^;]+);/g)].map((match) =>
+      (match[1] ?? '').trim(),
+    );
+
+    for (const value of spacing) {
+      expect(value === '0' || value.includes('--display-tracking'), value).toBe(true);
+    }
+  });
+});
+
+describe('capabilities', () => {
+  it('numbers each one', () => {
+    const html = renderCapabilities();
+
+    expect(html).toContain('>01<');
+    expect(html).toContain('>06<');
+  });
+
+  it('leads with the name rather than a label', () => {
+    const html = renderCapabilities();
+
+    // The old shape put a faint label above and the gloss in the bright role.
+    expect(html.indexOf('<b>')).toBeLessThan(html.indexOf('capability-note'));
   });
 });

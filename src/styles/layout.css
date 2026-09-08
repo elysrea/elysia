@@ -73,10 +73,9 @@
 
   .index-list b {
     display: block;
-    font-family: var(--font-mono);
-    font-size: var(--size-mono);
-    font-weight: 400;
-    letter-spacing: var(--track-mono);
+    font-family: var(--font-sans);
+    font-size: var(--size-label);
+    font-weight: 500;
     color: var(--text-faint);
   }
 
@@ -90,29 +89,93 @@
   .index-list--facts {
     --index-min: 160px;
   }
+}
 
-  /* Facts are label-then-value, so the label is the quiet half. A capability
-     is the opposite: the name is the point and the gloss supports it. */
-  .index-list--caps b {
-    font-family: var(--font-sans);
-    font-size: 15.5px;
-    font-weight: 500;
-    letter-spacing: -0.005em;
+@layer components {
+  /*
+   * The capabilities read as an index rather than as a row of boxes: a numeral,
+   * a name set in the display face, and a line of gloss. The surface is a
+   * gradient that lifts toward the top left, which is where the numeral is, so
+   * the card has a direction instead of being a flat rectangle.
+   */
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 8px;
+    margin-top: clamp(32px, 5vh, 56px);
+    counter-reset: capability;
+  }
+
+  .capabilities li {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding: 22px 20px 24px;
+    border-radius: 18px;
+    background:
+      radial-gradient(120% 100% at 0% 0%, rgb(var(--halo-rgb) / 0.07), transparent 62%),
+      var(--surface-raised);
+    transition:
+      background var(--dur-fast) ease,
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .capabilities li:hover {
+    transform: translateY(-2px);
+    background:
+      radial-gradient(120% 100% at 0% 0%, rgb(var(--halo-rgb) / 0.12), transparent 62%),
+      var(--surface-hover);
+  }
+
+  .capability-index {
+    color: var(--accent);
+  }
+
+  .capabilities b {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+    font-weight: var(--display-weight-text);
+    line-height: 1.12;
+    letter-spacing: var(--display-tracking);
     color: var(--halo);
   }
 
-  .index-list--caps span {
-    margin-top: 5px;
+  .capability-note {
+    max-width: 30ch;
     font-size: 14.5px;
+    line-height: 1.45;
     color: var(--text-dim);
+  }
+
+  @media (max-width: 560px) {
+    .capabilities {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .capabilities li {
+      padding: 18px 16px 20px;
+    }
   }
 }
 
 @layer utilities {
-  .mono {
+  /* Small text, set the way a magazine sets a standfirst: the reading face,
+     a little heavier than the body, and no tracking. Letter-spacing on small
+     type is a way of making plain type look considered; type with its own
+     character does not need it. */
+  .label {
+    font-family: var(--font-sans);
+    font-size: var(--size-label);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  /* Kept for the things that genuinely are values: token names, a year. */
+  .code {
     font-family: var(--font-mono);
-    font-size: var(--size-mono);
-    letter-spacing: var(--track-mono);
+    font-size: var(--size-code);
+    letter-spacing: 0;
   }
 
   /* A mark, not a rule: the label is announced by a dot rather than by a line

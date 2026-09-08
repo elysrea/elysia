@@ -10,7 +10,6 @@
 import { typeNames } from '../features/type/sets.ts';
 import { benchPanels, durations, easings, specimens, swatches } from './bench.ts';
 import {
-  announcement,
   capabilities,
   contact,
   facts,
@@ -47,24 +46,10 @@ export function renderNavLinks(): string {
 }
 
 export function renderNavCta(): string {
-  return `<a class="nav-cta mono" href="${escapeHtml(navCta.href)}">
+  return `<a class="nav-cta label" href="${escapeHtml(navCta.href)}">
         <span class="nav-cta-long">${escapeHtml(navCta.label)}</span>
         <span class="nav-cta-short" aria-hidden="true">${escapeHtml(navCta.short)}</span>
       </a>`;
-}
-
-/**
- * The standing note above the wordmark. It is a link, not a banner: it says
- * one true thing about availability and goes where that leads.
- */
-export function renderAnnouncement(): string {
-  if (!announcement) return '';
-
-  return `<a class="announce mono" href="${escapeHtml(announcement.href)}">
-          <span class="announce-tag">${escapeHtml(announcement.tag)}</span>
-          <span class="announce-text">${escapeHtml(announcement.text)}</span>
-          <span class="announce-arrow" aria-hidden="true">&rarr;</span>
-        </a>`;
 }
 
 /**
@@ -89,7 +74,7 @@ function renderPalette(): string {
               ${swatches
                 .map(
                   (swatch) =>
-                    `<li><span class="bench-chip" style="background: var(${escapeHtml(swatch.token)})"></span><b>${escapeHtml(swatch.label)}</b><span class="mono">${escapeHtml(swatch.token)}</span><span class="mono bench-value" data-token="${escapeHtml(swatch.token)}"></span></li>`,
+                    `<li><span class="bench-chip" style="background: var(${escapeHtml(swatch.token)})"></span><b>${escapeHtml(swatch.label)}</b><span class="code">${escapeHtml(swatch.token)}</span><span class="code bench-value" data-token="${escapeHtml(swatch.token)}"></span></li>`,
                 )
                 .join('\n              ')}
             </ul>`;
@@ -100,7 +85,7 @@ function renderSpecimens(): string {
               ${specimens
                 .map(
                   (specimen) =>
-                    `<li><span class="mono bench-role">${escapeHtml(specimen.role)}<span class="bench-value" data-token="${escapeHtml(specimen.token)}"></span></span><p class="${escapeHtml(specimen.className)}">${escapeHtml(specimen.sample)}</p></li>`,
+                    `<li><span class="label bench-role">${escapeHtml(specimen.role)}<span class="code bench-value" data-token="${escapeHtml(specimen.token)}"></span></span><p class="${escapeHtml(specimen.className)}">${escapeHtml(specimen.sample)}</p></li>`,
                 )
                 .join('\n              ')}
             </ul>`;
@@ -123,7 +108,7 @@ function renderMotion(): string {
                 </svg>
                 <div>
                   <b>${escapeHtml(easing.label)}</b>
-                  <span class="mono">${escapeHtml(easing.token)}</span>
+                  <span class="code">${escapeHtml(easing.token)}</span>
                   <p>${escapeHtml(easing.note)}</p>
                   <span class="bench-runner" style="animation-timing-function: var(${escapeHtml(easing.token)})"></span>
                 </div>
@@ -134,7 +119,7 @@ function renderMotion(): string {
   const scale = durations
     .map(
       (duration) =>
-        `<li><b class="mono bench-value" data-token="${escapeHtml(duration.token)}"></b><span>${escapeHtml(duration.use)}</span><span class="mono">${escapeHtml(duration.token)}</span></li>`,
+        `<li><b class="code bench-value" data-token="${escapeHtml(duration.token)}"></b><span>${escapeHtml(duration.use)}</span><span class="code">${escapeHtml(duration.token)}</span></li>`,
     )
     .join('\n              ');
 
@@ -149,11 +134,10 @@ function renderMotion(): string {
 /** The real components, rendered rather than pictured. */
 function renderParts(): string {
   return `<div class="bench-parts">
-              <a class="nav-cta mono" href="#contact"><span class="nav-cta-long">Start a project</span></a>
-              <span class="announce mono bench-static"><span class="announce-tag">Now</span><span class="announce-text">Booking projects for Q3</span><span class="announce-arrow" aria-hidden="true">&rarr;</span></span>
-              <span class="eyebrow mono">Section label</span>
-              <ul class="work-stack mono"><li>TypeScript</li><li>Design tokens</li><li>WCAG 2.2 AA</li></ul>
-              <ul class="case-metrics"><li><b>63 → 9</b><span class="mono">Button variants</span></li></ul>
+              <a class="nav-cta label" href="#contact"><span class="nav-cta-long">Start a project</span></a>
+              <span class="eyebrow label">Section label</span>
+              <ul class="work-stack label"><li>TypeScript</li><li>Design tokens</li><li>WCAG 2.2 AA</li></ul>
+              <ul class="case-metrics"><li><b>63 → 9</b><span class="label">Button variants</span></li></ul>
               <ul class="index-list index-list--caps"><li><b>Product design</b><span>Flows, states and the edges nobody specs</span></li></ul>
             </div>`;
 }
@@ -198,8 +182,12 @@ export function renderPractice(): string {
 export function renderCapabilities(): string {
   return capabilities
     .map(
-      ({ title, detail }) =>
-        `<li><b>${escapeHtml(title)}</b><span>${escapeHtml(detail)}</span></li>`,
+      (capability, index) =>
+        `<li>
+            <span class="capability-index code">${String(index + 1).padStart(2, '0')}</span>
+            <b>${escapeHtml(capability.title)}</b>
+            <span class="capability-note">${escapeHtml(capability.detail)}</span>
+          </li>`,
     )
     .join('\n        ');
 }
@@ -221,15 +209,15 @@ function renderProject(project: Project): string {
           <summary class="work-row">
             <span class="work-name">${escapeHtml(name)}</span>
             <span class="work-scope">${escapeHtml(scope)}</span>
-            <span class="work-year mono">${year}</span>
-            <span class="work-cue mono" aria-hidden="true">Detail</span>
+            <span class="work-year code">${year}</span>
+            <span class="work-cue label" aria-hidden="true">Detail</span>
           </summary>
           <div class="work-panel">
             <ul class="case-metrics" aria-label="Results">
               ${metrics
                 .map(
                   (metric) =>
-                    `<li><b>${escapeHtml(metric.value)}</b><span class="mono">${escapeHtml(metric.label)}</span></li>`,
+                    `<li><b>${escapeHtml(metric.value)}</b><span class="label">${escapeHtml(metric.label)}</span></li>`,
                 )
                 .join('\n              ')}
             </ul>
@@ -238,16 +226,16 @@ function renderProject(project: Project): string {
               <div class="case-approach">
                 ${paragraphs}
               </div>
-              <p class="case-outcome"><b class="mono">Outcome</b> ${escapeHtml(outcome)}</p>
+              <p class="case-outcome"><b class="label">Outcome</b> ${escapeHtml(outcome)}</p>
             </div>
             <aside class="case-meta">
               <dl class="case-facts">
-                <dt class="mono">Role</dt>
+                <dt class="label">Role</dt>
                 <dd>${escapeHtml(role)}</dd>
-                <dt class="mono">Duration</dt>
+                <dt class="label">Duration</dt>
                 <dd>${escapeHtml(duration)}</dd>
               </dl>
-              <ul class="work-stack mono" aria-label="Stack">
+              <ul class="work-stack label" aria-label="Stack">
                 ${stack.map((item) => `<li>${escapeHtml(item)}</li>`).join('\n                ')}
               </ul>
             </aside>
@@ -309,7 +297,6 @@ export const slots: Readonly<Record<string, () => string>> = {
   'bench-tabs': renderBenchTabs,
   bench: renderBench,
   'type-names': renderTypeNames,
-  announcement: renderAnnouncement,
   practice: renderPractice,
   capabilities: renderCapabilities,
   work: renderWork,

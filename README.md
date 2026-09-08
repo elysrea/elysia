@@ -149,7 +149,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 211 tests, no browser required.
+`npm test` — 216 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
@@ -208,9 +208,12 @@ the availability badge.
 
 ## Type
 
-Nothing is set in capitals — including the city names drawn on the canvas. The
-type has enough character without shouting, and lower case is easier to read at
-the sizes the labels actually use.
+Nothing is set in capitals, and nothing is tracked. Uppercase with wide
+letter-spacing is how plain type is made to look considered; these faces have
+their own character and do not need either. Small text is set in the reading
+face at a slightly heavier weight — the way a magazine sets a caption — and the
+monospace is kept for the things that genuinely are values: a year, a token
+name, a duration.
 
 The display face is a system rather than a family, because swapping one for
 another and leaving the weight, tracking and leading alone gets you a worse

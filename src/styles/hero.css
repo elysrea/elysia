@@ -65,62 +65,8 @@
     height: var(--horizon);
     display: grid;
     align-content: end;
-    justify-items: end;
+    justify-items: center;
     pointer-events: none;
-  }
-
-  @media (max-width: 480px) {
-    .announce {
-      font-size: 9.5px;
-      letter-spacing: 0.12em;
-    }
-  }
-
-  .announce {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: clamp(14px, 2.2vh, 26px);
-    padding: 7px 14px 7px 8px;
-    border: 1px solid rgb(var(--halo-rgb) / 0.12);
-    border-radius: 999px;
-    background: rgb(17 9 34 / 0.4);
-    backdrop-filter: blur(10px);
-    color: var(--text-dim);
-    text-decoration: none;
-    pointer-events: auto;
-    opacity: 0;
-    animation: surface 1200ms ease-out 1500ms forwards;
-    transition:
-      color var(--dur-fast) ease,
-      border-color var(--dur-fast) ease;
-  }
-
-  .announce:hover {
-    color: var(--halo);
-    border-color: rgb(var(--halo-rgb) / 0.3);
-  }
-
-  @media (prefers-reduced-transparency: reduce) {
-    .announce {
-      background: #140a26;
-      backdrop-filter: none;
-    }
-  }
-
-  .announce-tag {
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: rgb(var(--halo-rgb) / 0.14);
-    color: var(--halo);
-  }
-
-  .announce-arrow {
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-
-  .announce:hover .announce-arrow {
-    transform: translateX(3px);
   }
 
   .wordmark {
@@ -130,7 +76,7 @@
     font-weight: var(--display-weight);
     line-height: var(--display-leading);
     letter-spacing: var(--display-tracking);
-    text-align: right;
+    text-align: center;
     color: var(--halo);
     opacity: 0;
     filter: blur(14px);
@@ -147,10 +93,11 @@
   .hero-sub {
     position: absolute;
     top: calc(var(--horizon) + clamp(20px, 3.2vh, 38px));
+    left: var(--edge);
     right: var(--edge);
-    max-width: 34ch;
-    text-align: right;
-    letter-spacing: 0.08em;
+    max-width: none;
+    text-align: center;
+
     color: rgb(var(--halo-rgb) / 0.62);
     opacity: 0;
     animation: surface 1500ms ease-out 1900ms forwards;
@@ -162,18 +109,10 @@
     }
   }
 
-  @media (max-width: 720px) {
-    .hero-sub {
-      max-width: 24ch;
-      letter-spacing: 0.06em;
-    }
-  }
-
   /* Nothing animates in; everything is simply present. */
   @media (prefers-reduced-motion: reduce) {
     .wordmark,
-    .hero-sub,
-    .announce {
+    .hero-sub {
       opacity: 1;
       transform: none;
       filter: none;

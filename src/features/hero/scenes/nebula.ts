@@ -86,10 +86,20 @@ export class NebulaScene implements Scene {
     }
 
     // The field drifts, so sooner or later a bright filament passes under the
-    // wordmark. A scrim on the side the type sits on makes that a non-event.
-    const scrim = context.createLinearGradient(this.#width * 0.42, 0, this.#width, 0);
-    scrim.addColorStop(0, 'rgba(5,3,12,0)');
-    scrim.addColorStop(1, `rgba(5,3,12,${(0.72 * rise).toFixed(3)})`);
+    // wordmark. The type sits in the middle, so the scrim is a soft well in the
+    // middle rather than a wash down one side — it has to darken where the
+    // words are without flattening the corners the nebula is doing its work in.
+    const scrim = context.createRadialGradient(
+      this.#width * 0.5,
+      this.#height * 0.46,
+      0,
+      this.#width * 0.5,
+      this.#height * 0.46,
+      Math.max(this.#width, this.#height) * 0.62,
+    );
+    scrim.addColorStop(0, `rgba(5,3,12,${(0.74 * rise).toFixed(3)})`);
+    scrim.addColorStop(0.45, `rgba(5,3,12,${(0.44 * rise).toFixed(3)})`);
+    scrim.addColorStop(1, 'rgba(5,3,12,0)');
     context.fillStyle = scrim;
     context.fillRect(0, 0, this.#width, this.#height);
 

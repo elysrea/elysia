@@ -377,3 +377,37 @@ arrows, Home and End, and no opinion about URLs — a widget is not a place. And
 the sections went back to scrolling, which brought the header scrollspy back
 with them, because inferring the current section from scroll position is right
 again once sections scroll.
+
+## Tracking, and the honest name for a class
+
+Every small label on the page was monospace with 0.18em, then 0.04em, of
+letter-spacing. It is a familiar move, and what it mostly does is make plain
+type look considered — which is worth doing when the type has no character of
+its own and worth undoing when it has.
+
+Labels are now set in the reading face a little heavier, with no tracking at
+all, and the monospace is kept for the things that are actually values: a year,
+a token name, a duration. The class changed name with the style, because
+`.mono` on something that is not monospace is a comment that lies. `.label` is
+the editorial one, `.code` is the technical one, and a test asserts no
+stylesheet reintroduces letter-spacing.
+
+## The wordmark moved to the middle
+
+Right-aligned, the wordmark shared the frame with the planet on the left, and
+the composition depended on that. Centred, it is the only thing in the frame,
+which is a stronger and simpler statement — and it made the availability badge
+above it look like an ornament hung on a title, so that went.
+
+It also broke the nebula's scrim, which was a wash down the right-hand side
+protecting type that used to sit there. It is a soft well in the middle now: it
+darkens where the words are without flattening the corners, which is where the
+nebula is doing most of its work.
+
+## Capabilities are an index, not a row of boxes
+
+Six identical rounded rectangles with a bold line and a grey line is the default
+answer, and it looks like one. They are numbered now — the numeral in the accent,
+the name in the display face, the gloss underneath — and the surface is a
+gradient that lifts toward the corner the numeral sits in, so a card has a
+direction rather than being a flat rectangle.

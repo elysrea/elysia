@@ -95,16 +95,6 @@ export const navCta = {
 } as const;
 
 /** The standing note above the wordmark. Null hides it entirely. */
-export const announcement: {
-  readonly tag: string;
-  readonly text: string;
-  readonly href: string;
-} | null = {
-  tag: 'Now',
-  text: 'Booking projects for Q3',
-  href: '#contact',
-};
-
 export const practice = {
   lede: 'We design the parts of a product people actually touch.',
   body: [

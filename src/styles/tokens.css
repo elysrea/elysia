@@ -42,7 +42,7 @@
     --font-display: 'Syne Variable', 'Helvetica Neue', Arial, sans-serif;
     --display-weight: 700;
     --display-weight-text: 500;
-    --display-tracking: -0.03em;
+    --display-tracking: 0em;
     --display-leading: 0.94;
     --wordmark-scale: 0.92;
 
@@ -52,8 +52,8 @@
     --size-lede: clamp(1.6rem, 3.4vw, 2.9rem);
     --size-work: clamp(1.25rem, 2.3vw, 1.85rem);
     --size-contact: clamp(1.9rem, 6vw, 4.6rem);
-    --size-mono: 11.5px;
-    --track-mono: 0.04em;
+    --size-label: 13px;
+    --size-code: 11.5px;
 
     /* Motion */
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -68,7 +68,7 @@
     --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
     --display-weight: 400;
     --display-weight-text: 400;
-    --display-tracking: -0.018em;
+    --display-tracking: 0em;
     --display-leading: 0.86;
     --wordmark-scale: 1;
   }
@@ -78,7 +78,7 @@
     --font-display: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --display-weight: 400;
     --display-weight-text: 400;
-    --display-tracking: -0.04em;
+    --display-tracking: 0em;
     --display-leading: 1;
     --wordmark-scale: 0.78;
   }

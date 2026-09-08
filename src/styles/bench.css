@@ -59,7 +59,7 @@
     color: var(--halo);
   }
 
-  .bench-swatches .mono {
+  .bench-swatches .code {
     color: var(--text-faint);
   }
 
@@ -96,7 +96,6 @@
   .bench-specimen-mono {
     font-family: var(--font-mono);
     font-size: 13px;
-    letter-spacing: var(--track-mono);
     color: var(--text-dim);
   }
 
@@ -140,7 +139,7 @@
     color: var(--halo);
   }
 
-  .bench-easing .mono {
+  .bench-easing .code {
     margin-left: 8px;
     color: var(--text-faint);
   }
