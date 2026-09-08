@@ -32,6 +32,31 @@
     /* One warm note, borrowed from the hot end of the nebula's ramp. */
     --accent: #f0895f;
 
+    /*
+     * The prism.
+     *
+     * Not a rainbow — this site already has a spectrum, and it is the one
+     * `hero/ramp.ts` bakes for the nebula: violet holding until the top of the
+     * range, where it breaks pink and then warm. These are the ramp's upper
+     * stops lifted into a register that reads as type on a dark ground.
+     *
+     * The sequence appears twice so the image is two periods across. At
+     * `background-size: 200%`, sliding the position by one element width moves
+     * it exactly one period, and the sweep has no seam.
+     */
+    --prism: linear-gradient(
+      90deg,
+      #c9b2ff 0%,
+      #e79ad8 12.5%,
+      #f6a98a 25%,
+      #ffe8c6 37.5%,
+      #c9b2ff 50%,
+      #e79ad8 62.5%,
+      #f6a98a 75%,
+      #ffe8c6 87.5%,
+      #c9b2ff 100%
+    );
+
     /* The horizon is a shared constant: the CSS gradient, the rule, and the
        canvas particle field all read this one value. */
     --horizon: 66%;

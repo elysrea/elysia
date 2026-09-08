@@ -687,3 +687,38 @@ Dead CSS is not free: it is a rule someone later has to read and decide about.
 The footer came down about a fifth in height at the same time. Nothing was
 removed from it — the padding and the gaps were simply larger than a footer with
 two short columns needs.
+
+## The prism is the ramp, not a rainbow
+
+**Context.** An iridescent gradient — the Apple register: a multi-hue fill on
+display type, drifting. Asked for one, the obvious move is a stock rainbow, and
+it would have been the first thing on this page that came from nowhere. Every
+colour here is one hue at a different value, and a spectrum that ignores that
+reads as an effect applied to the site rather than a property of it.
+
+**Decision.** The site already owns a spectrum: `hero/ramp.ts` bakes the
+nebula's, violet holding until the top of the range where it breaks pink and
+then warm. `--prism` is that ramp's upper stops, lifted into a register that
+reads as type on a dark ground. The same light the hero is painted with, used as
+ink.
+
+**Where.** Two places, one token. The wordmark takes it with a slow sweep — the
+page's largest surface and the only one big enough for a gradient to be a
+gradient rather than a tint. The capability numerals take it standing still, six
+cards sampling one period at even intervals, so the index reads as a spectrum
+across the row instead of six copies of the accent. A numeral is two characters
+wide and lands on effectively one colour; the effect is the row, not the numeral.
+
+**Guarded, because the failure mode is invisible text.** The fill is a background
+clipped to the glyphs, which means `-webkit-text-fill-color: transparent`. Where
+`background-clip: text` is unsupported that is a wordmark nobody can read, so
+everything sits inside `@supports`, and `color: var(--halo)` outside it still
+stands. Reduced motion keeps the gradient and drops the sweep.
+
+**The sweep loops.** `background-size: 200%` and a position animating 0% to 100%
+slides the image by exactly one element width, so the gradient carries the stop
+sequence twice and one period is one element width. Stated that way it is
+obviously seamless, which is not a reason to believe it: rendered at both ends
+of the cycle the wordmark is pixel-identical, against a control at 50% that is
+not. The first attempt at that test compared screenshots with the nebula still
+running behind the transparent glyphs and reported a seam that did not exist.

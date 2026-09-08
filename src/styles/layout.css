@@ -128,6 +128,46 @@
     color: var(--accent);
   }
 
+  /*
+   * The numerals walk the prism.
+   *
+   * A numeral is two characters wide, so the gradient barely moves inside one
+   * of them — each lands on effectively a single colour. The point is the row:
+   * six cards sampling one period at even intervals, so the index reads as a
+   * spectrum rather than six copies of the accent.
+   *
+   * Guarded like the wordmark: the fill is a clipped background, and without
+   * support for that the numerals would vanish instead of falling back.
+   */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .capability-index {
+      background-image: var(--prism);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .capabilities li:nth-child(1) .capability-index {
+      background-position: 0% 0;
+    }
+    .capabilities li:nth-child(2) .capability-index {
+      background-position: 20% 0;
+    }
+    .capabilities li:nth-child(3) .capability-index {
+      background-position: 40% 0;
+    }
+    .capabilities li:nth-child(4) .capability-index {
+      background-position: 60% 0;
+    }
+    .capabilities li:nth-child(5) .capability-index {
+      background-position: 80% 0;
+    }
+    .capabilities li:nth-child(6) .capability-index {
+      background-position: 100% 0;
+    }
+  }
+
   .capabilities b {
     font-family: var(--font-display);
     font-size: clamp(1.15rem, 1.7vw, 1.4rem);
