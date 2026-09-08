@@ -65,7 +65,8 @@ src/
     render.ts           Pure content -> HTML (runs at build time only)
   features/
     nav.ts              Sticky header + scrollspy, both IntersectionObserver
-    deck.ts             The seam tabs: one section panel at a time
+    tabs.ts             A tab group: one panel at a time, arrows, roving focus
+    bench.ts            Fills the specimen from the live cascade
     work.ts             Deep links: an open case study is addressable
     reveal.ts           Scroll-in transitions
     hero/
@@ -148,7 +149,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 210 tests, no browser required.
+`npm test` — 211 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long

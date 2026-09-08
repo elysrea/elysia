@@ -1,0 +1,235 @@
+@layer components {
+  /* The bench sits directly under the seam, so the tabs read as belonging to
+     it rather than to the page. */
+  .bench {
+    padding-top: calc(var(--section-gap) * 0.6);
+  }
+
+  .bench-caption {
+    max-width: 52ch;
+    margin-bottom: 26px;
+    color: var(--text-dim);
+  }
+
+  .deck[data-tabs='on'] .bench-panel {
+    animation: panel-in 380ms var(--ease-out) both;
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  /* Without script the panels stack, so each needs its own heading distance. */
+  .deck:not([data-tabs='on']) .bench-panel + .bench-panel {
+    margin-top: 44px;
+  }
+
+  .bench-value {
+    color: var(--text-faint);
+  }
+
+  /* --- palette ---------------------------------------------------------- */
+
+  .bench-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .bench-swatches li {
+    display: grid;
+    gap: 3px;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--surface-raised);
+  }
+
+  .bench-chip {
+    height: 54px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgb(var(--halo-rgb) / 0.08);
+  }
+
+  .bench-swatches b {
+    font-weight: 500;
+    color: var(--halo);
+  }
+
+  .bench-swatches .mono {
+    color: var(--text-faint);
+  }
+
+  /* --- type ------------------------------------------------------------- */
+
+  .bench-type {
+    display: grid;
+    gap: 26px;
+  }
+
+  .bench-role {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--text-faint);
+  }
+
+  .bench-specimen-display {
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.6vw, 3rem);
+    font-weight: var(--display-weight-text);
+    line-height: calc(var(--display-leading) + 0.22);
+    letter-spacing: var(--display-tracking);
+    color: var(--halo);
+  }
+
+  .bench-specimen-sans {
+    max-width: 46ch;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--text);
+  }
+
+  .bench-specimen-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: var(--track-mono);
+    color: var(--text-dim);
+  }
+
+  /* --- motion ----------------------------------------------------------- */
+
+  .bench-easings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .bench-easing {
+    display: flex;
+    gap: 18px;
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--surface-raised);
+  }
+
+  .bench-easing svg {
+    flex: none;
+    width: 84px;
+    height: 84px;
+  }
+
+  .bench-axis {
+    fill: none;
+    stroke: rgb(var(--halo-rgb) / 0.16);
+    stroke-width: 2;
+  }
+
+  .bench-curve {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .bench-easing b {
+    font-weight: 500;
+    color: var(--halo);
+  }
+
+  .bench-easing .mono {
+    margin-left: 8px;
+    color: var(--text-faint);
+  }
+
+  .bench-easing p {
+    margin: 6px 0 12px;
+    font-size: 14.5px;
+    color: var(--text-dim);
+  }
+
+  /* The same curve the diagram draws, actually running. */
+  .bench-runner {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 5px;
+    background: var(--halo);
+    animation-name: bench-run;
+    animation-duration: 2.4s;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes bench-run {
+    0%,
+    8% {
+      transform: translateX(0);
+    }
+    50%,
+    58% {
+      transform: translateX(calc(100% + 120px));
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  .bench-durations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .bench-durations li {
+    display: grid;
+    gap: 3px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--surface-raised);
+  }
+
+  .bench-durations b {
+    font-size: 15px;
+    color: var(--halo);
+  }
+
+  .bench-durations span:last-child {
+    color: var(--text-faint);
+  }
+
+  /* --- parts ------------------------------------------------------------ */
+
+  .bench-parts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 20px;
+  }
+
+  .bench-parts > * {
+    margin: 0;
+  }
+
+  .bench-parts .index-list,
+  .bench-parts .case-metrics {
+    flex: 1 1 240px;
+    margin-top: 0;
+  }
+
+  /* A specimen of the badge, not a live one: it should not be clickable here. */
+  .bench-static {
+    animation: none;
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bench-runner {
+      animation: none;
+    }
+  }
+}

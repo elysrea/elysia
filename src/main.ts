@@ -2,7 +2,8 @@ import './styles/index.css';
 
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
-import { initDeckTabs } from './features/deck.ts';
+import { initBenchValues } from './features/bench.ts';
+import { initTabs } from './features/tabs.ts';
 import { initWorkDeepLinks } from './features/work.ts';
 import { query } from './lib/dom.ts';
 import { SceneHost, resolveScene } from './features/hero/index.ts';
@@ -31,10 +32,10 @@ enhance('reveal', () => {
   initReveal();
 });
 
-// The deck runs before the work feature: a link to a case study has to land on
-// a panel that is already showing before the study inside it is opened.
-enhance('deck', () => {
-  initDeckTabs();
+enhance('bench', () => {
+  const deck = query('.deck');
+  if (deck) initTabs(deck, { idPrefix: 'bench' });
+  initBenchValues();
 });
 
 enhance('work', () => {

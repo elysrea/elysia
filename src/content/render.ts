@@ -8,6 +8,7 @@
  */
 
 import { typeNames } from '../features/type/sets.ts';
+import { benchPanels, durations, easings, specimens, swatches } from './bench.ts';
 import {
   announcement,
   capabilities,
@@ -17,7 +18,6 @@ import {
   meta,
   navCta,
   navLinks,
-  sections,
   practice,
   projects,
   studio,
@@ -70,17 +70,111 @@ export function renderAnnouncement(): string {
 /**
  * The tabs in the seam between the hero and the page.
  *
- * They are rendered as real links to each section, so with JavaScript off they
- * are exactly that: links to four sections that are all on the page. Script
- * upgrades them into tabs and hides the panels they are not pointing at.
+ * They are rendered as real links to the panels below them, so with JavaScript
+ * off the bench is simply four blocks of content in order. Script shows one at
+ * a time and gives the strip tab semantics.
  */
-export function renderDeckTabs(): string {
-  return sections
-    .map((section, index) => {
-      const current = index === 0 ? ' aria-current="true"' : '';
-      return `<a class="deck-tab" href="#${escapeHtml(section.id)}" data-section="${escapeHtml(section.id)}"${current}>${escapeHtml(section.label)}</a>`;
-    })
+export function renderBenchTabs(): string {
+  return benchPanels
+    .map(
+      (panel) =>
+        `<a class="deck-tab" href="#bench-${escapeHtml(panel.name)}" data-tab="${escapeHtml(panel.name)}">${escapeHtml(panel.label)}</a>`,
+    )
     .join('\n          ');
+}
+
+/** A colour chip per token. The value beside it is filled in from the cascade. */
+function renderPalette(): string {
+  return `<ul class="bench-swatches">
+              ${swatches
+                .map(
+                  (swatch) =>
+                    `<li><span class="bench-chip" style="background: var(${escapeHtml(swatch.token)})"></span><b>${escapeHtml(swatch.label)}</b><span class="mono">${escapeHtml(swatch.token)}</span><span class="mono bench-value" data-token="${escapeHtml(swatch.token)}"></span></li>`,
+                )
+                .join('\n              ')}
+            </ul>`;
+}
+
+function renderSpecimens(): string {
+  return `<ul class="bench-type">
+              ${specimens
+                .map(
+                  (specimen) =>
+                    `<li><span class="mono bench-role">${escapeHtml(specimen.role)}<span class="bench-value" data-token="${escapeHtml(specimen.token)}"></span></span><p class="${escapeHtml(specimen.className)}">${escapeHtml(specimen.sample)}</p></li>`,
+                )
+                .join('\n              ')}
+            </ul>`;
+}
+
+/**
+ * Each easing is drawn from its own control points and then run, so the curve
+ * and the movement beside it cannot disagree.
+ */
+function renderMotion(): string {
+  const curves = easings
+    .map((easing) => {
+      const [x1, y1, x2, y2] = easing.points;
+      const path = `M0,100 C${x1 * 100},${100 - y1 * 100} ${x2 * 100},${100 - y2 * 100} 100,0`;
+
+      return `<li class="bench-easing">
+                <svg viewBox="-6 -6 112 112" aria-hidden="true">
+                  <path d="M0,100 L100,100 M0,100 L0,0" class="bench-axis" />
+                  <path d="${path}" class="bench-curve" />
+                </svg>
+                <div>
+                  <b>${escapeHtml(easing.label)}</b>
+                  <span class="mono">${escapeHtml(easing.token)}</span>
+                  <p>${escapeHtml(easing.note)}</p>
+                  <span class="bench-runner" style="animation-timing-function: var(${escapeHtml(easing.token)})"></span>
+                </div>
+              </li>`;
+    })
+    .join('\n              ');
+
+  const scale = durations
+    .map(
+      (duration) =>
+        `<li><b class="mono bench-value" data-token="${escapeHtml(duration.token)}"></b><span>${escapeHtml(duration.use)}</span><span class="mono">${escapeHtml(duration.token)}</span></li>`,
+    )
+    .join('\n              ');
+
+  return `<ul class="bench-easings">
+              ${curves}
+            </ul>
+            <ul class="bench-durations">
+              ${scale}
+            </ul>`;
+}
+
+/** The real components, rendered rather than pictured. */
+function renderParts(): string {
+  return `<div class="bench-parts">
+              <a class="nav-cta mono" href="#contact"><span class="nav-cta-long">Start a project</span></a>
+              <span class="announce mono bench-static"><span class="announce-tag">Now</span><span class="announce-text">Booking projects for Q3</span><span class="announce-arrow" aria-hidden="true">&rarr;</span></span>
+              <span class="eyebrow mono">Section label</span>
+              <ul class="work-stack mono"><li>TypeScript</li><li>Design tokens</li><li>WCAG 2.2 AA</li></ul>
+              <ul class="case-metrics"><li><b>63 → 9</b><span class="mono">Button variants</span></li></ul>
+              <ul class="index-list index-list--caps"><li><b>Product design</b><span>Flows, states and the edges nobody specs</span></li></ul>
+            </div>`;
+}
+
+export function renderBench(): string {
+  const bodies: Readonly<Record<string, () => string>> = {
+    palette: renderPalette,
+    type: renderSpecimens,
+    motion: renderMotion,
+    parts: renderParts,
+  };
+
+  return benchPanels
+    .map((panel) => {
+      const body = bodies[panel.name];
+      return `<div class="bench-panel" id="bench-${escapeHtml(panel.name)}" data-panel="${escapeHtml(panel.name)}">
+            <p class="bench-caption">${escapeHtml(panel.caption)}</p>
+            ${body ? body() : ''}
+          </div>`;
+    })
+    .join('\n        ');
 }
 
 /**
@@ -212,7 +306,8 @@ export function renderStructuredData(): string {
 export const slots: Readonly<Record<string, () => string>> = {
   'nav-links': renderNavLinks,
   'nav-cta': renderNavCta,
-  'deck-tabs': renderDeckTabs,
+  'bench-tabs': renderBenchTabs,
+  bench: renderBench,
   'type-names': renderTypeNames,
   announcement: renderAnnouncement,
   practice: renderPractice,

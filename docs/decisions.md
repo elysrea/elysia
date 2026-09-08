@@ -351,3 +351,29 @@ The trade is real and worth stating: a tabbed page hides three quarters of
 itself, and a visitor who does not touch the tabs sees one section. That is the
 right shape for a product page built around a switchable view, and a bet on a
 studio site.
+
+## The tabs got their own subject
+
+Switching page sections made the tabs navigation, and navigation the header
+already had. They open a bench instead — a specimen of the system the page is
+built from: the palette, the three faces, the two easings and their durations,
+and the components themselves.
+
+The rule that makes it worth having is that nothing in it is transcribed. The
+content model lists token _names_; the values beside them are read from the live
+cascade when the page loads. Change `--accent` and the swatch, the label and the
+hex all change with it, because they were never separate facts. A test asserts
+the rendered bench contains no hex value at all, which is the only way that rule
+stays true.
+
+The easings are drawn from the same control points they animate with, and the
+square beside each curve runs on that token — so the diagram and the movement
+cannot disagree either. The components are the real ones, rendered, not
+screenshotted.
+
+Two things fell out of doing this. The tab controller stopped being about
+sections and became a plain tab group: a strip, a panel each, roving tabindex,
+arrows, Home and End, and no opinion about URLs — a widget is not a place. And
+the sections went back to scrolling, which brought the header scrollspy back
+with them, because inferring the current section from scroll position is right
+again once sections scroll.
