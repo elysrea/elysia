@@ -795,3 +795,37 @@ neutral, along with its shadow and its opaque reduced-transparency fallback.
 The bench caption said "One hue held across values, and a single warm note",
 which stopped being true the moment this landed. A palette exhibit that
 describes a system the page no longer has is worse than no exhibit.
+
+## Four subtractions
+
+**Supersedes** "Capabilities are an index, not a row of boxes".
+
+**The dot in front of every section label.** A five-pixel accent circle on
+`.eyebrow::before`. One of them is a nice detail; five down the page read as
+punctuation the sections did not ask for, and the label already says where you
+are. The eyebrow is an `inline-block` with no gap now, and `--accent` still has
+two users — the work list and the bench — so the token stays honest.
+
+**The capability cards.** Six rounded rectangles under the practice lede,
+numbered, gradient-lifted, redesigned once already. The section is the lede and
+two paragraphs now, which say the same six things in prose and say them better.
+
+That removed the last reader of `capabilities` in `site.ts`, and with it
+`knowsAbout` in the JSON-LD. Structured data describes the page: the page no
+longer claims those six disciplines, so neither should the markup describing it
+to a crawler. A schema field kept alive by an array nothing renders is a claim
+about a page that does not exist.
+
+The bench's Parts panel showed a capability card among its live components. It
+now shows the same `.index-list` the studio facts use — still a real component
+on a real page, which is the only thing that panel is allowed to contain.
+
+**The Email / Work / Studio row under the contact note.** Three links twenty
+pixels above a footer that carries all three. The note itself still reaches the
+inbox through "say hello".
+
+**The prism stopped crawling.** The sweep was 28 seconds — slow enough that
+nothing appears to be happening, which makes a prism just a multicoloured
+paragraph. Ten seconds is where the colour is visibly travelling through the
+words without the line you are reading changing underneath you. Verified by
+capturing the paragraph 1.5 seconds apart and confirming the frames differ.

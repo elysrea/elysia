@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 import {
   escapeHtml,
   renderBench,
-  renderCapabilities,
   renderBenchTabs,
   renderStructuredData,
   renderTypeNames,
@@ -180,21 +179,5 @@ describe('small type', () => {
     for (const value of spacing) {
       expect(value === '0' || value.includes('--display-tracking'), value).toBe(true);
     }
-  });
-});
-
-describe('capabilities', () => {
-  it('numbers each one', () => {
-    const html = renderCapabilities();
-
-    expect(html).toContain('>01<');
-    expect(html).toContain('>06<');
-  });
-
-  it('leads with the name rather than a label', () => {
-    const html = renderCapabilities();
-
-    // The old shape put a faint label above and the gloss in the bright role.
-    expect(html.indexOf('<b>')).toBeLessThan(html.indexOf('capability-note'));
   });
 });

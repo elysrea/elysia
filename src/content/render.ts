@@ -10,10 +10,8 @@
 import { typeNames } from '../features/type/sets.ts';
 import { benchPanels, durations, easings, specimens, swatches } from './bench.ts';
 import {
-  capabilities,
   contact,
   facts,
-  contactLinks,
   footerGroups,
   meta,
   navCta,
@@ -140,7 +138,7 @@ function renderParts(): string {
               <span class="eyebrow label">Section label</span>
               <ul class="work-stack label"><li>TypeScript</li><li>Design tokens</li><li>WCAG 2.2 AA</li></ul>
               <ul class="case-metrics"><li><b>63 → 9</b><span class="label">Button variants</span></li></ul>
-              <ul class="index-list index-list--caps"><li><b>Product design</b><span>Flows, states and the edges nobody specs</span></li></ul>
+              <ul class="index-list"><li><b>Product design</b><span>Flows, states and the edges nobody specs</span></li></ul>
             </div>`;
 }
 
@@ -179,19 +177,6 @@ export function renderPractice(): string {
         <div class="body">
           ${paragraphs(practice.body)}
         </div>`;
-}
-
-export function renderCapabilities(): string {
-  return capabilities
-    .map(
-      (capability, index) =>
-        `<li>
-            <span class="capability-index code">${String(index + 1).padStart(2, '0')}</span>
-            <b>${escapeHtml(capability.title)}</b>
-            <span class="capability-note">${escapeHtml(capability.detail)}</span>
-          </li>`,
-    )
-    .join('\n        ');
 }
 
 /**
@@ -284,11 +269,6 @@ export function renderContact(): string {
   return `<div class="contact">
         <p class="contact-note">${renderFragments(contact.note)}</p>
         <p class="contact-place">${escapeHtml(contact.place)}</p>
-        <nav class="contact-links label" aria-label="Elsewhere">
-          ${contactLinks
-            .map(({ href, label }) => `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`)
-            .join('\n          ')}
-        </nav>
       </div>`;
 }
 
@@ -327,7 +307,6 @@ export function renderStructuredData(): string {
     url: meta.url,
     email: `mailto:${meta.email}`,
     foundingDate: String(meta.founded),
-    knowsAbout: capabilities.map((capability) => capability.title),
   };
   // `<` cannot appear unescaped inside a script element.
   return JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
@@ -341,7 +320,6 @@ export const slots: Readonly<Record<string, () => string>> = {
   bench: renderBench,
   'type-names': renderTypeNames,
   practice: renderPractice,
-  capabilities: renderCapabilities,
   work: renderWork,
   studio: renderStudio,
   facts: renderFacts,

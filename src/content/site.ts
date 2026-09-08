@@ -13,11 +13,6 @@ export interface NavLink {
   readonly label: string;
 }
 
-export interface Capability {
-  readonly title: string;
-  readonly detail: string;
-}
-
 /** A number worth putting in front of someone, and what it counts. */
 export interface Metric {
   readonly value: string;
@@ -105,15 +100,6 @@ export const practice = {
     'Engagements run eight to sixteen weeks. We work directly with founders and product leads — no account layer, no handoff document standing in for a conversation.',
   ],
 } as const;
-
-export const capabilities: readonly Capability[] = [
-  { title: 'Product design', detail: 'Flows, states and the edges nobody specs' },
-  { title: 'Interface systems', detail: 'Tokens, components, and the rules that hold them' },
-  { title: 'Brand identity', detail: 'Marks, type, and how they behave in motion' },
-  { title: 'Motion and interaction', detail: 'Timing that reads as intent, not decoration' },
-  { title: 'Front-end engineering', detail: 'Typed, tested, accessible, and shipped' },
-  { title: 'Prototyping', detail: 'Working answers to questions a mockup cannot settle' },
-];
 
 export const projects: readonly Project[] = [
   {
@@ -265,13 +251,6 @@ export const contact = {
 
   place: 'Written and built remotely, from six desks across Europe.',
 } as const;
-
-/** The row under the note. */
-export const contactLinks: readonly NavLink[] = [
-  { href: `mailto:${meta.email}`, label: 'Email' },
-  { href: '#work', label: 'Work' },
-  { href: '#studio', label: 'Studio' },
-];
 
 export interface FooterGroup {
   readonly title: string;
