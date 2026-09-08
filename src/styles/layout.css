@@ -20,9 +20,9 @@
     max-width: 24ch;
     font-family: var(--font-display);
     font-size: var(--size-lede);
-    font-weight: 400;
-    line-height: 1.18;
-    letter-spacing: -0.005em;
+    font-weight: var(--display-weight-text);
+    line-height: calc(var(--display-leading) + 0.28);
+    letter-spacing: calc(var(--display-tracking) + 0.012em);
     color: var(--halo);
   }
 

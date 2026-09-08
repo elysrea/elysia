@@ -126,10 +126,10 @@
   .wordmark {
     margin-bottom: clamp(10px, 1.6vh, 22px);
     font-family: var(--font-display);
-    font-size: var(--size-wordmark);
-    font-weight: 400;
-    line-height: 0.86;
-    letter-spacing: -0.018em;
+    font-size: calc(var(--size-wordmark) * var(--wordmark-scale));
+    font-weight: var(--display-weight);
+    line-height: var(--display-leading);
+    letter-spacing: var(--display-tracking);
     text-align: right;
     color: var(--halo);
     opacity: 0;

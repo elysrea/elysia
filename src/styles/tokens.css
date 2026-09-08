@@ -32,10 +32,20 @@
     --section-gap: clamp(64px, 11vh, 148px);
     --wrap: 1240px;
 
-    /* Type. A display serif carries the voice, a grotesk carries the reading,
-       a mono carries the small technical labels. Nothing is set in capitals:
-       the type has enough character without shouting. */
-    --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+    /* Type. A display face carries the voice, a grotesk carries the reading, a
+       mono carries the small technical labels. Nothing is set in capitals: the
+       type has enough character without shouting.
+
+       The display face is a whole system, not a family swap — each one wants
+       its own weight, tracking and leading — so all four travel together and
+       `[data-type]` below overrides the set. */
+    --font-display: 'Syne Variable', 'Helvetica Neue', Arial, sans-serif;
+    --display-weight: 700;
+    --display-weight-text: 500;
+    --display-tracking: -0.03em;
+    --display-leading: 0.94;
+    --wordmark-scale: 0.92;
+
     --font-sans: 'Inter Variable', 'Helvetica Neue', Arial, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --size-wordmark: clamp(3.4rem, 15vw, 12rem);
@@ -51,6 +61,26 @@
     --dur-fast: 0.35s;
     --dur-mid: 0.6s;
     --dur-slow: 0.9s;
+  }
+
+  /* An editorial serif: light, high contrast, set tight and large. */
+  :root[data-type='serif'] {
+    --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+    --display-weight: 400;
+    --display-weight-text: 400;
+    --display-tracking: -0.018em;
+    --display-leading: 0.86;
+    --wordmark-scale: 1;
+  }
+
+  /* The technical reading: everything in the label face, scaled up. */
+  :root[data-type='mono'] {
+    --font-display: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --display-weight: 400;
+    --display-weight-text: 400;
+    --display-tracking: -0.04em;
+    --display-leading: 1;
+    --wordmark-scale: 0.78;
   }
 
   @media (max-width: 720px) {

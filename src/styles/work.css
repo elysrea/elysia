@@ -41,8 +41,8 @@
   .work-name {
     font-family: var(--font-display);
     font-size: var(--size-work);
-    font-weight: 400;
-    letter-spacing: -0.005em;
+    font-weight: var(--display-weight-text);
+    letter-spacing: calc(var(--display-tracking) + 0.012em);
     color: var(--halo);
   }
 

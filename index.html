@@ -22,16 +22,25 @@
          discovered halfway through parsing the stylesheet. -->
     <link
       rel="preload"
-      href="/src/assets/fonts/instrument-serif-latin-400.woff2"
+      href="/src/assets/fonts/syne-latin-variable.woff2"
       as="font"
       type="font/woff2"
       crossorigin
     />
 
-    <!-- Marks the document as scripted before first paint, so the reveal
-         animations only hide content that JavaScript can actually reveal. -->
+    <!-- Runs before first paint: marks the document as scripted, so the reveal
+         animations only hide content that JavaScript can actually reveal, and
+         applies the type set, which would otherwise reflow the whole page a
+         moment after it rendered. The default set needs no attribute. -->
     <script>
       document.documentElement.classList.add('js');
+      (function () {
+        var sets = <!--@type-names-->;
+        var wanted = new URLSearchParams(location.search).get('type');
+        if (wanted && sets.indexOf(wanted) !== -1) {
+          document.documentElement.setAttribute('data-type', wanted);
+        }
+      })();
     </script>
 
     <script type="module" src="/src/main.ts"></script>

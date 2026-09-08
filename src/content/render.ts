@@ -8,6 +8,7 @@
  */
 
 import { DEFAULT_HERO, HERO_CATALOGUE } from '../features/hero/catalogue.ts';
+import { typeNames } from '../features/type/sets.ts';
 import {
   announcement,
   capabilities,
@@ -78,6 +79,17 @@ export function renderHeroTabs(): string {
     const current = entry.name === DEFAULT_HERO ? ' aria-current="true"' : '';
     return `<a class="deck-tab" href="?hero=${escapeHtml(entry.name)}" data-hero="${escapeHtml(entry.name)}" title="${escapeHtml(entry.blurb)}"${current}>${escapeHtml(entry.label)}</a>`;
   }).join('\n          ');
+}
+
+/**
+ * The type-set names, as a JSON array for the inline script in the head.
+ *
+ * The set has to be applied before first paint or the page renders in one face
+ * and reflows into another, which rules out doing it from a module. Writing the
+ * list in here keeps the inline script and `type/sets.ts` from drifting.
+ */
+export function renderTypeNames(): string {
+  return JSON.stringify(typeNames);
 }
 
 export function renderPractice(): string {
@@ -176,6 +188,7 @@ export const slots: Readonly<Record<string, () => string>> = {
   'nav-links': renderNavLinks,
   'nav-cta': renderNavCta,
   'hero-tabs': renderHeroTabs,
+  'type-names': renderTypeNames,
   announcement: renderAnnouncement,
   practice: renderPractice,
   capabilities: renderCapabilities,

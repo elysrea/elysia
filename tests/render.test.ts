@@ -6,10 +6,12 @@ import {
   escapeHtml,
   renderHeroTabs,
   renderStructuredData,
+  renderTypeNames,
   renderWork,
   slots,
 } from '../src/content/render.ts';
 import { DEFAULT_HERO, HERO_CATALOGUE } from '../src/features/hero/catalogue.ts';
+import { DEFAULT_TYPE, resolveTypeSet, typeNames } from '../src/features/type/sets.ts';
 import { projects } from '../src/content/site.ts';
 
 describe('escapeHtml', () => {
@@ -96,6 +98,39 @@ describe('content slots', () => {
   it('every slot renders a non-empty string', () => {
     for (const [name, render] of Object.entries(slots)) {
       expect(render(), `slot ${name}`).not.toBe('');
+    }
+  });
+});
+
+describe('type sets', () => {
+  it('resolves a known set and falls back for anything else', () => {
+    for (const name of typeNames) expect(resolveTypeSet(`?type=${name}`)).toBe(name);
+
+    expect(resolveTypeSet('')).toBe(DEFAULT_TYPE);
+    expect(resolveTypeSet('?type=comic')).toBe(DEFAULT_TYPE);
+    expect(resolveTypeSet('?type=constructor')).toBe(DEFAULT_TYPE);
+  });
+
+  it('hands the inline script the same list, as JSON', () => {
+    expect(JSON.parse(renderTypeNames())).toEqual([...typeNames]);
+  });
+
+  it('is applied before first paint, not from a module', () => {
+    // A module runs after the document has rendered, so a set applied there
+    // would reflow the whole page a moment after it appeared.
+    const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+    const head = html.slice(0, html.indexOf('</head>'));
+
+    expect(head).toContain('<!--@type-names-->');
+    expect(head).toContain('data-type');
+  });
+
+  it('declares a face for every set', () => {
+    const tokens = readFileSync(resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+
+    for (const name of typeNames) {
+      if (name === DEFAULT_TYPE) continue;
+      expect(tokens).toContain(`[data-type='${name}']`);
     }
   });
 });

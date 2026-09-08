@@ -268,3 +268,21 @@ import the scene classes, which expect a DOM. So the list lives in
 `catalogue.ts`, which imports nothing, and the registry that builds scenes is
 checked against it by a test. Two sources of truth would drift the first time
 someone added a hero and forgot the tab.
+
+## A display face is a system, not a family
+
+Swapping `--font-display` alone and leaving everything else in place produces a
+worse version of both faces: Instrument Serif wants 400 weight, tight tracking
+and 0.86 leading; Syne wants 700, looser leading and a smaller size for the same
+optical weight; a mono wants smaller still. So a type set is five tokens —
+family, display weight, text weight, tracking, leading — plus a scale for the
+wordmark, and `[data-type]` overrides the lot.
+
+The default set is the one declared on bare `:root`. That means the common case
+needs no attribute, no script and no work: only a visitor who asked for a
+different set pays for one.
+
+It is applied by the inline script in the head rather than from a module,
+because a module runs after the document has rendered and the page would visibly
+reflow from one face into another. The script's allowlist is written at build
+time from `type/sets.ts`, so there is still one source of truth.

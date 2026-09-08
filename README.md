@@ -147,7 +147,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 185 tests, no browser required.
+`npm test` — 189 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long
@@ -206,11 +206,28 @@ the availability badge.
 
 ## Type
 
-Three faces, each with a job: **Instrument Serif** for the things that carry the
-voice, **Inter** for everything you read, **IBM Plex Mono** for small technical
-labels. Nothing is set in capitals — including the city names drawn on the
-canvas. The type has enough character without shouting, and lower case is easier
-to read at the sizes the labels actually use.
+Nothing is set in capitals — including the city names drawn on the canvas. The
+type has enough character without shouting, and lower case is easier to read at
+the sizes the labels actually use.
+
+The display face is a system rather than a family, because swapping one for
+another and leaving the weight, tracking and leading alone gets you a worse
+version of both. Each set carries its own five tokens, and `?type=` switches
+between them:
+
+|           |                                                                                          |
+| --------- | ---------------------------------------------------------------------------------------- |
+| `grotesk` | **Default.** Syne for display, Inter for reading. Wide, architectural, contemporary.     |
+| `serif`   | Instrument Serif for display. Editorial, high contrast, set tight.                       |
+| `mono`    | IBM Plex Mono all the way up. Technical, and the hardest of the three to read at length. |
+
+Four faces are declared and a visit downloads two or three: a browser only
+fetches a face something on the page is actually set in, so the display faces
+the current set does not use cost nothing.
+
+The set is applied by the inline script in the head, before first paint — from a
+module it would render in one face and reflow into another. The default set is
+the one on bare `:root`, so it needs no attribute and no script at all.
 
 ## Things deliberately not done
 
@@ -222,7 +239,8 @@ to read at the sizes the labels actually use.
 
 ## Credits
 
-Typeset in [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif),
+Typeset in [Syne](https://fonts.google.com/specimen/Syne),
+[Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif),
 [Inter](https://fonts.google.com/specimen/Inter) and
 [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), all under the
 SIL Open Font License. Coastlines from

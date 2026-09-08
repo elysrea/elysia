@@ -18,12 +18,14 @@ const files = [
     'instrument-serif-latin-400.woff2',
   ],
   ['@fontsource-variable/inter/files/inter-latin-wght-normal.woff2', 'inter-latin-variable.woff2'],
+  ['@fontsource-variable/syne/files/syne-latin-wght-normal.woff2', 'syne-latin-variable.woff2'],
   [
     '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2',
     'ibm-plex-mono-latin-400.woff2',
   ],
   ['@fontsource/instrument-serif/LICENSE', 'InstrumentSerif-OFL.txt'],
   ['@fontsource-variable/inter/LICENSE', 'Inter-OFL.txt'],
+  ['@fontsource-variable/syne/LICENSE', 'Syne-OFL.txt'],
   ['@fontsource/ibm-plex-mono/LICENSE', 'IBMPlexMono-OFL.txt'],
 ];
 
