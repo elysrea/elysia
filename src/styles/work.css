@@ -7,6 +7,20 @@
     color: var(--text-faint);
   }
 
+  /*
+   * The work band.
+   *
+   * The deck runs at one value from the seam to the footer, which is a lot of
+   * one colour to ask a reader to cross. The case studies are the longest read
+   * on the page, so this section drops back to a deeper ground: the page gains
+   * a rhythm, and the thing worth reading gets a surface of its own.
+   *
+   * A plane change, not a rule — the edge is where two grounds meet.
+   */
+  #work {
+    background: var(--dusk);
+  }
+
   .work {
     --work-cols: minmax(0, 1.1fr) minmax(0, 1.9fr) 90px 72px;
   }

@@ -16,40 +16,33 @@ npm install && npm run dev
 
 ## What is interesting here
 
-|                                         |                                                                                                                                                                                                                                                                                                                 |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zero client-side templating**         | Content lives in `src/content/site.ts` as typed data and is rendered into `index.html` by a Vite plugin at build time. The shipped page is complete markup: it reads with JavaScript disabled and crawlers get real text.                                                                                       |
-| **A globe with no globe library**       | Continents come from Natural Earth polygons baked into a 2.7 kB bitmask at build time (`npm run land:sync`). The browser gets an array lookup instead of a GeoJSON, a projection library, or a map tile server. Rotation, orthographic projection and great-circle paths are about 150 lines of pure functions. |
-| **Deterministic simulation**            | The dot lattice and the arc traffic run on a seeded PRNG, so the same load produces the same globe — and a test can assert exact positions instead of statistical hand-waving.                                                                                                                                  |
-| **Fixed timestep**                      | Time is accumulated and consumed in whole 16.67ms steps, so the globe turns at the same speed on a 60Hz laptop and a 144Hz monitor. A tab restored after ten minutes does not replay ten minutes of simulation.                                                                                                 |
-| **Self-governing effect**               | A quality governor watches median frame time and scales the dot count between 100% and 35%. A background animation should never be the reason a page drops frames.                                                                                                                                              |
-| **One source of truth for the horizon** | `--horizon` is declared once in CSS. The gradient, the rule, and the globe's placement all read that value; the canvas asks the cascade rather than restating the breakpoints in JavaScript.                                                                                                                    |
-| **Platform first**                      | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync.                                                                    |
+|                                        |                                                                                                                                                                                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zero client-side templating**        | Content lives in `src/content/site.ts` as typed data and is rendered into `index.html` by a Vite plugin at build time. The shipped page is complete markup: it reads with JavaScript disabled and crawlers get real text.                    |
+| **A nebula with no shader**            | Domain-warped fBm over seeded value noise, sampled on a coarse grid and pushed through a 256-entry colour ramp baked once at startup. No WebGL, no texture, no library — about 200 lines of pure functions and one `putImageData`.           |
+| **Deterministic simulation**           | The starfield and the noise field run on a seeded PRNG, so the same load produces the same sky — and a test can assert exact positions instead of statistical hand-waving.                                                                   |
+| **Fixed timestep**                     | Time is accumulated and consumed in whole 16.67ms steps, so the nebula drifts at the same speed on a 60Hz laptop and a 144Hz monitor. A tab restored after ten minutes does not replay ten minutes of simulation.                            |
+| **Self-governing effect**              | A quality governor watches median frame time and scales the sample resolution between 100% and 35%. A background animation should never be the reason a page drops frames.                                                                   |
+| **A ground scale that carries weight** | The page separates by plane, not by rule: four violet values, and the steps between them are measured. The seam between hero and deck once ran at a 1.028 contrast ratio, which is a decision you cannot see. It is 1.274 now.               |
+| **Platform first**                     | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync. |
 
-## Four heroes, one page
+## One hero
 
-The hero is swappable, and the switch is in the page: the tabs in the seam
-between the hero and the content change it in place, without a reload. They are
-real links to `?hero=…`, so they still work with JavaScript off — it just costs
-a navigation. What the script adds is not the ability to switch but the ability
-to switch _without losing the animation you were comparing_.
+The landing page carries a single treatment: domain-warped noise, drifting,
+through a colour ramp baked at startup.
 
-|           |                                                                                                                           |
-| --------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `planet`  | The heat-map globe. Literal, informational, the most to say.                                                              |
-| `eclipse` | A black body with a corona burning around it. Four gradients and a filled circle — the whole scene is about thirty lines. |
-| `aurora`  | Curtains of light low in the frame, each one filled path whose edge is a sum of three sines.                              |
-| `nebula`  | Domain-warped noise through the same colour ramp the planet uses, drifting.                                               |
+It carried four for a while, behind a `?hero=` switch with tabs in the seam —
+planet, eclipse, aurora, nebula — so they could be compared by looking rather
+than by arguing. That was the right way to choose and the wrong way to ship: a
+landing page with four moods has none. The three that lost are gone, and the
+globe renderer went with them, which is most of why the JavaScript bundle is
+11.15 kB rather than 29.20 kB.
 
-Four is arguably three too many for a finished site. They are one commit from
-being deleted: the catalogue lists them, the registry builds them, and a test
-keeps the two in step.
-
-Everything about _hosting_ an effect is shared and lives in `hero/host.ts`:
-sizing for the device pixel ratio, pausing off-screen and on a hidden tab,
-honouring reduced motion, fixed-step time, and backing off when frames run long.
-A scene is only `layout`, `step` and `draw` — which is why the three
-alternatives are small.
+Everything about _hosting_ an effect still lives in `hero/host.ts`: sizing for
+the device pixel ratio, pausing off-screen and on a hidden tab, honouring
+reduced motion, fixed-step time, and backing off when frames run long. A scene
+is only `layout`, `step` and `draw`, so the seam where the alternatives plugged
+in is still there — it is simply not carrying anything.
 
 ## Architecture
 
@@ -57,8 +50,6 @@ alternatives are small.
 index.html              HTML shell with <!--@slot--> placeholders
 plugins/
   html-content.ts       Vite plugin: fills slots, emits robots.txt + sitemap.xml
-scripts/
-  build-land-mask.js    Natural Earth polygons -> a committed bitmask
 src/
   content/
     site.ts             All copy, as typed data
@@ -73,19 +64,9 @@ src/
       host.ts           Canvas, events, timing, quality — everything but drawing
       scene.ts          What a hero has to implement: layout, step, draw
       noise.ts          Pure: seeded value noise and fBm
-      catalogue.ts      The heroes as data, imported by the build-time renderer
-      switcher.ts       Turns the seam tabs into an in-place hero switch
-      scenes/           planet, eclipse, aurora, nebula
-    globe/
-      geo.ts            Pure: sphere coordinates, rotation, projection, slerp
-      land.ts           Pure: bitmask lookup -> the points that are on land
-      land-mask.ts      Generated: Natural Earth land as one bit per cell
-      cities.ts         The named places arcs travel between
-      heat.ts           Pure: land + city activity -> a heat texture and ramp
-      surface.ts        Pure: the per-pixel renderer and its lookup tables
+      ramp.ts           Pure: the colour ramp, baked to a 256-entry lookup
       stars.ts          Pure: the starfield and its twinkle
-      arcs.ts           The travelling connections and their lifecycle
-      globe-field.ts    Canvas, browser events, and when not to run
+      scenes/nebula.ts  The one hero
   lib/
     loop.ts             Fixed-timestep render loop
     quality.ts          Frame-budget governor
@@ -188,7 +169,6 @@ npm test             # unit tests
 npm run coverage     # tests with coverage
 npm run check        # everything CI runs
 npm run fonts:sync   # re-vendor the font subsets
-npm run land:sync    # regenerate the land mask from Natural Earth
 ```
 
 ## Deployment

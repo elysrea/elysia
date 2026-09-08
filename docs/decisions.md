@@ -411,3 +411,78 @@ answer, and it looks like one. They are numbered now — the numeral in the acce
 the name in the display face, the gloss underneath — and the surface is a
 gradient that lifts toward the corner the numeral sits in, so a card has a
 direction rather than being a flat rectangle.
+
+## Three heroes were deleted, and the globe with them
+
+**Supersedes** "The globe is drawn, not embedded", "Dots on the far side are
+drawn too", "Arcs end somewhere named", "The globe is opaque", "The planet is
+bigger than the frame", "A graticule, faintly", "The planet is a heat map, drawn
+per pixel", "Screened, not summed", "The hero is swappable", "The switcher is
+links first", and "The catalogue is data, the registry is code".
+
+**Context.** The registry was built as its own deletion plan: four heroes behind
+`?hero=`, a catalogue the renderer read, and a test keeping the two in step, so
+that when one won the other three could go in a single commit. This is that
+commit.
+
+**Decision.** Nebula stays. Planet, eclipse and aurora go, and the switching
+machinery goes with them — the catalogue, `resolveScene`, the `data-hero`
+attribute and the query-string parsing. `createHero()` returns the one scene.
+
+**Consequence.** Planet was the only caller of the globe engine, so deleting it
+orphaned the projection, the land mask, the great-circle arcs, the city anchors
+and the heat field: 965 lines of source and 732 lines of tests, all of it
+working, none of it reachable. It went too. Keeping tested code alive with no
+caller is not thrift, it is a second thing to maintain and a dead branch for
+anyone reading the repo to walk down.
+
+The JavaScript bundle fell from 29.20 kB to 11.15 kB — 4.58 kB gzipped, down
+from 11.03 — and the suite from 216 tests to 123. Only two pieces survived, because the nebula uses them: the starfield
+and the colour ramp, both now in `hero/`. `SceneHost` is untouched — the seam
+the alternatives plugged into is still there, carrying one thing.
+
+The deleted work is not gone, it is just not here: `git log` has it, and the
+argument for drawing a globe rather than embedding one is still worth reading.
+That is why the entries above were superseded rather than removed.
+
+## A step you cannot see is not a decision
+
+**Context.** The seam between the hero and the deck is the most worked-on shape
+on the page — a tab rising out of the deck's top edge with two concave notches
+masked by a radial gradient, so it reads as cut from the same sheet. It was
+invisible, and had been for weeks.
+
+**Cause.** The two grounds it separates were `--void` `#05030c` and `--surface`
+`#0a0619`: a contrast ratio of **1.028**. Not a subtle edge — a 2.8% difference,
+below the threshold where a large flat area reads as a different plane at all.
+The shape was correct and the colours made it moot. `--deep` was in the palette,
+described as the deck's ground, and used for nothing but the skip link.
+
+**Decision.** Rebuild the grounds as a scale rather than a pair, one violet hue
+across four values, and size the steps against the job each one does:
+
+| token       | value     | vs. the void | does                               |
+| ----------- | --------- | ------------ | ---------------------------------- |
+| `--void`    | `#05030c` | —            | the hero sky, and the footer       |
+| `--deep`    | `#150c31` | 1.102        | raised chrome: nav pill, skip link |
+| `--dusk`    | `#160c33` | 1.107        | the work band                      |
+| `--surface` | `#241650` | **1.274**    | the deck — this is the seam        |
+| `--iris`    | `#4a2a86` | 1.919        | the lift at the top of the deck    |
+
+`--dusk` sits close to `--deep` against the void but that is not the step it has
+to survive: it is read against `--surface`, where it lands at 1.151.
+
+**Consequence.** The seam reads. The deck opens at a mix of `--iris` into
+`--surface` and settles over 520px, so it is brightest exactly where the notch
+is; the tab and both notches read the same `--deck-top` token, because a tab
+painted the colour the deck _ends_ at would float rather than rise out of it.
+
+The page also gained a rhythm it did not have: void, violet, then a drop back to
+`--dusk` under the case studies — the longest read on the page, and now the only
+section with a ground of its own — then violet again, then void under the
+footer. Four bands instead of one flat field.
+
+Two tokens were audited out on the way: `--veil` was declared and never
+referenced, and `--iris` was shown in the palette bench as part of the system
+while being used by nothing. A design system that lists colours it does not use
+is a swatch library. `--iris` now does the lift.

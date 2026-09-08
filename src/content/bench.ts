@@ -37,11 +37,13 @@ export interface Swatch {
   readonly label: string;
 }
 
+/** The ground scale in order, darkest first, then the ink and the one accent. */
 export const swatches: readonly Swatch[] = [
-  { token: '--void', label: 'Ground' },
+  { token: '--void', label: 'Void' },
+  { token: '--dusk', label: 'Dusk' },
   { token: '--deep', label: 'Deep' },
-  { token: '--iris', label: 'Iris' },
   { token: '--surface', label: 'Surface' },
+  { token: '--iris', label: 'Iris' },
   { token: '--halo', label: 'Halo' },
   { token: '--accent', label: 'Accent' },
 ];
