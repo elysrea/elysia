@@ -15,16 +15,18 @@
     /* The tab rises above the deck's top edge, so it has to be painted the
        same colour the deck starts at — not the colour it settles to. One
        token, read by the deck, the tab and both notches. */
-    --deck-top: color-mix(in oklab, var(--iris) 34%, var(--surface));
+    --deck-top: color-mix(in oklab, var(--iris) 20%, var(--surface));
 
     position: relative;
     z-index: 2;
     margin-top: calc(var(--tab-height) * -1);
     border-radius: var(--deck-radius) var(--deck-radius) 0 0;
 
-    /* Brightest where it meets the sky, settling over the first screen. The
-       lift is what makes the seam read as an edge you could run a hand along. */
-    background: linear-gradient(to bottom, var(--deck-top), var(--surface) 520px);
+    /* Brightest where it meets the sky, settling within half a screen. The
+       lift is what makes the seam read as an edge you could run a hand along —
+       and keeping it short means the contrast is spent at the edge, where the
+       shape is, rather than across the whole page. */
+    background: linear-gradient(to bottom, var(--deck-top), var(--surface) 440px);
   }
 
   /* The group is the shape that rises out of the deck; the tabs sit in it. */

@@ -6,11 +6,12 @@
        The site once ran --void #05030c under the hero and --surface #0a0619
        under the deck: a contrast ratio of 1.028, which is to say the seam
        between them — a carefully masked concave notch — was invisible. A step
-       has to be big enough to see before it can be called a design. */
+       has to be big enough to see before it can be called a design, and small
+       enough that the page still reads as one dark room rather than two. */
     --void: #05030c; /* the hero sky, and the footer that closes the loop */
     --deep: #150c31; /* raised chrome: the nav pill, the skip link */
-    --surface: #241650; /* the deck: 1.274 against the void, so the seam cuts */
-    --dusk: #160c33; /* the work band, dropped back for long reading */
+    --surface: #1a0f3a; /* the deck: 1.145 against the void, so the seam cuts */
+    --dusk: #0d0621; /* the work band, dropped back for long reading */
     --iris: #4a2a86; /* the lift inside the deck, brightest at the seam */
     --halo: #e9ddff;
     --halo-rgb: 233 221 255;

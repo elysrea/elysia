@@ -30,4 +30,153 @@
     margin-top: clamp(22px, 3vh, 34px);
     color: var(--text-dim);
   }
+
+  /*
+   * The close of the page.
+   *
+   * The address alone was a dead end: correct, and asking the visitor to do all
+   * the work of starting. The composer writes the email for them, and the
+   * sequence beside it says what answering actually gets them.
+   */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+    margin-top: clamp(40px, 6vh, 72px);
+  }
+
+  /* The composer is an enhancement over the address above it: with no script
+     to rewrite the href there is nothing for the fields to feed, so they are
+     never shown. The plain mailto link is the baseline and it always works. */
+  .brief {
+    display: none;
+  }
+
+  .js .brief {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding: clamp(22px, 3vw, 30px);
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 100% at 0% 0%, rgb(var(--halo-rgb) / 0.07), transparent 62%),
+      var(--surface-raised);
+  }
+
+  .brief-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: var(--display-weight-text);
+    line-height: 1.1;
+    letter-spacing: var(--display-tracking);
+    color: var(--halo);
+  }
+
+  .brief-caption {
+    max-width: 46ch;
+    margin: -4px 0 6px;
+    color: var(--text-dim);
+  }
+
+  .brief-fields {
+    display: grid;
+    gap: 12px;
+  }
+
+  .brief-field {
+    display: grid;
+    gap: 7px;
+  }
+
+  .brief-field > .label {
+    color: var(--text-dim);
+  }
+
+  /* No border: the field is a surface at a different value, like everything
+     else that separates on this page. */
+  .brief-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--surface-raised);
+    color: var(--halo);
+    font: inherit;
+    transition: background var(--dur-fast) ease;
+  }
+
+  .brief-field input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .brief-field input:hover,
+  .brief-field input:focus {
+    background: var(--surface-hover);
+  }
+
+  .brief-action {
+    justify-self: start;
+    margin-top: 4px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #efe6ff, #cfbdff);
+    color: #150a29;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      filter var(--dur-fast) ease,
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .brief-action:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  .next {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .next-step {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 2px 12px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    transition: background var(--dur-fast) ease;
+  }
+
+  .next-step:hover {
+    background: var(--surface-raised);
+  }
+
+  .next-num {
+    grid-row: span 2;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .next-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: var(--display-weight-text);
+    letter-spacing: var(--display-tracking);
+    color: var(--text);
+  }
+
+  .next-detail {
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 860px) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 }

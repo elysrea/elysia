@@ -240,9 +240,49 @@ export const facts: readonly Fact[] = [
   { label: 'Capacity', value: 'Four to five projects a year' },
 ];
 
+export interface BriefField {
+  /** Input name, and the label used as the line's prefix in the composed email. */
+  readonly name: string;
+  readonly label: string;
+  readonly placeholder: string;
+}
+
+export interface Step {
+  readonly name: string;
+  readonly detail: string;
+}
+
 export const contact = {
   lede: 'Tell us what you are building.',
   note: 'Send a short note about the project, the timeline, and who is on the team. We answer within two working days.',
+
+  /**
+   * The brief composer. It writes a mailto: link — nothing leaves the browser,
+   * there is no endpoint, and the copy says so rather than implying a form.
+   */
+  brief: {
+    title: 'Start with a brief',
+    caption:
+      'Three lines is plenty. This writes the email and opens it in your own client — nothing is sent from here.',
+    subject: 'Project enquiry',
+    action: 'Open the email',
+    fields: [
+      {
+        name: 'building',
+        label: 'What you are building',
+        placeholder: 'A clinical data platform for trial coordinators',
+      },
+      { name: 'timeline', label: 'Timeline', placeholder: 'Kickoff in March, live before summer' },
+      { name: 'team', label: 'Who is on the team', placeholder: 'Two founders and one engineer' },
+    ] as readonly BriefField[],
+  },
+
+  /** What answering the email actually gets you. Stated, so it can be held to. */
+  next: [
+    { name: 'A reply', detail: 'Within two working days, from whoever would run the project.' },
+    { name: 'A call', detail: 'Thirty minutes on what you are building and what is in the way.' },
+    { name: 'A proposal', detail: 'Scope, team, timeline and price, in writing, within a week.' },
+  ] as readonly Step[],
 } as const;
 
 export const footerLinks: readonly NavLink[] = [

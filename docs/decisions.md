@@ -461,19 +461,28 @@ described as the deck's ground, and used for nothing but the skip link.
 **Decision.** Rebuild the grounds as a scale rather than a pair, one violet hue
 across four values, and size the steps against the job each one does:
 
-| token       | value     | vs. the void | does                               |
-| ----------- | --------- | ------------ | ---------------------------------- |
-| `--void`    | `#05030c` | —            | the hero sky, and the footer       |
-| `--deep`    | `#150c31` | 1.102        | raised chrome: nav pill, skip link |
-| `--dusk`    | `#160c33` | 1.107        | the work band                      |
-| `--surface` | `#241650` | **1.274**    | the deck — this is the seam        |
-| `--iris`    | `#4a2a86` | 1.919        | the lift at the top of the deck    |
+| token       | value     | vs. the void | does                            |
+| ----------- | --------- | ------------ | ------------------------------- |
+| `--void`    | `#05030c` | —            | the hero sky, and the footer    |
+| `--dusk`    | `#0d0621` | 1.039        | the work band                   |
+| `--deep`    | `#150c31` | 1.102        | raised chrome: the skip link    |
+| `--surface` | `#1a0f3a` | **1.145**    | the deck — this is the seam     |
+| `--iris`    | `#4a2a86` | 1.919        | the lift at the top of the deck |
 
-`--dusk` sits close to `--deep` against the void but that is not the step it has
-to survive: it is read against `--surface`, where it lands at 1.151.
+`--dusk` sits near the void on this table but that is not the step it has to
+survive: it is read against `--surface`, where it lands at 1.102.
+
+**Revised once.** The first pass put `--surface` at `#241650` — 1.274 against
+the void, with the deck opening at a 34% mix of `--iris`, so the seam edge ran
+at 1.447. It worked, and it was too much: a bright violet field under the whole
+page, and a jump at the seam that read as two different sites rather than two
+planes of one. The fix was not to undo it but to spend the contrast where the
+shape is. The lift dropped to 20% and settles within 440px instead of 520, so
+the seam edge is 1.241 and the field it settles into is 1.145. Loud at the edge,
+quiet everywhere else.
 
 **Consequence.** The seam reads. The deck opens at a mix of `--iris` into
-`--surface` and settles over 520px, so it is brightest exactly where the notch
+`--surface` and settles over 440px, so it is brightest exactly where the notch
 is; the tab and both notches read the same `--deck-top` token, because a tab
 painted the colour the deck _ends_ at would float rather than rise out of it.
 
@@ -486,3 +495,39 @@ Two tokens were audited out on the way: `--veil` was declared and never
 referenced, and `--iris` was shown in the palette bench as part of the system
 while being used by nothing. A design system that lists colours it does not use
 is a swatch library. `--iris` now does the lift.
+
+## The last section had to do something
+
+**Context.** Contact was an eyebrow, one line, the address set large, and a
+paragraph asking for "a short note about the project, the timeline, and who is
+on the team". Correct, and a dead end: it names three things it wants and then
+leaves the visitor to open a mail client and remember all three.
+
+**Decision.** Write the email for them. Three inputs — what you are building,
+timeline, who is on the team — compose a `mailto:` href with the subject set and
+the answers as labelled lines. Beside it, what answering actually gets you: a
+reply in two working days, a thirty-minute call, a written proposal inside a
+week. Numbered, because it is a sequence and it can be held to.
+
+**Consequence.** There is no endpoint, no request and nothing to secure: the
+link opens the visitor's own client, and the caption says so rather than
+implying a form that submits somewhere. The action ships as a working `mailto:`
+with the subject already on it, so it is useful before any script runs; the
+composer only ever rewrites an href that was already correct. With scripting off
+the fields are never shown — `.js .brief` — and the address above them is the
+baseline it always was.
+
+The action is an anchor rather than a button, so middle-click and long-press
+behave the way they do on every other link on the page.
+
+One detail worth the test it has: `URLSearchParams` is form encoding and writes
+a space as `+`. A mail client reading a `mailto:` query shows that plus sign
+literally, so the subject arrives as "Project+enquiry". The composed href
+percent-encodes instead.
+
+**Verified against the build, not the dev server.** In dev, Vite injects CSS
+through JavaScript, so a scripting-off check there loads no styles at all and
+every element reports its default `display` — which looks exactly like the
+fallback being broken. The no-JS behaviour was confirmed on `vite preview`,
+where the composer is `display: none` and the address, the subject-bearing
+action and all three steps are still in the markup.

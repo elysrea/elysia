@@ -262,10 +262,76 @@ export function renderFacts(): string {
     .join('\n        ');
 }
 
+/**
+ * The brief composer, as markup.
+ *
+ * The action ships as a working `mailto:` with the subject already on it, so
+ * the link is useful before any script runs; the composer only ever rewrites
+ * an href that was already correct.
+ */
+function renderBrief(): string {
+  const { brief } = contact;
+
+  const fields = brief.fields
+    .map(
+      ({ name, label, placeholder }) => `<label class="brief-field">
+                <span class="label">${escapeHtml(label)}</span>
+                <input
+                  type="text"
+                  name="${escapeHtml(name)}"
+                  placeholder="${escapeHtml(placeholder)}"
+                  autocomplete="off"
+                  data-brief-field
+                  data-label="${escapeHtml(label)}"
+                />
+              </label>`,
+    )
+    .join('\n              ');
+
+  const href = `mailto:${meta.email}?subject=${encodeURIComponent(brief.subject)}`;
+
+  return `<div class="brief" data-brief>
+            <h2 class="brief-title">${escapeHtml(brief.title)}</h2>
+            <p class="brief-caption">${escapeHtml(brief.caption)}</p>
+            <div class="brief-fields">
+              ${fields}
+            </div>
+            <a
+              class="brief-action label"
+              href="${escapeHtml(href)}"
+              data-brief-action
+              data-email="${escapeHtml(meta.email)}"
+              data-subject="${escapeHtml(brief.subject)}"
+              >${escapeHtml(brief.action)}</a
+            >
+          </div>`;
+}
+
+/** What happens after the email. Numbered, because it is a sequence. */
+function renderNext(): string {
+  const steps = contact.next
+    .map(
+      ({ name, detail }, index) => `<li class="next-step">
+                <span class="next-num label">${String(index + 1).padStart(2, '0')}</span>
+                <b class="next-name">${escapeHtml(name)}</b>
+                <span class="next-detail">${escapeHtml(detail)}</span>
+              </li>`,
+    )
+    .join('\n              ');
+
+  return `<ol class="next">
+              ${steps}
+            </ol>`;
+}
+
 export function renderContact(): string {
   return `<p class="lede lede--wide">${escapeHtml(contact.lede)}</p>
       <a class="contact-link" href="mailto:${escapeHtml(meta.email)}">${escapeHtml(meta.email)}</a>
-      <p class="contact-note">${escapeHtml(contact.note)}</p>`;
+      <p class="contact-note">${escapeHtml(contact.note)}</p>
+      <div class="contact-grid">
+        ${renderBrief()}
+        ${renderNext()}
+      </div>`;
 }
 
 export function renderFooterLinks(): string {
