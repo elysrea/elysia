@@ -642,3 +642,26 @@ the top and bottom edges — which is exactly what the first three attempts did,
 means it holds at any width and whatever the copyright line wraps to, and a
 short window shrinks the body and the light together rather than cropping one of
 them.
+
+## An ordinary footer
+
+**Supersedes** "The page sets" and "The page sets, second attempt".
+
+The page had a horizon here, then an eclipse. Both were good drawings, and both
+were louder than a footer needs to be. This is the part of a site people arrive
+at looking for a link, and the job is to have the link where they expect it.
+
+Brand and tagline on the left, two columns of links on the right, copyright and
+the disclaimer along the bottom. It separates from the contact section by ground
+like everything else on the page — no rule across the top, and none between the
+rows.
+
+Two ideas were built and thrown away to get to the plainest possible answer.
+That is not waste: an eclipse in the footer is the kind of thing that looks like
+a decision until you have seen it under the section it follows, and the contact
+note above it is now the last thing with any weight, which is the right order.
+
+The `Source` link points at the repository. The studio is invented; the code is
+not, and a footer is the conventional place to say so. External links carry
+`rel="noreferrer"` — the page has no business telling another site where its
+visitors came from.

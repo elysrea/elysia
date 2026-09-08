@@ -14,6 +14,7 @@ import {
   contact,
   facts,
   contactLinks,
+  footerGroups,
   meta,
   navCta,
   navLinks,
@@ -293,6 +294,31 @@ export function renderContact(): string {
       </div>`;
 }
 
+/**
+ * The footer's link columns.
+ *
+ * An external link gets rel="noreferrer" — the page has no business telling
+ * another site where its visitors came from.
+ */
+export function renderFooterGroups(): string {
+  return footerGroups
+    .map(
+      ({ title, links }) => `<div class="foot-group">
+          <h2 class="foot-group-title">${escapeHtml(title)}</h2>
+          <ul>
+            ${links
+              .map(({ href, label }) => {
+                const external = href.startsWith('http');
+                const attrs = external ? ' target="_blank" rel="noreferrer"' : '';
+                return `<li><a href="${escapeHtml(href)}"${attrs}>${escapeHtml(label)}</a></li>`;
+              })
+              .join('\n            ')}
+          </ul>
+        </div>`,
+    )
+    .join('\n        ');
+}
+
 /** schema.org description of the studio, emitted as JSON-LD. */
 export function renderStructuredData(): string {
   const data = {
@@ -322,6 +348,7 @@ export const slots: Readonly<Record<string, () => string>> = {
   studio: renderStudio,
   facts: renderFacts,
   contact: renderContact,
+  'footer-groups': renderFooterGroups,
   'structured-data': renderStructuredData,
   'site-name': () => escapeHtml(meta.name),
   tagline: () => escapeHtml(meta.tagline),

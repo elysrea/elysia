@@ -67,6 +67,9 @@ export const meta: SiteMeta = {
   founded: 2023,
 };
 
+/** Where the code for this page lives. The studio is invented; the repo is not. */
+export const repo = 'https://github.com/elysrea/elysia';
+
 /** The panels of the deck, in order. The first one is what opens. */
 export interface SectionEntry {
   readonly id: string;
@@ -265,9 +268,33 @@ export const contact = {
   place: 'Written and built remotely, from six desks across Europe.',
 } as const;
 
-/** The column beside the note. The footer below it carries no links of its own. */
+/** The row under the note. */
 export const contactLinks: readonly NavLink[] = [
   { href: `mailto:${meta.email}`, label: 'Email' },
   { href: '#work', label: 'Work' },
   { href: '#studio', label: 'Studio' },
+];
+
+export interface FooterGroup {
+  readonly title: string;
+  readonly links: readonly NavLink[];
+}
+
+export const footerGroups: readonly FooterGroup[] = [
+  {
+    title: 'Sections',
+    links: [
+      { href: '#practice', label: 'Practice' },
+      { href: '#work', label: 'Work' },
+      { href: '#studio', label: 'Studio' },
+      { href: '#contact', label: 'Contact' },
+    ],
+  },
+  {
+    title: 'Elsewhere',
+    links: [
+      { href: `mailto:${meta.email}`, label: 'Email' },
+      { href: repo, label: 'Source' },
+    ],
+  },
 ];
