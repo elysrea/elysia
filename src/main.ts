@@ -3,7 +3,6 @@ import './styles/index.css';
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
 import { initBenchValues } from './features/bench.ts';
-import { initBrief } from './features/brief.ts';
 import { initTabs } from './features/tabs.ts';
 import { initWorkDeepLinks } from './features/work.ts';
 import { query } from './lib/dom.ts';
@@ -41,11 +40,6 @@ enhance('bench', () => {
 
 enhance('work', () => {
   initWorkDeepLinks();
-});
-
-enhance('brief', () => {
-  const brief = query<HTMLElement>('[data-brief]');
-  if (brief) initBrief(brief);
 });
 
 enhance('hero', () => {

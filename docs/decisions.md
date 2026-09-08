@@ -531,3 +531,77 @@ every element reports its default `display` — which looks exactly like the
 fallback being broken. The no-JS behaviour was confirmed on `vite preview`,
 where the composer is `display: none` and the address, the subject-bearing
 action and all three steps are still in the markup.
+
+## The composer came out again
+
+**Supersedes** "The last section had to do something".
+
+**Context.** The brief composer worked — three inputs writing a `mailto:` with
+labelled lines, hidden without JavaScript, tested to the encoding. It was also
+the wrong answer to the question. Set against a reference for how the section
+should read, the difference was obvious: a studio's last word should sound like
+a person talking, and a panel of form fields sounds like a support ticket.
+
+**Decision.** Prose. The note runs as a sentence with links inside it — five
+projects, how we work, say hello — with the address still set large above it and
+a column of destinations to the right. Nothing to fill in.
+
+**Consequence.** `features/brief.ts` and its nine tests are gone. The behaviour
+they protected went with them, and that is the point: an enhancement nobody
+wants is a liability whatever its coverage. `git log` has it if the argument for
+a composer ever comes back.
+
+Copy stays data rather than markup. A run of prose is an array where a string is
+escaped text and an object is a link, so the content module cannot hand the
+renderer a string of HTML, and the sentence still reads as a sentence in
+`site.ts`. The footer lost its own nav in the same pass: the column beside the
+note carries those three links now, and repeating them twenty pixels lower was
+never doing anything.
+
+**One line drawn on purpose.** Links inside running prose are underlined. The
+page removed every hairline it had, and this is the exception: inside a
+sentence, a colour change alone does not say "this is a link" — and unlike a
+rule, an underline is doing work rather than dividing something.
+
+## The page sets
+
+**Context.** The footer was a row of links and a copyright line on the darkest
+value in the palette. The page opened with a sky and ended with a form field's
+worth of nothing.
+
+**Decision.** End on a horizon. A circle 5600px across, painted the same colour
+as the ground it sits on, pushed down until only a rim of it is inside the
+frame. It is never seen — it exists to have an edge, and all the light is in the
+shadow cast around that edge, which is what turns a glow into a horizon.
+
+Three shadow layers, cold to warm to cold, in the order the hero's colour ramp
+uses them: a tight white rim, the warm note just above it, then a wide violet
+atmosphere holding the curve. The body carries a short gradient of its own so it
+catches a little of that light before falling away to the ground colour, rather
+than reading as a hole cut in the page.
+
+**Consequence.** The globe that used to turn in the hero is gone, but the shape
+it left behind was worth keeping, and this costs one pseudo-element instead of a
+renderer — no canvas, no loop, nothing to pause when the tab is hidden.
+
+The geometry is stated rather than guessed: `--rim` is how far above the
+footer's bottom edge the horizon sits, and the circle's offset and the footer's
+padding are both derived from it, so the type always clears the line. The radius
+shrinks with the viewport, because a curve has to be read against the width it
+is drawn in — left at the desktop radius a phone shows a straight line.
+
+## A page that scrolled sideways on a phone
+
+Found while checking the footer at 390px: the address, set at
+`--size-contact`, ran 15px past the right edge and took the whole document with
+it. The minimum of the clamp was `1.9rem`, which is wider than a phone can hold
+for an unbreakable twenty-one character token.
+
+It predates the footer work — the same overflow reproduces on the previous
+commit, which is worth saying, because "my change broke it" and "my change
+revealed it" call for different fixes. The clamp now bottoms out at `1.35rem`
+and scales on `6.9vw`, and the link is `overflow-wrap: anywhere` as a floor it
+should never reach. Nothing overflows at 390px or at 320px.
+
+A horizontal scrollbar on a phone is not a small bug on a page whose whole
+argument is that the details were checked.
