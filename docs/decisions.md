@@ -722,3 +722,33 @@ obviously seamless, which is not a reason to believe it: rendered at both ends
 of the cycle the wordmark is pixel-identical, against a control at 50% that is
 not. The first attempt at that test compared screenshots with the nebula still
 running behind the transparent glyphs and reported a seam that did not exist.
+
+## The prism moved to the note
+
+**Supersedes** the placement in "The prism is the ramp, not a rainbow". The
+token and the argument for it stand; where it lands changed.
+
+Off the wordmark and off the capability numerals, onto the contact note. The
+wordmark is the page's loudest element already — size, weight and a canvas
+behind it — and giving it a second job made the hero busy rather than better.
+The numerals were the opposite problem: two characters of 11.5px mono each,
+which is not enough surface for a gradient to be a gradient. The note is one
+paragraph at reading size, which turns out to be the right amount of text: long
+enough that the spectrum travels, short enough that it is an accent rather than
+a wall of coloured type.
+
+**Legibility is the reason it is safe here.** Every stop is light, and against
+the deck ground they run 8.53 to 15.01 — the plain body text on that ground sits
+at about 10.53, so the coloured lines are in the same band, not below it. That is
+the check that decides whether an effect can go on body copy, and it is worth
+doing before the effect rather than after.
+
+`-webkit-text-fill-color` inherits, so the links inside the sentence take the
+prism too. That is correct — the paragraph is one piece of text — and their
+underlines come from `text-decoration-color`, which nothing here touches, so a
+link still reads as a link at whichever stop it lands on.
+
+One rule was written and deleted in the same pass: an override nudging that
+underline from 0.4 to 0.45 alpha, placed above the rule it meant to beat. Same
+specificity, earlier in the file, so it did nothing. The computed value said 0.4
+and the rule went.

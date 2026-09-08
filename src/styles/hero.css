@@ -83,37 +83,6 @@
     animation: wordmark-land 1700ms var(--ease-land) 1150ms forwards;
   }
 
-  /*
-   * The wordmark takes the prism.
-   *
-   * Guarded, because the fill is painted by clipping a background to the
-   * glyphs: without `background-clip: text` the transparent fill would leave
-   * the name invisible rather than merely unstyled. Inside the guard the
-   * colour above is overridden; outside it, it still stands.
-   */
-  @supports (background-clip: text) or (-webkit-background-clip: text) {
-    .wordmark {
-      background-image: var(--prism);
-      background-size: 200% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation:
-        wordmark-land 1700ms var(--ease-land) 1150ms forwards,
-        prism-sweep 24s linear 2900ms infinite;
-    }
-  }
-
-  /* One element width per cycle, which is one period of the image. */
-  @keyframes prism-sweep {
-    from {
-      background-position: 0% 0;
-    }
-    to {
-      background-position: 100% 0;
-    }
-  }
-
   @keyframes wordmark-land {
     to {
       opacity: 1;

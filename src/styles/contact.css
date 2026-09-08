@@ -27,6 +27,51 @@
     color: var(--text);
   }
 
+  /*
+   * The note takes the prism.
+   *
+   * Guarded, because the fill is a background clipped to the glyphs: without
+   * `background-clip: text` the transparent fill would leave the paragraph
+   * invisible rather than merely unstyled. Inside the guard the colour above is
+   * overridden; outside it, it still stands.
+   *
+   * -webkit-text-fill-color inherits, so the links inside the sentence take the
+   * prism with it — which is what should happen, since the paragraph is one
+   * piece of text. Their underlines are drawn from text-decoration-color, which
+   * is set below and untouched by any of this, so a link still looks like a
+   * link whichever stop it lands on.
+   *
+   * The gradient runs horizontally, so every line gets the same progression
+   * rather than the block being one long fade — at this measure that reads as
+   * deliberate instead of as a paragraph that got lighter towards the end.
+   */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .contact-note {
+      background-image: var(--prism);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: prism-sweep 28s linear infinite;
+    }
+  }
+
+  /* One element width per cycle, which is one period of the image. */
+  @keyframes prism-sweep {
+    from {
+      background-position: 0% 0;
+    }
+    to {
+      background-position: 100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact-note {
+      animation: none;
+    }
+  }
+
   /* Links inside running prose are underlined. It is the one place on the page
      that draws a line, because inside a sentence a colour change alone is not
      enough to say "this is a link" — and unlike a rule, it is doing work. */
