@@ -66,6 +66,7 @@ src/
     render.ts           Pure content -> HTML (runs at build time only)
   features/
     nav.ts              Sticky header + scrollspy, both IntersectionObserver
+    work.ts             Deep links: an open case study is addressable
     reveal.ts           Scroll-in transitions
     hero/
       host.ts           Canvas, events, timing, quality — everything but drawing
@@ -147,7 +148,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 189 tests, no browser required.
+`npm test` — 198 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long

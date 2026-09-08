@@ -2,6 +2,7 @@ import './styles/index.css';
 
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
+import { initWorkDeepLinks } from './features/work.ts';
 import { query } from './lib/dom.ts';
 import { SceneHost, initHeroSwitcher, resolveScene } from './features/hero/index.ts';
 
@@ -27,6 +28,10 @@ enhance('nav', () => {
 
 enhance('reveal', () => {
   initReveal();
+});
+
+enhance('work', () => {
+  initWorkDeepLinks();
 });
 
 enhance('hero', () => {

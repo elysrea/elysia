@@ -78,30 +78,99 @@
   .work-panel {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.9fr);
-    gap: 24px clamp(24px, 4vw, 64px);
+    gap: 28px clamp(24px, 4vw, 64px);
     padding: 4px 20px clamp(28px, 3.4vh, 42px);
   }
 
-  .work-detail {
+  /* The numbers come first: they are the part someone skimming will read. */
+  .case-metrics {
     grid-column: 2;
-    display: grid;
-    grid-template-columns: 88px minmax(0, 1fr);
-    gap: 10px 24px;
-    max-width: 62ch;
+    grid-row: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .work-detail dt {
+  .case-metrics li {
+    flex: 1 1 150px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--surface-raised);
+  }
+
+  .case-metrics b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.7vw, 1.5rem);
+    font-weight: var(--display-weight-text);
+    letter-spacing: var(--display-tracking);
+    color: var(--halo);
+  }
+
+  .case-metrics span {
+    display: block;
+    margin-top: 4px;
     color: var(--text-faint);
-    padding-top: 3px;
   }
 
-  .work-detail dd {
+  .case {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: 64ch;
+  }
+
+  .case-problem {
+    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+    line-height: 1.5;
+    color: var(--halo);
+  }
+
+  .case-approach {
+    margin-top: 18px;
     color: var(--text);
-    font-size: 15px;
+  }
+
+  .case-approach p + p {
+    margin-top: 1.05em;
+  }
+
+  .case-outcome {
+    margin-top: 22px;
+    padding-top: 18px;
+    color: var(--text);
+  }
+
+  .case-outcome b {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .case-meta {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .case-facts {
+    display: grid;
+    gap: 3px;
+  }
+
+  .case-facts dt {
+    color: var(--text-faint);
+  }
+
+  .case-facts dd {
+    margin-bottom: 12px;
+    color: var(--text);
+    font-size: 14.5px;
   }
 
   .work-stack {
-    grid-column: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -132,19 +201,21 @@
   }
 
   @media (max-width: 860px) {
-    .work-panel,
-    .work-detail {
+    .work-panel {
       grid-template-columns: 1fr;
+      gap: 22px;
     }
 
-    .work-panel > *,
-    .work-detail,
-    .work-stack {
+    .case-metrics,
+    .case,
+    .case-meta {
       grid-column: 1;
+      grid-row: auto;
     }
 
-    .work-detail dt {
-      padding-top: 0;
+    .case-metrics li {
+      flex-basis: 120px;
+      padding: 12px 14px;
     }
   }
 

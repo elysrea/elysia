@@ -286,3 +286,33 @@ It is applied by the inline script in the head rather than from a module,
 because a module runs after the document has rendered and the page would visibly
 reflow from one face into another. The script's allowlist is written at build
 time from `type/sets.ts`, so there is still one source of truth.
+
+## The work section had to earn its name
+
+The five projects carried twenty-two words each: a role and an outcome. On a
+site whose entire subject is the work, that was the emptiest thing on the page
+and the first thing a reader would test.
+
+Each is now a case study with the shape a case study needs — the situation
+before, the decisions taken and why, what changed, and three numbers — which is
+about six hundred words in place of a hundred. The content model grew to match,
+so the structure is enforced by the compiler rather than by whoever writes the
+next one.
+
+Two layout decisions came out of it. The numbers are placed first in the source,
+because on a phone the panel stacks in document order and the numbers are what
+someone skimming reads; on a wide screen explicit grid placement puts them back
+above the narrative. And the outcome is labelled in the accent colour, because
+it is the one paragraph a reader who is only skimming should not miss.
+
+## An open case study is a URL
+
+`<details>` opens and closes without any script. What script adds is that the
+open one is addressable: the hash follows it, a link into one arrives with it
+open, and the back button closes it.
+
+The synchronisation is one flag away from a loop — opening a study from the hash
+fires the same `toggle` event that writes the hash — so the code sets a guard
+while it is the one doing the opening. `<details name>` closing a sibling also
+fires a toggle, which is why closing only clears the hash when the hash actually
+pointed at the study that closed.

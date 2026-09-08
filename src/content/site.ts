@@ -18,7 +18,13 @@ export interface Capability {
   readonly detail: string;
 }
 
-/** One row of the work index, expandable into a short case study. */
+/** A number worth putting in front of someone, and what it counts. */
+export interface Metric {
+  readonly value: string;
+  readonly label: string;
+}
+
+/** One row of the work index, expandable into a case study. */
 export interface Project {
   readonly slug: string;
   readonly name: string;
@@ -26,7 +32,14 @@ export interface Project {
   readonly scope: string;
   readonly year: number;
   readonly role: string;
+  readonly duration: string;
+  /** The situation before the engagement. Why there was a job here at all. */
+  readonly problem: string;
+  /** What was done, in paragraphs. Decisions, not deliverables. */
+  readonly approach: readonly string[];
+  /** What changed, stated so it could be checked. */
   readonly outcome: string;
+  readonly metrics: readonly Metric[];
   readonly stack: readonly string[];
 }
 
@@ -103,8 +116,20 @@ export const projects: readonly Project[] = [
     scope: 'Design system and front-end for a clinical data platform',
     year: 2026,
     role: 'Design system lead, front-end build',
+    duration: '14 weeks',
+    problem:
+      'Four product teams had built four component sets from the same Figma file. A clinician moving between two modules in one shift met two different date pickers, two error conventions, and two definitions of critical.',
+    approach: [
+      'We did not start by drawing components. We started by cataloguing every state the four sets already had between them, which turned out to be sixty-three buttons that resolved to nine.',
+      'What replaced them is token-driven and framework-agnostic, because two of the four teams were not going to migrate their framework and pretending otherwise would have produced a fifth set. Every accessibility behaviour the library promises is wired to a test, so the documentation cannot quietly go stale.',
+    ],
     outcome:
-      'Replaced four divergent component sets with one token-driven library. Onboarding for a new screen went from a week of copy-paste to an afternoon.',
+      'Building a new screen went from a week of copy-paste to an afternoon. The audit that started the project now runs in CI against the live application, so drift is a failing build rather than a discovery.',
+    metrics: [
+      { value: '63 → 9', label: 'Button variants' },
+      { value: '4 → 1', label: 'Component sets' },
+      { value: '120', label: 'Screens at AA' },
+    ],
     stack: ['TypeScript', 'Design tokens', 'Storybook', 'WCAG 2.2 AA'],
   },
   {
@@ -112,19 +137,43 @@ export const projects: readonly Project[] = [
     name: 'Halcyon',
     scope: 'Identity and site for a synthetic biology lab',
     year: 2025,
-    role: 'Identity, art direction, build',
+    role: 'Identity, art direction, front-end build',
+    duration: '9 weeks',
+    problem:
+      "The lab's most striking asset was its microscope imagery, and that imagery was also the reason nothing else on the page could be read.",
+    approach: [
+      'The mark is drawn to survive being placed on top of a photograph: one weight, one counter, and no detail that disappears below sixteen pixels. It was tested against the twenty worst images in their archive before it was tested against a white square.',
+      'The site is static HTML. Imagery is processed at build time into three sizes and a blurred placeholder, so the type lands first and nothing moves after it.',
+    ],
     outcome:
-      'A mark and type system that survives a microscope image behind it. The site ships as static HTML and holds a 100 Lighthouse performance score on 3G.',
-    stack: ['Identity', 'Variable type', 'Static site', 'Canvas'],
+      'Holds a perfect performance score on a throttled connection, and the lab publishes new imagery without involving a developer.',
+    metrics: [
+      { value: '100', label: 'Lighthouse on 3G' },
+      { value: '0.00', label: 'Cumulative layout shift' },
+      { value: '11 kB', label: 'Critical path' },
+    ],
+    stack: ['Identity', 'Variable type', 'Static site', 'Image pipeline'],
   },
   {
     slug: 'northlight',
     name: 'Northlight',
     scope: 'Product design for a grid forecasting tool',
     year: 2025,
-    role: 'Product design, interaction prototyping',
+    role: 'Product design, research, prototyping',
+    duration: '11 weeks',
+    problem:
+      'Operators did not trust the forecast, and the reason was visible in the chart: one confident line standing in for a number that was never a single number.',
+    approach: [
+      'We rebuilt the forecast around uncertainty bands, then spent most of the engagement on the legend — which is the part that decides whether a band reads as rigour or as hedging.',
+      'Six operators replayed the same three past incidents against the old view and the new one. Three of them changed their decision, and two of those changes were the reason the design shipped in the shape it did.',
+    ],
     outcome:
-      'Reframed the forecast view around uncertainty bands instead of single lines. Operators stopped exporting to spreadsheets to sanity-check the model.',
+      'Operators stopped exporting to spreadsheets to sanity-check the model. The band became the default view in the downstream tools as well, which nobody had asked for at the start.',
+    metrics: [
+      { value: '3 of 6', label: 'Operators changed a call' },
+      { value: '−40%', label: 'Spreadsheet exports' },
+      { value: '3', label: 'Incidents replayed' },
+    ],
     stack: ['Data visualisation', 'Prototyping', 'User research'],
   },
   {
@@ -133,8 +182,20 @@ export const projects: readonly Project[] = [
     scope: 'Component library and documentation for an infrastructure team',
     year: 2024,
     role: 'Library architecture, documentation',
+    duration: '8 weeks',
+    problem:
+      'The library was good. Its documentation described a version of it from eight months earlier, and every consuming team had quietly forked rather than argue with the docs.',
+    approach: [
+      "Each component's documented accessibility behaviour was rewritten as an executable test, and the documentation renders from that same source. A claim and its proof are now the same object.",
+      'Docs deploy from the pipeline that publishes the package, so a change that breaks a promise fails before it ships rather than being discovered by the team that trusted it.',
+    ],
     outcome:
-      'Documented every component against the accessibility behaviour it promises, then wired those promises to tests so the docs cannot quietly go stale.',
+      'The forks folded back in over a quarter. The docs cannot go stale, because a stale claim is a failing test rather than a stale sentence.',
+    metrics: [
+      { value: '9 → 0', label: 'Internal forks' },
+      { value: '100%', label: 'Behaviours under test' },
+      { value: '1', label: 'Source of truth' },
+    ],
     stack: ['TypeScript', 'Testing Library', 'Docs as code'],
   },
   {
@@ -142,10 +203,22 @@ export const projects: readonly Project[] = [
     name: 'Osmo',
     scope: 'Motion language and interactive prototype for a hardware launch',
     year: 2024,
-    role: 'Motion design, WebGL prototype',
+    role: 'Motion design, prototyping',
+    duration: '10 weeks',
+    problem:
+      "Three agencies, one launch, and no shared definition of how anything should move. The device's own interface and the site announcing it did not agree on what fast meant.",
+    approach: [
+      'One easing family and three transition primitives, specified in prose and in code, so engineering could apply them correctly without a designer in the room.',
+      'Every primitive ships with a reduced-motion counterpart that is a designed state rather than a disabled one — which is the difference between honouring the setting and punishing it.',
+    ],
     outcome:
-      'One easing family and three transition primitives, specified so engineering could apply them without a designer in the room.',
-    stack: ['Motion spec', 'WebGL', 'Reduced-motion parity'],
+      'Applied across web, retail display and the device interface without a motion designer on the critical path for any of them.',
+    metrics: [
+      { value: '3', label: 'Transition primitives' },
+      { value: '1', label: 'Easing family' },
+      { value: 'Parity', label: 'Reduced-motion states' },
+    ],
+    stack: ['Motion spec', 'WebGL', 'Prototyping'],
   },
 ];
 

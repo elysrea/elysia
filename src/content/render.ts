@@ -114,7 +114,13 @@ export function renderCapabilities(): string {
  * platform, and every case study still readable with JavaScript off.
  */
 function renderProject(project: Project): string {
-  const { slug, name, scope, year, role, outcome, stack } = project;
+  const { slug, name, scope, year, role, duration, problem, approach, outcome, metrics, stack } =
+    project;
+
+  const paragraphs = approach
+    .map((line) => `<p>${escapeHtml(line)}</p>`)
+    .join('\n                ');
+
   return `<details class="work-item" name="work" id="work-${escapeHtml(slug)}">
           <summary class="work-row">
             <span class="work-name">${escapeHtml(name)}</span>
@@ -123,15 +129,32 @@ function renderProject(project: Project): string {
             <span class="work-cue mono" aria-hidden="true">Detail</span>
           </summary>
           <div class="work-panel">
-            <dl class="work-detail">
-              <dt class="mono">Role</dt>
-              <dd>${escapeHtml(role)}</dd>
-              <dt class="mono">Outcome</dt>
-              <dd>${escapeHtml(outcome)}</dd>
-            </dl>
-            <ul class="work-stack mono" aria-label="Stack">
-              ${stack.map((item) => `<li>${escapeHtml(item)}</li>`).join('\n              ')}
+            <ul class="case-metrics" aria-label="Results">
+              ${metrics
+                .map(
+                  (metric) =>
+                    `<li><b>${escapeHtml(metric.value)}</b><span class="mono">${escapeHtml(metric.label)}</span></li>`,
+                )
+                .join('\n              ')}
             </ul>
+            <div class="case">
+              <p class="case-problem">${escapeHtml(problem)}</p>
+              <div class="case-approach">
+                ${paragraphs}
+              </div>
+              <p class="case-outcome"><b class="mono">Outcome</b> ${escapeHtml(outcome)}</p>
+            </div>
+            <aside class="case-meta">
+              <dl class="case-facts">
+                <dt class="mono">Role</dt>
+                <dd>${escapeHtml(role)}</dd>
+                <dt class="mono">Duration</dt>
+                <dd>${escapeHtml(duration)}</dd>
+              </dl>
+              <ul class="work-stack mono" aria-label="Stack">
+                ${stack.map((item) => `<li>${escapeHtml(item)}</li>`).join('\n                ')}
+              </ul>
+            </aside>
           </div>
         </details>`;
 }
