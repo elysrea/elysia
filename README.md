@@ -41,10 +41,9 @@ to switch _without losing the animation you were comparing_.
 | `aurora`  | Curtains of light low in the frame, each one filled path whose edge is a sum of three sines.                              |
 | `nebula`  | Domain-warped noise through the same colour ramp the planet uses, drifting.                                               |
 
-Four is arguably three too many for a finished site, and the switcher is a
-demo affordance rather than a feature a studio would ship. Both are one commit
-from being deleted: the catalogue drives the tabs, the registry builds the
-scenes, and a test keeps the two in step.
+Four is arguably three too many for a finished site. They are one commit from
+being deleted: the catalogue lists them, the registry builds them, and a test
+keeps the two in step.
 
 Everything about _hosting_ an effect is shared and lives in `hero/host.ts`:
 sizing for the device pixel ratio, pausing off-screen and on a hidden tab,
@@ -66,6 +65,7 @@ src/
     render.ts           Pure content -> HTML (runs at build time only)
   features/
     nav.ts              Sticky header + scrollspy, both IntersectionObserver
+    deck.ts             The seam tabs: one section panel at a time
     work.ts             Deep links: an open case study is addressable
     reveal.ts           Scroll-in transitions
     hero/
@@ -148,7 +148,7 @@ invisible and the path setup is not.
 
 ## Tests
 
-`npm test` — 198 tests, no browser required.
+`npm test` — 210 tests, no browser required.
 
 The suite covers the parts where being wrong is invisible: that the PRNG is
 reproducible and uniform, that the timestep planner cannot spiral after a long

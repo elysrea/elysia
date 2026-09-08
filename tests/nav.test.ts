@@ -21,12 +21,6 @@ let harness: ObserverHarness;
 let nav: HTMLElement;
 let teardown: () => void;
 
-const link = (hash: string): HTMLAnchorElement => {
-  const found = document.querySelector<HTMLAnchorElement>(`a[href="${hash}"]`);
-  if (!found) throw new Error(`missing link ${hash}`);
-  return found;
-};
-
 beforeEach(() => {
   harness = installIntersectionObserver();
   document.body.innerHTML = markup;
@@ -60,48 +54,14 @@ describe('initNav sticky state', () => {
   });
 });
 
-describe('initNav scrollspy', () => {
-  const section = (id: string): Element => document.querySelector(`#${id}`)!;
-
-  it('marks the section being read', () => {
-    const spy = harness.observing(section('work'))!;
-    spy.emit([{ target: section('work'), isIntersecting: true }]);
-
-    expect(link('#work').getAttribute('aria-current')).toBe('true');
-    expect(link('#studio').hasAttribute('aria-current')).toBe(false);
-  });
-
-  it('moves the marker as the reader scrolls on', () => {
-    const spy = harness.observing(section('work'))!;
-    spy.emit([{ target: section('work'), isIntersecting: true }]);
-    spy.emit([
-      { target: section('work'), isIntersecting: false },
-      { target: section('studio'), isIntersecting: true },
-    ]);
-
-    expect(link('#work').hasAttribute('aria-current')).toBe(false);
-    expect(link('#studio').getAttribute('aria-current')).toBe('true');
-  });
-
-  it('marks nothing between sections', () => {
-    const spy = harness.observing(section('work'))!;
-    spy.emit([{ target: section('work'), isIntersecting: true }]);
-    spy.emit([{ target: section('work'), isIntersecting: false }]);
-
-    expect(document.querySelectorAll('[aria-current]').length).toBe(0);
-  });
-
-  it('breaks ties in document order, never at random', () => {
-    const spy = harness.observing(section('work'))!;
-    spy.emit([
-      { target: section('studio'), isIntersecting: true },
-      { target: section('work'), isIntersecting: true },
-    ]);
-
-    expect(link('#work').getAttribute('aria-current')).toBe('true');
-  });
-
-  it('only watches the band across the middle of the viewport', () => {
-    expect(harness.observing(section('work'))?.options?.rootMargin).toBe('-45% 0px -50% 0px');
+describe('initNav and the current section', () => {
+  it('leaves marking the current section to the deck', () => {
+    // Which section is current used to be inferred here from scroll position.
+    // The deck shows one at a time now, so it is a fact rather than a guess,
+    // and two things marking the same links would fight.
+    const work = document.querySelector('#work');
+    expect(work).not.toBeNull();
+    expect(harness.observing(work!)).toBeUndefined();
+    expect(document.querySelectorAll('.nav-links [aria-current]')).toHaveLength(0);
   });
 });

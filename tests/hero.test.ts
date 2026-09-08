@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_SCENE,
   createScene,
-  initHeroSwitcher,
   resolveScene,
   sceneNames,
   scenes,
@@ -69,102 +68,6 @@ describe('createScene', () => {
   it('falls back rather than throwing on a name it does not know', () => {
     expect(createScene('nonsense')).toBeDefined();
     expect(createScene('constructor')).toBeDefined();
-  });
-});
-
-describe('hero switcher', () => {
-  const markup = HERO_CATALOGUE.map(
-    (entry) =>
-      `<a class="deck-tab" href="?hero=${entry.name}" data-hero="${entry.name}"${
-        entry.name === DEFAULT_HERO ? ' aria-current="true"' : ''
-      }>${entry.label}</a>`,
-  ).join('');
-
-  const build = () => {
-    document.body.innerHTML = `<div class="deck-tabs">${markup}</div>`;
-    const container = document.querySelector('.deck-tabs');
-    if (!container) throw new Error('expected a container');
-
-    const scenes: unknown[] = [];
-    const host = { setScene: (scene: unknown) => scenes.push(scene) } as never;
-    const teardown = initHeroSwitcher(host, container);
-
-    return { container, scenes, teardown };
-  };
-
-  // Scoped to the tab strip on purpose: the switcher also stamps `data-hero`
-  // on the document element, and an unscoped lookup matches that first.
-  const tab = (name: string): HTMLAnchorElement => {
-    const found = document.querySelector<HTMLAnchorElement>(`.deck-tabs [data-hero="${name}"]`);
-    if (!found) throw new Error(`missing tab ${name}`);
-    return found;
-  };
-
-  const click = (name: string, init: MouseEventInit = {}): MouseEvent => {
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...init });
-    tab(name).dispatchEvent(event);
-    return event;
-  };
-
-  afterEach(() => {
-    document.body.innerHTML = '';
-  });
-
-  it('swaps the scene without leaving the page', () => {
-    const { scenes: swapped, teardown } = build();
-
-    const event = click('eclipse');
-
-    expect(swapped).toHaveLength(1);
-    expect(event.defaultPrevented).toBe(true);
-    teardown();
-  });
-
-  it('moves the marker to the tab that was chosen', () => {
-    const { teardown } = build();
-
-    click('aurora');
-
-    expect(tab('aurora').getAttribute('aria-current')).toBe('true');
-    expect(tab(DEFAULT_HERO).hasAttribute('aria-current')).toBe(false);
-    expect(document.querySelectorAll('.deck-tabs [aria-current]')).toHaveLength(1);
-    teardown();
-  });
-
-  it('records the choice on the document, for anything else that cares', () => {
-    const { teardown } = build();
-
-    click('planet');
-
-    expect(document.documentElement.getAttribute('data-hero')).toBe('planet');
-    teardown();
-  });
-
-  it('leaves a modified click alone, because that means "new tab"', () => {
-    const { scenes: swapped, teardown } = build();
-
-    const meta = click('eclipse', { metaKey: true });
-
-    expect(meta.defaultPrevented).toBe(false);
-    expect(swapped).toHaveLength(0);
-    teardown();
-  });
-
-  it('stops listening on teardown', () => {
-    const { scenes: swapped, teardown } = build();
-    teardown();
-
-    click('eclipse');
-
-    expect(swapped).toHaveLength(0);
-  });
-
-  it('does nothing, safely, when there are no tabs', () => {
-    document.body.innerHTML = '<div class="deck-tabs"></div>';
-    const container = document.querySelector('.deck-tabs');
-    if (!container) throw new Error('expected a container');
-
-    expect(() => initHeroSwitcher({} as never, container)()).not.toThrow();
   });
 });
 

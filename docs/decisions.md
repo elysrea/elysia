@@ -316,3 +316,38 @@ fires the same `toggle` event that writes the hash — so the code sets a guard
 while it is the one doing the opening. `<details name>` closing a sibling also
 fires a toggle, which is why closing only clears the hash when the hash actually
 pointed at the study that closed.
+
+## The seam tabs switch the page, not the hero
+
+They used to switch the hero, which made them a demo control. They now switch
+the section below them, which makes them navigation.
+
+Deciding that took more than moving a click handler, because three things were
+already holding the same state:
+
+**The hash.** It has to mean two things at once. `#work` is the Work panel;
+`#work-meridian` is the Work panel _and_ a case study open inside it. One
+resolver — `sectionForHash` — answers the first question, and the work feature
+answers the second, so neither has to know the other exists. When a case study
+is already in the hash the deck leaves it alone rather than flattening it back
+to `#work`.
+
+**The scrollspy.** Marking the current section by watching sections cross the
+middle of the viewport was a reasonable guess when they all scrolled past. Now
+one is showing and the rest are `hidden`, so it is a fact the deck knows. Two
+things marking the same header links would have fought, so the scrollspy is
+gone rather than left running.
+
+**The click.** A tab is a link to a section, so following it would scroll to a
+panel already in front of the reader. The handler prevents that and switches in
+place — except for modified clicks, which mean "new tab" and are left alone.
+
+Without script none of it applies: four sections on the page in order, four
+links pointing at them. Script upgrades the strip to a real tablist — roving
+tabindex, arrows, Home and End, `aria-selected`, a labelled `tabpanel` each —
+because at that point it is a tab widget and should say so.
+
+The trade is real and worth stating: a tabbed page hides three quarters of
+itself, and a visitor who does not touch the tabs sees one section. That is the
+right shape for a product page built around a switchable view, and a bet on a
+studio site.

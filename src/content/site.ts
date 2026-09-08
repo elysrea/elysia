@@ -67,6 +67,19 @@ export const meta: SiteMeta = {
   founded: 2023,
 };
 
+/** The panels of the deck, in order. The first one is what opens. */
+export interface SectionEntry {
+  readonly id: string;
+  readonly label: string;
+}
+
+export const sections: readonly SectionEntry[] = [
+  { id: 'practice', label: 'Practice' },
+  { id: 'work', label: 'Work' },
+  { id: 'studio', label: 'Studio' },
+  { id: 'contact', label: 'Contact' },
+];
+
 export const navLinks: readonly NavLink[] = [
   { href: '#practice', label: 'Practice' },
   { href: '#work', label: 'Work' },

@@ -73,11 +73,6 @@
     background: var(--surface-raised);
   }
 
-  .deck-tab[aria-current='true'] {
-    background: var(--surface-hover);
-    color: var(--halo);
-  }
-
   @media (max-width: 560px) {
     .deck-tabs {
       gap: 0;
@@ -93,5 +88,26 @@
   /* The first section starts under the tab, so it needs room for it. */
   .deck > .section:first-child {
     padding-top: calc(var(--section-gap) * 0.72);
+  }
+
+  /* With script the deck shows one panel at a time, and a panel that has just
+     been asked for should arrive rather than appear. Without script every
+     section is on the page in order and none of this applies. */
+  .deck[data-tabs='on'] > .section {
+    padding-top: calc(var(--section-gap) * 0.72);
+    animation: panel-in 420ms var(--ease-out) both;
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .deck-tab[aria-selected='true'],
+  .deck-tab[aria-current='true'] {
+    background: var(--surface-hover);
+    color: var(--halo);
   }
 }

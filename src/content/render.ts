@@ -7,7 +7,6 @@
  * empty root element.
  */
 
-import { DEFAULT_HERO, HERO_CATALOGUE } from '../features/hero/catalogue.ts';
 import { typeNames } from '../features/type/sets.ts';
 import {
   announcement,
@@ -18,6 +17,7 @@ import {
   meta,
   navCta,
   navLinks,
+  sections,
   practice,
   projects,
   studio,
@@ -70,15 +70,17 @@ export function renderAnnouncement(): string {
 /**
  * The tabs in the seam between the hero and the page.
  *
- * They are rendered as real links to `?hero=…`, so the switcher works with
- * JavaScript off — it just costs a reload. The active one is marked here from
- * the default, and re-marked by the switcher once it takes over.
+ * They are rendered as real links to each section, so with JavaScript off they
+ * are exactly that: links to four sections that are all on the page. Script
+ * upgrades them into tabs and hides the panels they are not pointing at.
  */
-export function renderHeroTabs(): string {
-  return HERO_CATALOGUE.map((entry) => {
-    const current = entry.name === DEFAULT_HERO ? ' aria-current="true"' : '';
-    return `<a class="deck-tab" href="?hero=${escapeHtml(entry.name)}" data-hero="${escapeHtml(entry.name)}" title="${escapeHtml(entry.blurb)}"${current}>${escapeHtml(entry.label)}</a>`;
-  }).join('\n          ');
+export function renderDeckTabs(): string {
+  return sections
+    .map((section, index) => {
+      const current = index === 0 ? ' aria-current="true"' : '';
+      return `<a class="deck-tab" href="#${escapeHtml(section.id)}" data-section="${escapeHtml(section.id)}"${current}>${escapeHtml(section.label)}</a>`;
+    })
+    .join('\n          ');
 }
 
 /**
@@ -210,7 +212,7 @@ export function renderStructuredData(): string {
 export const slots: Readonly<Record<string, () => string>> = {
   'nav-links': renderNavLinks,
   'nav-cta': renderNavCta,
-  'hero-tabs': renderHeroTabs,
+  'deck-tabs': renderDeckTabs,
   'type-names': renderTypeNames,
   announcement: renderAnnouncement,
   practice: renderPractice,

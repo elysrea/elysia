@@ -1,16 +1,18 @@
-import { queryAll } from '../lib/dom.ts';
-
 export interface NavOptions {
   /** Distance scrolled before the bar takes on its background, in pixels. */
   readonly stuckAfter?: number;
 }
 
 /**
- * Sticky state and scrollspy for the header.
+ * Sticky state for the header.
  *
- * Both use IntersectionObserver rather than a scroll handler: a scroll listener
- * fires on every wheel tick and has to be throttled by hand, while the observer
- * only wakes the main thread when the answer actually changes.
+ * It uses IntersectionObserver on a sentinel rather than a scroll handler: a
+ * scroll listener fires on every wheel tick and has to be throttled by hand,
+ * while the observer only wakes the main thread when the answer changes.
+ *
+ * Marking the current section used to live here as a scrollspy. The deck shows
+ * one section at a time now, so which one is current is a fact the deck knows
+ * and no longer something to infer from scroll position.
  *
  * Returns a teardown function.
  */
@@ -40,45 +42,6 @@ export function initNav(nav: HTMLElement, options: NavOptions = {}): () => void 
     stuckObserver.disconnect();
     sentinel.remove();
   });
-
-  // --- scrollspy ---------------------------------------------------------
-
-  const links = queryAll<HTMLAnchorElement>('.nav-links a', nav).filter((link) =>
-    link.hash.startsWith('#'),
-  );
-
-  const sections = new Map<Element, HTMLAnchorElement>();
-  for (const link of links) {
-    const section = document.querySelector(link.hash);
-    if (section) sections.set(section, link);
-  }
-
-  if (sections.size > 0) {
-    const active = new Set<Element>();
-
-    const spy = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) active.add(entry.target);
-          else active.delete(entry.target);
-        }
-
-        // With a narrow root margin at most one section qualifies, but keep
-        // document order as the tie-break so the result is never arbitrary.
-        const current = [...sections.keys()].find((section) => active.has(section));
-
-        for (const [section, link] of sections) {
-          if (section === current) link.setAttribute('aria-current', 'true');
-          else link.removeAttribute('aria-current');
-        }
-      },
-      // Only the band across the middle of the viewport counts as "reading".
-      { rootMargin: '-45% 0px -50% 0px' },
-    );
-
-    for (const section of sections.keys()) spy.observe(section);
-    teardown.push(() => spy.disconnect());
-  }
 
   return () => {
     for (const off of teardown) off();

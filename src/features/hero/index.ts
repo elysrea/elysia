@@ -13,7 +13,6 @@ export { NebulaScene } from './scenes/nebula.ts';
 export { PlanetScene } from './scenes/planet.ts';
 export { fbm, makeNoise } from './noise.ts';
 export { HERO_CATALOGUE, DEFAULT_HERO, type HeroEntry } from './catalogue.ts';
-export { initHeroSwitcher } from './switcher.ts';
 
 /**
  * The hero treatments, by name. The catalogue lists them; this builds them.

@@ -2,9 +2,10 @@ import './styles/index.css';
 
 import { initNav } from './features/nav.ts';
 import { initReveal } from './features/reveal.ts';
+import { initDeckTabs } from './features/deck.ts';
 import { initWorkDeepLinks } from './features/work.ts';
 import { query } from './lib/dom.ts';
-import { SceneHost, initHeroSwitcher, resolveScene } from './features/hero/index.ts';
+import { SceneHost, resolveScene } from './features/hero/index.ts';
 
 /**
  * Entry point.
@@ -30,6 +31,12 @@ enhance('reveal', () => {
   initReveal();
 });
 
+// The deck runs before the work feature: a link to a case study has to land on
+// a panel that is already showing before the study inside it is opened.
+enhance('deck', () => {
+  initDeckTabs();
+});
+
 enhance('work', () => {
   initWorkDeepLinks();
 });
@@ -41,7 +48,5 @@ enhance('hero', () => {
   const { name, scene } = resolveScene(window.location.search);
   document.documentElement.setAttribute('data-hero', name);
 
-  const host = new SceneHost(canvas, scene);
-  const tabs = query('.deck-tabs');
-  if (tabs) initHeroSwitcher(host, tabs);
+  new SceneHost(canvas, scene);
 });

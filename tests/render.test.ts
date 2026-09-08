@@ -4,15 +4,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   escapeHtml,
-  renderHeroTabs,
+  renderDeckTabs,
   renderStructuredData,
   renderTypeNames,
   renderWork,
   slots,
 } from '../src/content/render.ts';
-import { DEFAULT_HERO, HERO_CATALOGUE } from '../src/features/hero/catalogue.ts';
 import { DEFAULT_TYPE, resolveTypeSet, typeNames } from '../src/features/type/sets.ts';
-import { projects } from '../src/content/site.ts';
+import { projects, sections } from '../src/content/site.ts';
 
 describe('escapeHtml', () => {
   it('neutralises every character that could break out of markup', () => {
@@ -50,22 +49,30 @@ describe('renderWork', () => {
   });
 });
 
-describe('renderHeroTabs', () => {
-  it('renders a real link per hero, so the switcher works without JavaScript', () => {
-    const html = renderHeroTabs();
+describe('renderDeckTabs', () => {
+  it('renders a real link per section, so the page works without JavaScript', () => {
+    const html = renderDeckTabs();
 
-    for (const entry of HERO_CATALOGUE) {
-      expect(html).toContain(`href="?hero=${entry.name}"`);
-      expect(html).toContain(`data-hero="${entry.name}"`);
-      expect(html).toContain(entry.label);
+    for (const section of sections) {
+      expect(html).toContain(`href="#${section.id}"`);
+      expect(html).toContain(`data-section="${section.id}"`);
+      expect(html).toContain(section.label);
     }
   });
 
-  it('marks the default before any script runs', () => {
-    const marked = renderHeroTabs().match(/aria-current="true"/g) ?? [];
+  it('marks the first section before any script runs', () => {
+    const marked = renderDeckTabs().match(/aria-current="true"/g) ?? [];
 
     expect(marked).toHaveLength(1);
-    expect(renderHeroTabs()).toContain(`data-hero="${DEFAULT_HERO}" title`);
+    expect(renderDeckTabs().indexOf('aria-current')).toBeLessThan(
+      renderDeckTabs().indexOf(`data-section="${sections[1]?.id}"`),
+    );
+  });
+
+  it('names a panel that exists on the page', () => {
+    const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+
+    for (const section of sections) expect(html).toContain(`id="${section.id}"`);
   });
 });
 
