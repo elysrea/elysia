@@ -18,53 +18,12 @@
     max-width: 62ch;
   }
 
-  .contact-lede {
-    max-width: 20ch;
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.5vw, 2rem);
-    font-weight: var(--display-weight-text);
-    line-height: 1.15;
-    letter-spacing: var(--display-tracking);
-    color: var(--text);
-  }
-
-  .contact-link {
-    display: inline-block;
-    max-width: 100%;
-    margin-top: clamp(14px, 2.2vh, 22px);
-    font-family: var(--font-display);
-    font-size: var(--size-contact);
-    font-weight: var(--display-weight);
-    line-height: 1.05;
-    letter-spacing: var(--display-tracking);
-    color: var(--halo);
-    text-decoration: none;
-
-    /* The address is one long unbreakable token. Set larger than this it ran
-       past the right edge of a phone and took the document with it. */
-    overflow-wrap: anywhere;
-    background-image: linear-gradient(
-      to right,
-      rgb(var(--halo-rgb) / 0.5),
-      rgb(var(--halo-rgb) / 0.5)
-    );
-    background-size: 0% 1px;
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    transition: background-size var(--dur-mid) var(--ease-out);
-  }
-
-  .contact-link:hover,
-  .contact-link:focus-visible {
-    background-size: 100% 1px;
-  }
-
+  /* The note is the section now: the line above it and the address below it
+     both went, and what is left says the same thing in a sentence. */
   .contact-note {
-    max-width: 52ch;
-    margin-top: clamp(22px, 3.4vh, 34px);
-    font-size: 1rem;
-    line-height: 1.65;
+    max-width: 54ch;
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.62;
     color: var(--text);
   }
 

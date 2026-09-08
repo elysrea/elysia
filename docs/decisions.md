@@ -665,3 +665,25 @@ The `Source` link points at the repository. The studio is invented; the code is
 not, and a footer is the conventional place to say so. External links carry
 `rel="noreferrer"` — the page has no business telling another site where its
 visitors came from.
+
+## The contact section lost its headline and its address
+
+The section opened with "Tell us what you are building." and set
+`studio@elysia.example` underneath it at display size. Both are gone; the note
+is the section now.
+
+The headline was saying what the paragraph under it already said, one line
+earlier and twice as loud. The address was the more interesting cut: it was the
+biggest thing on the page after the wordmark, and everything it did is still
+done — "say hello" in the note is a `mailto:`, the row under it has Email, and
+so does the footer. A twenty-one character string set at 2.85rem was buying
+emphasis, not access, and it was the one element on the page that had to be
+argued with about wrapping on a phone.
+
+`--size-contact` went with it, and so did `.lede--wide`, which had quietly lost
+its last user when the contact lede got a class of its own a commit earlier.
+Dead CSS is not free: it is a rule someone later has to read and decide about.
+
+The footer came down about a fifth in height at the same time. Nothing was
+removed from it — the padding and the gaps were simply larger than a footer with
+two short columns needs.

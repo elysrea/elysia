@@ -26,10 +26,6 @@
     color: var(--halo);
   }
 
-  .lede--wide {
-    max-width: 26ch;
-  }
-
   .body p + p {
     margin-top: 1.15em;
   }

@@ -12,8 +12,8 @@
    */
   .foot {
     display: grid;
-    gap: clamp(48px, 8vh, 84px);
-    padding: clamp(56px, 8vh, 92px) var(--edge) clamp(36px, 5vh, 52px);
+    gap: clamp(30px, 4.5vh, 48px);
+    padding: clamp(40px, 5.5vh, 60px) var(--edge) clamp(26px, 3.5vh, 36px);
     background: var(--void);
   }
 
@@ -21,7 +21,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 40px clamp(48px, 8vw, 120px);
+    gap: 28px clamp(40px, 7vw, 110px);
   }
 
   .foot-name {
@@ -35,7 +35,7 @@
   }
 
   .foot-tagline {
-    margin-top: 12px;
+    margin-top: 10px;
     max-width: 28ch;
     color: var(--text-dim);
   }
@@ -43,11 +43,11 @@
   .foot-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 32px clamp(48px, 7vw, 96px);
+    gap: 24px clamp(40px, 6vw, 84px);
   }
 
   .foot-group-title {
-    margin: 0 0 14px;
+    margin: 0 0 11px;
     font: inherit;
     font-weight: 500;
     color: var(--text-faint);
@@ -55,7 +55,7 @@
 
   .foot-group ul {
     display: grid;
-    gap: 9px;
+    gap: 7px;
     margin: 0;
     padding: 0;
     list-style: none;

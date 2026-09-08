@@ -253,8 +253,6 @@ export const facts: readonly Fact[] = [
 export type Fragment = string | { readonly text: string; readonly href: string };
 
 export const contact = {
-  lede: 'Tell us what you are building.',
-
   note: [
     'Send a short note about the project, the timeline and who is on the team — we answer within two working days. If you would rather look before you write, there are ',
     { text: 'five projects', href: '#work' },

@@ -282,8 +282,6 @@ function renderFragments(fragments: readonly Fragment[]): string {
 
 export function renderContact(): string {
   return `<div class="contact">
-        <p class="contact-lede">${escapeHtml(contact.lede)}</p>
-        <a class="contact-link" href="mailto:${escapeHtml(meta.email)}">${escapeHtml(meta.email)}</a>
         <p class="contact-note">${renderFragments(contact.note)}</p>
         <p class="contact-place">${escapeHtml(contact.place)}</p>
         <nav class="contact-links label" aria-label="Elsewhere">
