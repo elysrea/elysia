@@ -2,27 +2,37 @@
   /*
    * The close of the page: a note, not a form.
    *
-   * The address is set large because it is the one thing here worth stealing,
-   * and the paragraph under it does the work a contact form usually pretends
-   * to do — it says what to send and offers somewhere else to look first.
+   * Centred, and deliberately smaller than the sections above it. Everything
+   * else on the page is set left and runs wide; ending on a narrow centred
+   * column reads as the page drawing to a point rather than carrying on.
    */
-  .contact-grid {
+  #contact .wrap {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: clamp(28px, 5vw, 80px);
-    align-items: start;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .contact {
+    display: grid;
+    justify-items: center;
+    max-width: 62ch;
+  }
+
+  .contact-lede {
+    max-width: 20ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+    font-weight: var(--display-weight-text);
+    line-height: 1.15;
+    letter-spacing: var(--display-tracking);
+    color: var(--text);
   }
 
   .contact-link {
     display: inline-block;
     max-width: 100%;
-    margin-top: clamp(24px, 4vh, 44px);
-
-    /* The address is one long unbreakable token. Set at the display size it
-       ran past the right edge of a phone — the page scrolled sideways — so it
-       is allowed to break rather than push the viewport. The clamp on
-       --size-contact should keep it from ever coming to that. */
-    overflow-wrap: anywhere;
+    margin-top: clamp(14px, 2.2vh, 22px);
     font-family: var(--font-display);
     font-size: var(--size-contact);
     font-weight: var(--display-weight);
@@ -30,6 +40,10 @@
     letter-spacing: var(--display-tracking);
     color: var(--halo);
     text-decoration: none;
+
+    /* The address is one long unbreakable token. Set larger than this it ran
+       past the right edge of a phone and took the document with it. */
+    overflow-wrap: anywhere;
     background-image: linear-gradient(
       to right,
       rgb(var(--halo-rgb) / 0.5),
@@ -47,10 +61,10 @@
   }
 
   .contact-note {
-    max-width: 46ch;
-    margin-top: clamp(26px, 4vh, 40px);
-    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
-    line-height: 1.6;
+    max-width: 52ch;
+    margin-top: clamp(22px, 3.4vh, 34px);
+    font-size: 1rem;
+    line-height: 1.65;
     color: var(--text);
   }
 
@@ -72,21 +86,16 @@
 
   .contact-place {
     max-width: 46ch;
-    margin-top: clamp(20px, 3vh, 30px);
-    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
-    line-height: 1.6;
+    margin-top: clamp(14px, 2vh, 20px);
     color: var(--text-dim);
   }
 
   .contact-links {
-    display: grid;
-    gap: 6px;
-    justify-items: end;
-    text-align: right;
-    font-family: var(--font-display);
-    font-size: clamp(1.15rem, 2vw, 1.55rem);
-    font-weight: var(--display-weight-text);
-    letter-spacing: var(--display-tracking);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 28px;
+    margin-top: clamp(28px, 4vh, 44px);
   }
 
   .contact-links a {
@@ -98,17 +107,5 @@
   .contact-links a:hover,
   .contact-links a:focus-visible {
     color: var(--halo);
-  }
-
-  @media (max-width: 720px) {
-    .contact-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .contact-links {
-      justify-items: start;
-      text-align: left;
-      margin-top: 8px;
-    }
   }
 }

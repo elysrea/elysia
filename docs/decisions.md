@@ -605,3 +605,40 @@ should never reach. Nothing overflows at 390px or at 320px.
 
 A horizontal scrollbar on a phone is not a small bug on a page whose whole
 argument is that the details were checked.
+
+## The page sets, second attempt
+
+**Supersedes** "The page sets".
+
+**Context.** The horizon worked. Asked for another version of it, two were built
+before one was worth keeping.
+
+**Aurora, rejected.** Curtains of light rising from the bottom edge, echoing the
+hero that was deleted. It read as a smear. The failure is one this codebase has
+met before: the warm accent and the violet overlap and _sum_, and where they
+overlap they go brown. The heat map solved that by screening rather than adding;
+stacked CSS gradients have no such option, so the fix would have been to stop
+overlapping them, at which point it is no longer an aurora. Some ideas do not
+survive contact with their medium.
+
+**Eclipse, kept.** The same move as the horizon, turned into a whole shape
+rather than an arc: a body the colour of the ground it sits on, with the light
+stacked around its edge. Nothing is drawn, something is occluded, and what you
+see is the corona the occlusion leaves behind. The copyright sits inside it, in
+the shadow.
+
+**A rendering bug worth recording.** The first eclipse put all four light layers
+in one `box-shadow`, the widest at `280px` blur. Chrome tiles a blur that large
+and the seams show as hard vertical bands across the whole footer — visible in a
+screenshot, and nothing to do with the CSS being wrong. The three tight layers
+stayed in the shadow; the wide violet atmosphere became a `radial-gradient` on a
+second pseudo-element, which is the same light for less work and renders clean.
+
+**The geometry is derived, not guessed.** `--body` is the disc, `--corona` is how
+far the light reaches past it, and the footer's padding is `--body / 2 +
+--corona`. The footer clips its own overflow, so anything less cuts the glow at
+the top and bottom edges — which is exactly what the first three attempts did, at
+64 to 97px of margin against a corona that reached 126. Stating the relationship
+means it holds at any width and whatever the copyright line wraps to, and a
+short window shrinks the body and the light together rather than cropping one of
+them.

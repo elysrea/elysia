@@ -280,14 +280,12 @@ function renderFragments(fragments: readonly Fragment[]): string {
 }
 
 export function renderContact(): string {
-  return `<div class="contact-grid">
-        <div class="contact-prose">
-          <p class="lede lede--wide">${escapeHtml(contact.lede)}</p>
-          <a class="contact-link" href="mailto:${escapeHtml(meta.email)}">${escapeHtml(meta.email)}</a>
-          <p class="contact-note">${renderFragments(contact.note)}</p>
-          <p class="contact-place">${escapeHtml(contact.place)}</p>
-        </div>
-        <nav class="contact-links" aria-label="Elsewhere">
+  return `<div class="contact">
+        <p class="contact-lede">${escapeHtml(contact.lede)}</p>
+        <a class="contact-link" href="mailto:${escapeHtml(meta.email)}">${escapeHtml(meta.email)}</a>
+        <p class="contact-note">${renderFragments(contact.note)}</p>
+        <p class="contact-place">${escapeHtml(contact.place)}</p>
+        <nav class="contact-links label" aria-label="Elsewhere">
           ${contactLinks
             .map(({ href, label }) => `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`)
             .join('\n          ')}

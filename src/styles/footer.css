@@ -1,57 +1,73 @@
 @layer components {
   /*
-   * The page sets.
+   * The page sets — an eclipse.
    *
-   * The site opens in space, and this is where it comes back down: a body far
-   * larger than the frame, rising from the bottom edge and lit along its rim.
-   * The globe that used to turn in the hero is gone, but the shape it left was
-   * worth keeping — and a horizon costs one pseudo-element rather than a
-   * renderer.
+   * A body the colour of the ground it sits on, with the light stacked around
+   * its edge. Same trick as a horizon, turned into a whole shape instead of an
+   * arc: nothing is drawn, something is occluded, and what you see is the
+   * corona the occlusion leaves behind.
    *
-   * The geometry is stated rather than guessed. --rim is how far above the
-   * footer's bottom edge the horizon sits, and everything else is derived from
-   * it: a circle of --disc across, pushed down until exactly that much of it
-   * is showing, and padding that keeps the type above the line.
+   * The copyright sits inside it, in the shadow.
    */
   .foot {
-    --disc: 5600px;
-    --rim: clamp(96px, 14vh, 158px);
-
     position: relative;
     isolation: isolate;
+    display: grid;
+    place-items: center;
     overflow: hidden;
-    padding: clamp(72px, 10vh, 120px) var(--edge) calc(var(--rim) + clamp(36px, 6vh, 72px));
+    /* The geometry is stated rather than guessed. --corona is how far the
+       light reaches past the body; the padding is half a body plus that, so
+       the glow always clears the edges the footer clips at — at any width, and
+       whatever the copyright line wraps to. */
+    --body: clamp(230px, 27vw, 340px);
+    --corona: 100px;
+
+    padding: calc(var(--body) / 2 + var(--corona)) var(--edge);
     background: var(--void);
     text-align: center;
   }
 
-  /*
-   * The body is painted the colour of the ground it sits on, so it is never
-   * seen — it exists to have an edge. All the light is in the shadow cast
-   * around that edge, and only the top of the arc is inside the frame.
-   *
-   * Three layers, cold to warm to cold, in the order the hero's colour ramp
-   * uses them: a tight white rim, the warm note just above it, then a wide
-   * violet atmosphere holding the whole curve.
-   */
-  .foot::after {
+  .foot::before {
     content: '';
     position: absolute;
     z-index: -1;
+    top: 50%;
     left: 50%;
-    bottom: calc(var(--rim) - var(--disc));
-    width: var(--disc);
-    height: var(--disc);
-    transform: translateX(-50%);
+    width: var(--body);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
+    background: var(--void);
 
-    /* The body is not a hole: it catches a little of its own atmosphere along
-       the top before falling away to the ground colour. */
-    background: linear-gradient(to bottom, #150c31, var(--void) 260px);
+    /* Three layers, tight to wide, cold to warm — the order the hero's colour
+       ramp runs in. The first is the corona's own edge, kept just soft enough
+       not to read as a drawn ring.
+
+       The wide violet atmosphere is NOT a fourth layer here. A blur radius in
+       the hundreds of pixels gets tiled by the compositor and the seams show
+       as vertical bands across the footer; the same light as a radial gradient
+       costs nothing and renders clean. */
     box-shadow:
-      0 0 26px 2px rgb(var(--halo-rgb) / 0.42),
-      0 0 120px 16px color-mix(in oklab, var(--accent) 42%, transparent),
-      0 0 300px 80px color-mix(in oklab, var(--iris) 78%, transparent);
+      0 0 7px 1px rgb(var(--halo-rgb) / 0.5),
+      0 0 40px 5px rgb(var(--halo-rgb) / 0.2),
+      0 0 84px 12px color-mix(in oklab, var(--accent) 44%, transparent);
+  }
+
+  /* The atmosphere the corona sits in. */
+  .foot::after {
+    content: '';
+    position: absolute;
+    z-index: -2;
+    top: 50%;
+    left: 50%;
+    width: min(1100px, 96%);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--iris) 85%, transparent),
+      transparent 70%
+    );
   }
 
   .legal {
@@ -63,21 +79,12 @@
     display: block;
   }
 
-  /* The curve has to be read against the width it is drawn in. Left at the
-     desktop radius a phone shows a nearly straight line, so the body gets
-     smaller as the frame does and the arc stays an arc. */
-  @media (max-width: 720px) {
-    .foot {
-      --disc: 2200px;
-    }
-  }
-
-  /* A horizon needs room, and a short window has none to give: the curve is
-     pulled in so the light still reads inside what is left. */
+  /* A short window cannot afford a full corona: the body shrinks and the light
+     comes in with it, rather than the glow being cut in half. */
   @media (max-height: 640px) {
     .foot {
-      --disc: 3200px;
-      --rim: 76px;
+      --body: 180px;
+      --corona: 70px;
     }
   }
 }
