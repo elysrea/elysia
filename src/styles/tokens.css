@@ -1,6 +1,18 @@
 @layer tokens {
   :root {
-    /* Ground scale: one violet hue held across four values.
+    /* Ground scale: black, in four values.
+
+       The grounds were violet and are not any more. What that cost was the
+       hue: the seam between the hero and the deck used to read partly because
+       the two planes were different colours as well as different values. On
+       black there is only value, so the steps were rebuilt to land where the
+       violet ones did — 1.142 from the void to the deck against 1.145 before,
+       1.108 across the work band against 1.102. The same architecture, with
+       the colour taken out of it.
+
+       Violet did not leave the site, it stopped being the floor: it is in the
+       nebula, the light at the seam, the accent and the prism, which is a
+       better place for the only hue on a page to live.
 
        These are the page's planes, and the gaps between them are load-bearing.
        The site once ran --void #05030c under the hero and --surface #0a0619
@@ -8,10 +20,10 @@
        between them — a carefully masked concave notch — was invisible. A step
        has to be big enough to see before it can be called a design, and small
        enough that the page still reads as one dark room rather than two. */
-    --void: #05030c; /* the hero sky, and the footer that closes the loop */
-    --deep: #150c31; /* raised chrome: the nav pill, the skip link */
-    --surface: #1a0f3a; /* the deck: 1.145 against the void, so the seam cuts */
-    --dusk: #0d0621; /* the work band, dropped back for long reading */
+    --void: #050506; /* the hero sky, and the footer that closes the loop */
+    --deep: #141419; /* raised chrome: the nav pill, the skip link */
+    --surface: #17171d; /* the deck: 1.142 against the void, so the seam cuts */
+    --dusk: #0a0a0c; /* the work band, dropped back for long reading */
     --iris: #4a2a86; /* the lift inside the deck, brightest at the seam */
     --halo: #e9ddff;
     --halo-rgb: 233 221 255;

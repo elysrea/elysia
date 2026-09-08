@@ -752,3 +752,46 @@ One rule was written and deleted in the same pass: an override nudging that
 underline from 0.4 to 0.45 alpha, placed above the rule it meant to beat. Same
 specificity, earlier in the file, so it did nothing. The computed value said 0.4
 and the rule went.
+
+## The grounds went black
+
+**Supersedes the values in** "A step you cannot see is not a decision". The
+argument stands; the hue does not.
+
+**Context.** The page was violet all the way down — `--surface` `#1a0f3a` under
+the deck, which is most of what a visitor sees. It worked, and it committed the
+whole site to one colour whether or not a given section wanted it.
+
+**Decision.** Black grounds. `--void` `#050506`, `--dusk` `#0a0a0c`, `--deep`
+`#141419`, `--surface` `#17171d`.
+
+**What that costs, and how it was paid.** The seam between the hero and the deck
+was reading on two channels at once: the planes differed in value _and_ in hue.
+Take the hue away and only value is left, so the steps had to be rebuilt rather
+than desaturated. They were sized to land where the violet ones did, and they do:
+
+| step                  | violet | black     |
+| --------------------- | ------ | --------- |
+| seam edge             | 1.241  | **1.230** |
+| deck field            | 1.145  | **1.142** |
+| work band             | 1.102  | **1.108** |
+| body text on the deck | 10.53  | **10.50** |
+
+Same architecture, measured the same way, with the colour taken out of it.
+
+**Violet did not leave, it stopped being the floor.** It is in the nebula, in
+the light at the seam — the deck still opens at a mix of `--iris` — in the
+accent, and in the prism on the contact note. That is a better place for the
+only hue on a page to live than under every section of it, and on black those
+four things are now the only colour there is.
+
+**Components that were carrying the old hue.** The hero sky's vertical gradient
+ended on `#05030c` at both ends and had to end on the page's actual ground; its
+middle stops kept their violet, because that band _is_ the nebula's atmosphere
+and is now the only colour above the fold. The nav capsule was a violet
+translucency chosen to sit on a violet page — `rgb(17 9 34 / 0.55)` — and went
+neutral, along with its shadow and its opaque reduced-transparency fallback.
+
+The bench caption said "One hue held across values, and a single warm note",
+which stopped being true the moment this landed. A palette exhibit that
+describes a system the page no longer has is worse than no exhibit.

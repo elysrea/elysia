@@ -17,7 +17,7 @@ export const benchPanels: readonly BenchPanel[] = [
   {
     name: 'palette',
     label: 'Palette',
-    caption: 'One hue held across values, and a single warm note.',
+    caption: 'Four blacks carrying the page, and two colours that never touch a ground.',
   },
   {
     name: 'type',

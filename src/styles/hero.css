@@ -8,7 +8,12 @@
 
   /* Deep space rather than dusk: near-black overhead, a nebula bloom low and
      right where the light comes from, and the last of the atmosphere along the
-     horizon. The canvas paints the stars over this. */
+     horizon. The canvas paints the stars over this.
+
+     The ends of the vertical gradient are the page's own ground, so the hero
+     starts and finishes as black; the violet lives in the middle, around the
+     horizon, where the nebula is. On a black site that band is the only colour
+     above the fold, which is the point of it. */
   .sky {
     position: absolute;
     inset: 0;
@@ -32,12 +37,12 @@
       ),
       linear-gradient(
         to bottom,
-        #05030c 0%,
-        #0a0618 30%,
+        #050506 0%,
+        #08070f 30%,
         #150c2c 58%,
         #1d1038 70%,
-        #0a0518 88%,
-        #05030c 100%
+        #08070f 88%,
+        #050506 100%
       );
   }
 
