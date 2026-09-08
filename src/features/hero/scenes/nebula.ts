@@ -1,6 +1,6 @@
 import { mulberry32 } from '../../../lib/random.ts';
-import { buildRamp } from '../../globe/heat.ts';
-import { createStars, twinkle, type Star } from '../../globe/stars.ts';
+import { buildRamp } from '../ramp.ts';
+import { createStars, twinkle, type Star } from '../stars.ts';
 import { fbm, makeNoise, type Noise2D } from '../noise.ts';
 import type { Scene, SceneLayout } from '../scene.ts';
 

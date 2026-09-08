@@ -6,7 +6,7 @@ import { initBenchValues } from './features/bench.ts';
 import { initTabs } from './features/tabs.ts';
 import { initWorkDeepLinks } from './features/work.ts';
 import { query } from './lib/dom.ts';
-import { SceneHost, resolveScene } from './features/hero/index.ts';
+import { SceneHost, createHero } from './features/hero/index.ts';
 
 /**
  * Entry point.
@@ -46,8 +46,5 @@ enhance('hero', () => {
   const canvas = query<HTMLCanvasElement>('#globe');
   if (!canvas) return;
 
-  const { name, scene } = resolveScene(window.location.search);
-  document.documentElement.setAttribute('data-hero', name);
-
-  new SceneHost(canvas, scene);
+  new SceneHost(canvas, createHero());
 });

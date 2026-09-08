@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createStars, starCount, twinkle } from '../src/features/globe/stars.ts';
+import { createStars, starCount, twinkle } from '../src/features/hero/stars.ts';
 import { mulberry32 } from '../src/lib/random.ts';
 
 describe('starCount', () => {

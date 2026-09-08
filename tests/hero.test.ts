@@ -1,14 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  DEFAULT_SCENE,
-  createScene,
-  resolveScene,
-  sceneNames,
-  scenes,
-} from '../src/features/hero/index.ts';
-import { DEFAULT_HERO, HERO_CATALOGUE } from '../src/features/hero/catalogue.ts';
-import { CURTAINS, curtainEdge } from '../src/features/hero/scenes/aurora.ts';
+import { createHero } from '../src/features/hero/index.ts';
 import { fbm, makeNoise } from '../src/features/hero/noise.ts';
 import { SceneHost } from '../src/features/hero/host.ts';
 import type { Scene, SceneLayout } from '../src/features/hero/scene.ts';
@@ -18,80 +10,6 @@ import {
   installIntersectionObserver,
   type ObserverHarness,
 } from './helpers/intersection-observer.ts';
-
-describe('scene registry', () => {
-  it('offers every hero under a name', () => {
-    expect(sceneNames.length).toBeGreaterThan(1);
-    expect(sceneNames).toContain(DEFAULT_SCENE);
-  });
-
-  it('reads the hero from the query string', () => {
-    for (const name of sceneNames) {
-      expect(resolveScene(`?hero=${name}`).name).toBe(name);
-    }
-  });
-
-  it('falls back to the default, because a query string is user input', () => {
-    expect(resolveScene('').name).toBe(DEFAULT_SCENE);
-    expect(resolveScene('?hero=').name).toBe(DEFAULT_SCENE);
-    expect(resolveScene('?hero=constructor').name).toBe(DEFAULT_SCENE);
-    expect(resolveScene('?hero=__proto__').name).toBe(DEFAULT_SCENE);
-    expect(resolveScene('?other=aurora').name).toBe(DEFAULT_SCENE);
-  });
-});
-
-describe('hero catalogue', () => {
-  it('lists exactly what the registry can build', () => {
-    // The catalogue is imported by the build-time HTML renderer and the
-    // registry by the browser; nothing else stops them drifting apart.
-    expect(HERO_CATALOGUE.map((entry) => entry.name).sort()).toEqual(Object.keys(scenes).sort());
-  });
-
-  it('names and describes every entry', () => {
-    for (const entry of HERO_CATALOGUE) {
-      expect(entry.label.trim()).not.toBe('');
-      expect(entry.blurb.trim()).not.toBe('');
-    }
-  });
-
-  it('defaults to a hero that exists', () => {
-    expect(sceneNames).toContain(DEFAULT_HERO);
-    expect(DEFAULT_SCENE).toBe(DEFAULT_HERO);
-  });
-});
-
-describe('createScene', () => {
-  it('builds any catalogued hero', () => {
-    for (const name of sceneNames) expect(createScene(name)).toBeDefined();
-  });
-
-  it('falls back rather than throwing on a name it does not know', () => {
-    expect(createScene('nonsense')).toBeDefined();
-    expect(createScene('constructor')).toBeDefined();
-  });
-});
-
-describe('aurora curtains', () => {
-  it('keeps every curtain inside the frame it is drawn in', () => {
-    for (const curtain of CURTAINS) {
-      for (let t = 0; t <= 1; t += 0.02) {
-        for (let seconds = 0; seconds < 60; seconds += 3) {
-          const edge = curtainEdge(curtain, t, seconds);
-          expect(edge).toBeGreaterThan(-0.6);
-          expect(edge).toBeLessThan(curtain.base);
-        }
-      }
-    }
-  });
-
-  it('moves, and not in lockstep', () => {
-    const [first, second] = CURTAINS;
-    if (!first || !second) throw new Error('expected curtains');
-
-    expect(curtainEdge(first, 0.5, 0)).not.toBeCloseTo(curtainEdge(first, 0.5, 12), 4);
-    expect(curtainEdge(first, 0.5, 7)).not.toBeCloseTo(curtainEdge(second, 0.5, 7), 4);
-  });
-});
 
 describe('value noise', () => {
   const noise = makeNoise(7);
@@ -306,7 +224,7 @@ describe('SceneHost', () => {
   });
 });
 
-describe('every scene', () => {
+describe('the nebula', () => {
   it('survives being laid out and drawn at any size', () => {
     const harness = installCanvas();
     const canvas = document.createElement('canvas');
@@ -314,21 +232,23 @@ describe('every scene', () => {
     if (!context) throw new Error('expected a context');
 
     try {
-      for (const [name, factory] of Object.entries(scenes)) {
-        const scene = factory(3);
+      const scene = createHero(3);
 
-        for (const [width, height] of [
-          [1440, 900],
-          [375, 812],
-          [0, 0],
-        ] as const) {
-          scene.layout({ width, height, horizon: 0.66, quality: 0.8 });
-          scene.step(1);
-          expect(() => scene.draw(context, 1), name).not.toThrow();
-        }
+      for (const [width, height] of [
+        [1440, 900],
+        [375, 812],
+        [0, 0],
+      ] as const) {
+        scene.layout({ width, height, horizon: 0.66, quality: 0.8 });
+        scene.step(1);
+        expect(() => scene.draw(context, 1)).not.toThrow();
       }
     } finally {
       harness.restore();
     }
+  });
+
+  it('builds a fresh scene per call, so two hosts cannot share a star field', () => {
+    expect(createHero(3)).not.toBe(createHero(3));
   });
 });
