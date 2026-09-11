@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-import { htmlContent } from '../plugins/html-content.ts';
+import { deploymentSlotNames, htmlContent } from '../plugins/html-content.ts';
 
 /** Calls the plugin's transformIndexHtml hook the way Vite would. */
-function transform(html: string): string {
-  const plugin = htmlContent({ origin: 'https://example.test' });
+function transform(html: string, origin = 'https://example.test'): string {
+  const plugin = htmlContent({ origin });
   const hook = plugin.transformIndexHtml;
   if (typeof hook !== 'object' || typeof hook.handler !== 'function') {
     throw new Error('expected an object hook with a handler');
@@ -40,5 +42,33 @@ describe('htmlContent plugin', () => {
     const out = transform('<a><!--@site-name--></a><b><!--@site-name--></b>');
 
     expect(out).toBe('<a>Elysia</a><b>Elysia</b>');
+  });
+
+  it('points site-url at the address the page is served from', () => {
+    expect(transform('<link href="<!--@site-url-->">')).toBe('<link href="https://example.test/">');
+  });
+
+  it('does not double the slash when the origin already ends in one', () => {
+    expect(transform('<!--@site-url-->og.jpg', 'https://example.test/sub/')).toBe(
+      'https://example.test/sub/og.jpg',
+    );
+  });
+
+  it('does not resolve a placeholder through the prototype chain', () => {
+    expect(() => transform('<!--@constructor-->')).toThrow(/unknown content slot/);
+  });
+
+  it('fills every placeholder it says it owns', () => {
+    for (const name of deploymentSlotNames) {
+      expect(transform(`<!--@${name}-->`), name).not.toBe('');
+    }
+  });
+
+  it('renders the real shell end to end, leaving no placeholder behind', () => {
+    const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+    const out = transform(html);
+
+    expect(out).not.toMatch(/<!--@[a-z-]+-->/);
+    expect(out).toContain('<link rel="canonical" href="https://example.test/" />');
   });
 });

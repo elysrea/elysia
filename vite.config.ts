@@ -8,7 +8,9 @@ import { htmlContent } from './plugins/html-content.ts';
  */
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
-  plugins: [htmlContent()],
+  // Where the site is actually served, for canonical links, the sitemap and
+  // link previews. Unset, it falls back to the studio's own fictional domain.
+  plugins: [htmlContent(process.env.SITE_URL ? { origin: process.env.SITE_URL } : {})],
   build: {
     target: 'es2022',
     cssTarget: 'safari16',

@@ -21,8 +21,24 @@ export interface HtmlContentOptions {
  * An unknown or unfilled placeholder fails the build rather than shipping a
  * page with a hole in it.
  */
+/** Placeholders the plugin fills itself, from where the page is served. */
+export const deploymentSlotNames: readonly string[] = ['site-url'];
+
 export function htmlContent(options: HtmlContentOptions = {}): Plugin {
-  const origin = options.origin ?? meta.url;
+  const origin = (options.origin ?? meta.url).replace(/\/+$/, '');
+
+  // Slots that depend on where the page is served rather than on the content.
+  const deploymentSlots: Readonly<Record<string, () => string>> = {
+    'site-url': () => `${origin}/`,
+  };
+
+  // Own properties only: a placeholder named `constructor` must not resolve
+  // through the prototype chain to a function the renderer then calls.
+  const lookup = (name: string): (() => string) | undefined => {
+    if (Object.hasOwn(deploymentSlots, name)) return deploymentSlots[name];
+    if (Object.hasOwn(slots, name)) return slots[name];
+    return undefined;
+  };
 
   return {
     name: 'elysia:html-content',
@@ -34,7 +50,7 @@ export function htmlContent(options: HtmlContentOptions = {}): Plugin {
         const unknown: string[] = [];
 
         const rendered = html.replace(PLACEHOLDER, (_match, name: string) => {
-          const slot = slots[name];
+          const slot = lookup(name);
           if (!slot) {
             unknown.push(name);
             return '';
@@ -45,7 +61,7 @@ export function htmlContent(options: HtmlContentOptions = {}): Plugin {
         if (unknown.length > 0) {
           throw new Error(
             `[elysia:html-content] unknown content slot(s): ${unknown.join(', ')}. ` +
-              `Known slots: ${Object.keys(slots).join(', ')}.`,
+              `Known slots: ${[...Object.keys(deploymentSlots), ...Object.keys(slots)].join(', ')}.`,
           );
         }
 

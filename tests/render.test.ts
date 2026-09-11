@@ -12,6 +12,7 @@ import {
   slots,
 } from '../src/content/render.ts';
 import { DEFAULT_TYPE, resolveTypeSet, typeNames } from '../src/features/type/sets.ts';
+import { deploymentSlotNames } from '../plugins/html-content.ts';
 import { projects } from '../src/content/site.ts';
 import { benchPanels, easings, swatches } from '../src/content/bench.ts';
 
@@ -106,8 +107,11 @@ describe('content slots', () => {
   it('the HTML shell only asks for slots that exist', () => {
     expect(used.length).toBeGreaterThan(0);
 
+    // Content slots come from the renderer; a few, like the page's own address,
+    // are filled by the build plugin from where the site is served.
+    const known = [...Object.keys(slots), ...deploymentSlotNames];
     for (const name of used) {
-      expect(Object.keys(slots)).toContain(name);
+      expect(known).toContain(name);
     }
   });
 
