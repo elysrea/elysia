@@ -3,6 +3,66 @@
 Short notes on the choices that were not obvious, kept for the same reason a
 commit message is kept: the code shows what, not why.
 
+<!-- index -->
+
+The log runs in the order the decisions were made, and nothing is deleted from
+it. When a decision is reversed, the new entry names the ones it supersedes and
+the old ones stay: how a decision was retired is part of the record.
+
+**Still standing (31)**
+
+- [Content is rendered at build time, not in the browser](#content-is-rendered-at-build-time-not-in-the-browser)
+- [Fixed timestep instead of per-frame increments](#fixed-timestep-instead-of-per-frame-increments)
+- [A seeded PRNG](#a-seeded-prng)
+- [Native `<details>` for the case studies](#native-details-for-the-case-studies)
+- [The canvas reads `--horizon` from CSS](#the-canvas-reads---horizon-from-css)
+- [Quality is governed, not assumed](#quality-is-governed-not-assumed)
+- [Reduced motion gets a picture, not a blank](#reduced-motion-gets-a-picture-not-a-blank)
+- [The header is a capsule, not a bar](#the-header-is-a-capsule-not-a-bar)
+- [Space, in two layers](#space-in-two-layers)
+- [Nothing is set in capitals](#nothing-is-set-in-capitals)
+- [No hairlines](#no-hairlines)
+- [The seam is a shape, not an edge](#the-seam-is-a-shape-not-an-edge)
+- [A display face is a system, not a family](#a-display-face-is-a-system-not-a-family)
+- [The work section had to earn its name](#the-work-section-had-to-earn-its-name)
+- [An open case study is a URL](#an-open-case-study-is-a-url)
+- [The seam tabs switch the page, not the hero](#the-seam-tabs-switch-the-page-not-the-hero)
+- [The tabs got their own subject](#the-tabs-got-their-own-subject)
+- [Tracking, and the honest name for a class](#tracking-and-the-honest-name-for-a-class)
+- [The wordmark moved to the middle](#the-wordmark-moved-to-the-middle)
+- [Three heroes were deleted, and the globe with them](#three-heroes-were-deleted-and-the-globe-with-them)
+- [The composer came out again](#the-composer-came-out-again)
+- [A page that scrolled sideways on a phone](#a-page-that-scrolled-sideways-on-a-phone)
+- [An ordinary footer](#an-ordinary-footer)
+- [The contact section lost its headline and its address](#the-contact-section-lost-its-headline-and-its-address)
+- [The prism moved to the note](#the-prism-moved-to-the-note)
+- [The grounds went black](#the-grounds-went-black)
+- [Four subtractions](#four-subtractions)
+- [The hero went grey](#the-hero-went-grey)
+- [Sizes and spacing, and a rule that went missing](#sizes-and-spacing-and-a-rule-that-went-missing)
+- [The place line went too](#the-place-line-went-too)
+- [Presentable, and measured](#presentable-and-measured)
+
+**Superseded, kept for the record (17)**
+
+- [The globe is drawn, not embedded](#the-globe-is-drawn-not-embedded)
+- [Dots on the far side are drawn too](#dots-on-the-far-side-are-drawn-too)
+- [Arcs end somewhere named](#arcs-end-somewhere-named)
+- [The globe is opaque](#the-globe-is-opaque)
+- [The planet is bigger than the frame](#the-planet-is-bigger-than-the-frame)
+- [A graticule, faintly](#a-graticule-faintly)
+- [The planet is a heat map, drawn per pixel](#the-planet-is-a-heat-map-drawn-per-pixel)
+- [Screened, not summed](#screened-not-summed)
+- [The hero is swappable](#the-hero-is-swappable)
+- [The switcher is links first](#the-switcher-is-links-first)
+- [The catalogue is data, the registry is code](#the-catalogue-is-data-the-registry-is-code)
+- [Capabilities are an index, not a row of boxes](#capabilities-are-an-index-not-a-row-of-boxes)
+- [A step you cannot see is not a decision](#a-step-you-cannot-see-is-not-a-decision)
+- [The last section had to do something](#the-last-section-had-to-do-something)
+- [The page sets](#the-page-sets)
+- [The page sets, second attempt](#the-page-sets-second-attempt)
+- [The prism is the ramp, not a rainbow](#the-prism-is-the-ramp-not-a-rainbow)
+
 ## Content is rendered at build time, not in the browser
 
 **Context.** The site is a handful of static sections whose copy should live in
@@ -926,3 +986,71 @@ The wordmark was left alone — it is the one element meant to be that large.
 contact note. The studio section already says remote, Europe, and six people, a
 screen earlier and in facts rather than flourish. The note is the whole section
 now: one paragraph, and the footer under it.
+
+## Presentable, and measured
+
+**The README described a site that no longer existed.** It opened on a planet
+rendered as a heat map, counted 216 tests, walked through land-mask and
+city-table tests, credited Natural Earth coastlines, and mentioned a dot on
+every section label and an availability badge — all removed over the weeks
+before, none of it reflected. Anyone comparing it with the live page would have
+found the two contradicting each other. It is rewritten from the code as it
+stands, with every number in it measured the same day.
+
+**Lighthouse, run properly.** The first run on the unchanged build scored 70 on
+mobile with 920 ms of blocking time. The next four runs of the same build scored
+95 to 99 with blocking time near zero. A single simulated-throttling run is not
+a measurement, so every figure published is a median of three.
+
+That lesson arrived twice. A first "after" run appeared to lift mobile
+performance from 70 to 96 — but the check had failed on a test, the build step
+behind it never ran, and the preview was still serving the old build. The runs
+are gated now: nothing is measured unless the check passed and the built page
+carries the change being measured.
+
+**An optimisation that was reverted.** On the strength of that first 70, the
+hero was changed to start once the page went idle, at a lower density on touch
+screens. The baseline showed there was no problem for it to solve, so it came
+out. An optimisation without a measured problem is complexity with a story
+attached.
+
+**Two accessibility failures, fixed.** `color-contrast` flagged 12 elements: the
+dim ink at 4.34–4.39:1 on the darkest grounds, and the faint ink at 2.36:1 under
+the footer. The inks were recomputed against every ground they can land on, the
+lightest being a hovered card. The floor for 4.5:1 is 0.55 alpha; the three
+steps are now 0.8, 0.66 and 0.56, the last at 4.61:1 in the worst case.
+`link-name` flagged the call to action on phones: its long label was
+`display: none` and its short one `aria-hidden`, which left the link with no
+name at all. The long label is visually hidden instead. Accessibility went from
+92 and 96 to 100 on both.
+
+**Forced reflows, found and removed.** Lighthouse's forced-reflow insight named
+three places in the minified bundle, which mapped back to source like this:
+
+| what                                                       | desktop / mobile | fix                                                           |
+| ---------------------------------------------------------- | ---------------- | ------------------------------------------------------------- |
+| the canvas's draw read its element's size on every frame   | 127 / 153 ms     | size cached on resize; a test fails if a frame reads layout   |
+| the bench read a token, wrote it, then read the next       | 71 / 101 ms      | reads batched before writes, and deferred past the next frame |
+| the canvas read `--horizon` just after resizing its buffer | 32 / 40 ms       | every read first, then the writes                             |
+
+One remains. In about one run in three, the canvas host's first measurement at
+startup forces a single layout — 62 ms and 193 ms in the two runs that showed
+it. That is layout the browser has to compute before first paint regardless.
+Removing it means sizing the canvas from `ResizeObserver` entries instead of
+reading the element, which changes the host's startup order and every test that
+constructs one: worth doing, and not worth doing blind in the same pass as
+everything above.
+
+**Link previews pointed at a domain that does not exist.** The canonical link,
+`og:url`, the sitemap and `robots.txt` all used the studio's fictional address,
+and there was no preview image. The deploy build now passes `SITE_URL`, the
+plugin exposes it as a `site-url` placeholder, and a 1200 × 630 `og.jpg` ships
+with the page. Slot lookup also stopped resolving through the prototype chain,
+so a placeholder named `constructor` fails the build instead of calling
+`Object`.
+
+**Housekeeping.** `.claude/`, local tooling config, is untracked and ignored.
+`package.json` gained `homepage`, `repository`, `bugs` and `keywords`.
+`theme-color` was still the violet black from two palettes ago and now matches
+`--void`. And this log gained an index, split into what still stands and what
+was superseded, generated from the entries' own supersede lines.

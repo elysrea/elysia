@@ -1,228 +1,240 @@
 # Elysia
 
-A studio site built as a front-end engineering exercise: no framework, typed
-content rendered to static HTML at build time, and a planet over the hero —
-real continents rendered as a heat map, a starfield, traffic arcing between
-named cities — that is deterministic, frame-rate independent, and turns itself
-off when nobody is looking.
+[![CI](https://github.com/elysrea/elysia/actions/workflows/ci.yml/badge.svg)](https://github.com/elysrea/elysia/actions/workflows/ci.yml)
+[![Deploy](https://github.com/elysrea/elysia/actions/workflows/deploy.yml/badge.svg)](https://github.com/elysrea/elysia/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 
-**Elysia is not a real studio.** The copy and the case studies are invented so
-that a realistic content model had something to model. The engineering is the
-point of the repository.
+A studio website built as a front-end engineering project. No framework and no
+runtime dependencies: content is typed data rendered to static HTML at build
+time, and the hero is a live canvas nebula that keeps itself inside a frame
+budget.
 
-```bash
-npm install && npm run dev
-```
+**[Live site](https://elysrea.github.io/elysia/)** · **[Decision log](docs/decisions.md)** · **[Run it locally](#running-it)**
+
+![The Elysia homepage: a large wordmark over a grey canvas nebula, under a floating navigation capsule](docs/images/hero.jpg)
+
+> **Elysia is not a real studio.** The copy and the case studies are invented so
+> that a realistic content model had something to model. The engineering is the
+> point of the repository.
+
+## At a glance
+
+|                                                         |                                                                                                          |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Lighthouse** — median of three runs, mobile / desktop | Performance **99 / 99** · Accessibility **100 / 100** · Best practices **100 / 100** · SEO **100 / 100** |
+| **Core Web Vitals** — mobile, simulated                 | LCP 1.7 s · Total blocking time 0 ms · CLS 0                                                             |
+| **JavaScript**                                          | 11.2 kB, 4.6 kB gzipped — the whole site, with zero runtime dependencies                                 |
+| **First visit**                                         | 8 requests, 114 KiB transferred, 96 KiB of it self-hosted fonts                                          |
+| **Tests**                                               | 127 · 92.9% of statements and 94.9% of lines covered                                                     |
+| **Stack**                                               | TypeScript 6 (strict) · Vite 8 · Vitest 5 · ESLint 10 · Prettier · GitHub Actions and Pages              |
 
 ## What is interesting here
 
-|                                        |                                                                                                                                                                                                                                                                                                                                                                          |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Zero client-side templating**        | Content lives in `src/content/site.ts` as typed data and is rendered into `index.html` by a Vite plugin at build time. The shipped page is complete markup: it reads with JavaScript disabled and crawlers get real text.                                                                                                                                                |
-| **A nebula with no shader**            | Domain-warped fBm over seeded value noise, sampled on a coarse grid and pushed through a 256-entry colour ramp baked once at startup. No WebGL, no texture, no library — about 200 lines of pure functions and one `putImageData`.                                                                                                                                       |
-| **Deterministic simulation**           | The starfield and the noise field run on a seeded PRNG, so the same load produces the same sky — and a test can assert exact positions instead of statistical hand-waving.                                                                                                                                                                                               |
-| **Fixed timestep**                     | Time is accumulated and consumed in whole 16.67ms steps, so the nebula drifts at the same speed on a 60Hz laptop and a 144Hz monitor. A tab restored after ten minutes does not replay ten minutes of simulation.                                                                                                                                                        |
-| **Self-governing effect**              | A quality governor watches median frame time and scales the sample resolution between 100% and 35%. A background animation should never be the reason a page drops frames.                                                                                                                                                                                               |
-| **A ground scale that carries weight** | The page separates by plane, not by rule: four blacks, and the steps between them are measured. The seam between hero and deck once ran at a 1.028 contrast ratio, which is a decision you cannot see. It is 1.230 at the edge now, settling to 1.142.                                                                                                                   |
-| **A prism with a history**             | The iridescent fill on the contact note was lifted from the nebula's colour ramp while the nebula was violet. The hero has since gone grey and the prism kept the colours, so it is the one place that spectrum survives. Every stop clears AA on the ground it sits on, and the sweep loops seamlessly because the image carries two periods and slides by exactly one. |
-| **Prose that carries links**           | Copy is typed data, never markup: a run of text is an array where a string is escaped text and an object is a link. The contact note reads as a sentence in the source and cannot inject HTML into the page.                                                                                                                                                             |
-| **Platform first**                     | Case studies are native `<details name="work">`: exclusive accordion behaviour, keyboard support and screen-reader semantics from the browser, animated with `interpolate-size` and `::details-content`. No script, no ARIA to keep in sync.                                                                                                                             |
+### Content is data, rendered at build time
 
-## One hero
+Every word on the page lives in `src/content/site.ts` as typed data. A small
+Vite plugin renders it into `index.html` during the build, so the page that
+ships is complete markup: it reads with JavaScript off, and crawlers get real
+text. A placeholder the renderer does not know, or one left unfilled, fails the
+build instead of shipping a page with a hole in it.
 
-The landing page carries a single treatment: domain-warped noise, drifting,
-through a colour ramp baked at startup.
+Prose that carries links is modelled as an array in which a string is escaped
+text and an object is a link. The content cannot inject HTML, and a sentence
+still reads as a sentence in the source.
 
-It carried four for a while, behind a `?hero=` switch with tabs in the seam —
-planet, eclipse, aurora, nebula — so they could be compared by looking rather
-than by arguing. That was the right way to choose and the wrong way to ship: a
-landing page with four moods has none. The three that lost are gone, and the
-globe renderer went with them, which is most of why the JavaScript bundle is
-11.15 kB rather than 29.20 kB.
+### A canvas nebula with no shader, library or texture
 
-Everything about _hosting_ an effect still lives in `hero/host.ts`: sizing for
-the device pixel ratio, pausing off-screen and on a hidden tab, honouring
-reduced motion, fixed-step time, and backing off when frames run long. A scene
-is only `layout`, `step` and `draw`, so the seam where the alternatives plugged
-in is still there — it is simply not carrying anything.
+Domain-warped fractal noise over a seeded value-noise field, sampled on a coarse
+grid, pushed through a 256-entry colour ramp baked once at startup and drawn
+with one `putImageData`. About two hundred lines of pure functions.
+
+- **Deterministic.** A seeded PRNG means the same load produces the same sky, so
+  tests assert exact values instead of statistical hand-waving.
+- **Frame-rate independent.** Time is consumed in fixed 16.67 ms steps: the
+  drift is the same on a 60 Hz laptop and a 144 Hz monitor, and a tab restored
+  after ten minutes does not replay ten minutes of simulation.
+- **Self-governing.** A quality governor watches the median frame time and
+  scales the sample density between 100% and 35%.
+- **Polite.** It pauses when scrolled away or when the tab is hidden, caps the
+  device pixel ratio at 2, and under reduced motion paints a still frame of the
+  same scene — watching the setting live.
+- **No layout reads while animating.** The canvas size is measured on resize and
+  cached. A test fails if a frame ever reads layout.
+
+Everything about hosting an effect lives in `SceneHost`; a scene implements only
+`layout`, `step` and `draw`.
+
+### A design system that documents itself
+
+The deck under the hero is a working specimen of the site's own tokens —
+palette, type, motion and parts — inside an accessible tab group with roving
+focus and arrow, Home and End keys. Values are read from the live cascade rather
+than copied into the docs, so changing a token changes its documentation. The
+parts tab shows the real components, not pictures of them.
+
+### The platform first
+
+Case studies are native `<details name="work">` elements: exclusive accordion
+behaviour, keyboard support and screen-reader semantics come from the browser,
+animated with `interpolate-size`. An open case study writes its own URL
+fragment, so it can be linked to directly. The header is a floating capsule with
+a scrollspy built on `IntersectionObserver`.
+
+### Type as a system
+
+Three display systems are switchable with `?type=grotesk`, `serif` or `mono`,
+applied by an inline script before first paint so the page never reflows into a
+different face. Each carries its own weight, tracking and leading. Nothing is set
+in capitals. Browsers only download the faces a page actually uses: a default
+visit fetches three of the four.
+
+## Screens
+
+<table>
+  <tr>
+    <td width="62%"><img src="docs/images/case-study.jpg" alt="An open case study: three metrics, role and duration, stack, and a written problem, approach and outcome"></td>
+    <td width="38%" rowspan="2"><img src="docs/images/mobile.jpg" alt="The homepage on a phone"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/system.jpg" alt="The motion tab of the design system: two easing curves and three durations"></td>
+  </tr>
+</table>
+
+## Accessibility
+
+- Lighthouse accessibility **100** on mobile and desktop.
+- Every text colour clears 4.5:1 against every background it can land on —
+  computed for each ground, the lightest being a hovered card, rather than
+  checked by eye.
+- Complete and readable with JavaScript off. The reveal animations only hide
+  content that a script is present to reveal.
+- `prefers-reduced-motion` is honoured and watched live;
+  `prefers-contrast: more` raises ink opacity; `prefers-reduced-transparency`
+  turns the glass header solid.
+- A skip link, visible focus, `scroll-padding-top` so the fixed header never
+  covers a link target, and `aria-current` on the section in view.
+- On narrow screens the call to action shortens to "Start" on screen while
+  keeping its full name for assistive technology.
+
+## Performance
+
+Measured with Lighthouse 13 against the production build served locally. Every
+figure is the median of three runs — a single run is not a measurement: the same
+unchanged build scored 70 on its first, cold run and 95 to 99 on every run after.
+
+|                          | Mobile | Desktop |
+| ------------------------ | ------ | ------- |
+| Performance              | 99     | 99      |
+| First contentful paint   | 1.4 s  | 0.3 s   |
+| Largest contentful paint | 1.7 s  | 0.4 s   |
+| Total blocking time      | 0 ms   | 0 ms    |
+| Cumulative layout shift  | 0      | 0       |
+
+The build is one 11.2 kB script and one 19.8 kB stylesheet. Fonts are
+self-hosted latin subsets, and the wordmark's face is preloaded.
+
+One thing is known and not yet fixed: in about one run in three, the canvas
+host's first size measurement at startup forces a synchronous layout. It is a
+single read of layout the browser has to compute before first paint anyway. The
+decision log explains why it was left, and what removing it would take.
+
+## Tests
+
+`npm test` runs 127 tests in Node with happy-dom — no browser required. Coverage
+is 92.9% of statements, 82.8% of branches, 92.0% of functions and 94.9% of lines.
+
+They concentrate on the places where being wrong is invisible:
+
+- the PRNG is reproducible; the noise stays in range, is continuous, and
+  differs by seed;
+- the timestep planner cannot spiral after a long stall; the governor ignores a
+  single long frame but reacts to a sustained run;
+- the canvas host sizes itself for the pixel ratio, stops when scrolled away,
+  paints a still frame instead of looping under reduced motion, releases every
+  observer on destroy, and never reads layout while animating;
+- the tab group handles arrow keys, Home and End with roving focus, and an open
+  case study is a URL;
+- the build plugin fails on an unknown placeholder, cannot be tricked by one
+  named `constructor`, and renders the real `index.html` end to end.
+
+DOM behaviour is tested against controllable stand-ins rather than a real
+browser: an `IntersectionObserver` the test drives by hand, a manually advanced
+animation-frame clock, and a recording 2D context.
 
 ## Architecture
 
 ```
 index.html              HTML shell with <!--@slot--> placeholders
 plugins/
-  html-content.ts       Vite plugin: fills slots, emits robots.txt + sitemap.xml
+  html-content.ts       Fills the slots at build time; emits robots.txt and sitemap.xml
 src/
   content/
     site.ts             All copy, as typed data
-    render.ts           Pure content -> HTML (runs at build time only)
+    render.ts           Pure content → HTML, build time only
+    bench.ts            What the design-system specimen shows
   features/
-    nav.ts              Sticky header + scrollspy, both IntersectionObserver
-    tabs.ts             A tab group: one panel at a time, arrows, roving focus
+    hero/               SceneHost — canvas, timing, quality — and the nebula scene
+    nav.ts              Floating header and scrollspy
+    tabs.ts             Accessible tab group
     bench.ts            Fills the specimen from the live cascade
-    work.ts             Deep links: an open case study is addressable
+    work.ts             Case-study deep links
     reveal.ts           Scroll-in transitions
-    hero/
-      host.ts           Canvas, events, timing, quality — everything but drawing
-      scene.ts          What a hero has to implement: layout, step, draw
-      noise.ts          Pure: seeded value noise and fBm
-      ramp.ts           Pure: the colour ramp, baked to a 256-entry lookup
-      stars.ts          Pure: the starfield and its twinkle
-      scenes/nebula.ts  The one hero
-  lib/
-    loop.ts             Fixed-timestep render loop
-    quality.ts          Frame-budget governor
-    random.ts           Seeded PRNG
-    motion.ts           prefers-reduced-motion, including live changes
-    dom.ts              Typed query helpers, CSS token reader
+    type/sets.ts        The three type systems
+  lib/                  Render loop, quality governor, seeded PRNG, motion and DOM helpers
   styles/               Cascade layers: tokens, base, layout, components, utilities
+tests/                  Vitest and happy-dom, with hand-driven observers and a frame clock
+docs/decisions.md       Why things are the way they are
 ```
 
-The dependency direction is one-way: `lib` knows nothing about the site,
-`features` know nothing about each other, and `main.ts` wires them together with
-each enhancement independently guarded — an unsupported API in one feature
-cannot take the rest of the page down with it.
+Dependencies run one way: `lib` knows nothing about the site, `features` know
+nothing about each other, and `main.ts` wires them together with each
+enhancement independently guarded, so an unsupported API in one feature cannot
+take the rest of the page down with it.
 
-## Accessibility
+## Running it
 
-- Complete, readable content with JavaScript off; the reveal animations only
-  hide what a scripted page can reveal (`html.js`, set before first paint).
-- `prefers-reduced-motion` is honoured **and watched**: the globe stops turning
-  and is replaced by a still frame of the same scene — arcs mid-flight, not an
-  empty canvas — and it responds if the setting is changed while the page is
-  open.
-- `prefers-contrast: more` raises the ink and rule opacities, rather than leaving
-  the design sitting at 44% alpha for people who asked for more contrast.
-- `prefers-reduced-transparency` turns the glass header and the availability
-  badge solid, because the blur is decoration and some readers cannot use it.
-- Skip link, visible focus rings, `scroll-padding-top` so the floating header
-  never covers an in-page target, `aria-current` on the section being read.
-- Header link colour is set from a contrast measurement, not by eye: at 10.5px
-  uppercase, the muted ink used elsewhere sits under 4.5:1 on the capsule.
-
-## Performance
-
-Measured from `npm run build` (gzipped where it matters):
-
-| Asset                   | Size    | Gzip   |
-| ----------------------- | ------- | ------ |
-| HTML                    | 12.0 kB | 3.3 kB |
-| CSS                     | 11.8 kB | 3.7 kB |
-| JS                      | 7.5 kB  | 3.2 kB |
-| Fonts (2 latin subsets) | 105 kB  | —      |
-
-Fonts are self-hosted and vendored by `npm run fonts:sync`: no third-party
-request on first paint, no layout shift from a late stylesheet. Everything else the page needs is about 18 kB on the wire — and roughly 2 kB of
-that is the three hero variants that will not survive the choice.
-
-Stars are generated once per resize and then only read — a frame costs one
-`fillRect` and one sine each.
-
-The heat map is measured, not assumed. At full resolution it costs about 11ms a
-frame on this machine and at one step coarser about 3ms, so it opens at the
-coarser setting and the quality governor moves it up only if the frames allow
-it. Quality here is a sample size rather than a count: a slower machine gets a
-softer map, not a broken one.
-
-The canvas pauses when the hero scrolls away, when the tab is hidden, and when
-motion is reduced. Resizes are coalesced, and the device pixel ratio is capped
-at 2 — above that the cost is real and the visible gain is not. Dots are drawn
-as `fillRect`, not `arc`: at roughly two pixels across the difference is
-invisible and the path setup is not.
-
-## Tests
-
-`npm test` — 216 tests, no browser required.
-
-The suite covers the parts where being wrong is invisible: that the PRNG is
-reproducible and uniform, that the timestep planner cannot spiral after a long
-stall, that the governor ignores a single long frame but reacts to a sustained
-one, that rotation is a rotation and never stretches the sphere, that a
-great-circle path travels at a constant rate and stays on the surface, that arcs
-retire instead of accumulating, and that every content slot the HTML asks for
-actually exists.
-
-The land mask gets its own tests, and they are the ones worth stealing: they
-assert that the Sahara, Greenland, Siberia, Australia and Antarctica are land
-while the mid-Pacific and the Arctic Ocean are not. A flipped row order or an
-off-by-one in the projection fails all of them at once.
-
-The city table is checked against that same mask — but within one cell, not
-exactly on it. Nine of the cities are coastal, and at two degrees to a side
-their own cell centre is legitimately offshore; asserting otherwise would be
-asserting something false. The looser check still catches what matters, and a
-companion test proves it can fail.
-
-DOM behaviour is tested against controllable stand-ins rather than a real
-browser: an `IntersectionObserver` the test drives by hand, a manually advanced
-`requestAnimationFrame` clock, and a recording 2D context. That is enough to
-assert the things that actually matter about the canvas — that it sizes itself
-for the device pixel ratio, stops drawing when the hero scrolls away, paints a
-still frame and never starts a loop when motion is reduced, and releases every
-observer on `destroy()`.
-
-## Commands
+Requires Node 20.19 or newer.
 
 ```bash
-npm run dev          # dev server
-npm run build        # typecheck, then build to dist/
-npm run preview      # serve the built output
-npm test             # unit tests
-npm run coverage     # tests with coverage
-npm run check        # everything CI runs
-npm run fonts:sync   # re-vendor the font subsets
+npm install
+npm run dev
 ```
+
+| Command              | Does                             |
+| -------------------- | -------------------------------- |
+| `npm run dev`        | Development server               |
+| `npm run build`      | Typecheck, then build to `dist/` |
+| `npm run preview`    | Serve the production build       |
+| `npm test`           | Unit tests                       |
+| `npm run coverage`   | Tests with coverage              |
+| `npm run check`      | Everything CI runs               |
+| `npm run fonts:sync` | Re-vendor the font subsets       |
 
 ## Deployment
 
-`.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages on every push
-to `main`. A project page is served from a subpath, so the workflow passes
-`BASE_PATH=/<repo>/`; the same source builds for a domain root with no change.
+Every push to `main` runs CI — typecheck, lint, format check, tests with
+coverage, and a build — and a separate workflow deploys to GitHub Pages. A
+project page is served from a subpath, so the deploy build is given `BASE_PATH`
+and `SITE_URL`, which set the asset paths and the canonical, link-preview and
+sitemap addresses. The same source builds for a domain root with neither.
+Dependabot proposes dependency and workflow updates monthly.
 
-## Surfaces, not rules
+## How decisions were made
 
-There is not a hairline in the page. Sections are separated by ground and space:
-everything below the hero sits on a raised deck with a tab cut into its top
-edge, list items are soft cards, work rows light up on hover, and a section
-label is announced by a dot rather than by a rule drawn across the page. The
-only borders left are the ones that describe a shape — the header capsule and
-the availability badge.
+[`docs/decisions.md`](docs/decisions.md) records every choice that was not
+obvious, indexed by what still stands and what was superseded. Nothing is
+deleted from it: when a decision is reversed, the new entry names the one it
+replaces, because how a decision was retired is part of the record.
 
-## Type
+## Deliberately not done
 
-Nothing is set in capitals, and nothing is tracked. Uppercase with wide
-letter-spacing is how plain type is made to look considered; these faces have
-their own character and do not need either. Small text is set in the reading
-face at a slightly heavier weight — the way a magazine sets a caption — and the
-monospace is kept for the things that genuinely are values: a year, a token
-name, a duration.
-
-The display face is a system rather than a family, because swapping one for
-another and leaving the weight, tracking and leading alone gets you a worse
-version of both. Each set carries its own five tokens, and `?type=` switches
-between them:
-
-|           |                                                                                          |
-| --------- | ---------------------------------------------------------------------------------------- |
-| `grotesk` | **Default.** Syne for display, Inter for reading. Wide, architectural, contemporary.     |
-| `serif`   | Instrument Serif for display. Editorial, high contrast, set tight.                       |
-| `mono`    | IBM Plex Mono all the way up. Technical, and the hardest of the three to read at length. |
-
-Four faces are declared and a visit downloads two or three: a browser only
-fetches a face something on the page is actually set in, so the display faces
-the current set does not use cost nothing.
-
-The set is applied by the inline script in the head, before first paint — from a
-module it would render in one face and reflow into another. The default set is
-the one on bare `:root`, so it needs no attribute and no script at all.
-
-## Things deliberately not done
-
-- **No framework.** Nothing on this page has state worth a runtime. A framework
-  here would be a larger download than the entire site.
-- **No light theme.** The design is one continuous twilight gradient; a light
-  variant would be a different design, not a token swap.
+- **No framework.** Nothing on this page has state worth a runtime, and a
+  framework would be a larger download than the entire site.
 - **No client-side routing.** It is one page.
+- **No light theme.** The design is a black page with one nebula in it; a light
+  version would be a different design, not a token swap.
+- **No analytics and no third-party requests.** Every byte comes from the
+  site's own origin.
 
 ## Credits
 
@@ -230,6 +242,4 @@ Typeset in [Syne](https://fonts.google.com/specimen/Syne),
 [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif),
 [Inter](https://fonts.google.com/specimen/Inter) and
 [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono), all under the
-SIL Open Font License. Coastlines from
-[Natural Earth](https://www.naturalearthdata.com/) 110m physical land, public
-domain. Code is MIT — see [LICENSE](LICENSE).
+SIL Open Font License. Code is MIT — see [LICENSE](LICENSE).

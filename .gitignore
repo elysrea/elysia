@@ -22,3 +22,6 @@ coverage/
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# local agent and tooling config
+.claude/
