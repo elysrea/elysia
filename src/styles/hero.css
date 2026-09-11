@@ -1,10 +1,5 @@
 @layer components {
   .hero {
-    /* The hero's own ink. --halo is a lilac white, which is the right ink for
-       the page but reads faintly purple over a grey plate; here the type is
-       neutral with the same cool bias as everything under it. */
-    --hero-ink: 236 236 240;
-
     position: relative;
     height: 100svh;
     min-height: 540px;
@@ -37,7 +32,7 @@
       ),
       radial-gradient(
         70% 40% at 50% var(--horizon),
-        rgb(var(--hero-ink) / 0.09) 0%,
+        rgb(var(--neutral-rgb) / 0.09) 0%,
         transparent 70%
       ),
       linear-gradient(
@@ -87,7 +82,7 @@
     line-height: var(--display-leading);
     letter-spacing: var(--display-tracking);
     text-align: center;
-    color: rgb(var(--hero-ink));
+    color: rgb(var(--neutral-rgb));
     opacity: 0;
     filter: blur(14px);
     animation: wordmark-land 1700ms var(--ease-land) 1150ms forwards;
@@ -109,7 +104,7 @@
     text-align: center;
 
     /* It was the lilac ink at 0.62. Same weight, no hue. */
-    color: rgb(var(--hero-ink) / 0.62);
+    color: rgb(var(--neutral-rgb) / 0.62);
     opacity: 0;
     animation: surface 1500ms ease-out 1900ms forwards;
   }

@@ -27,7 +27,7 @@
   .foot-name {
     display: block;
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
     font-weight: var(--display-weight);
     line-height: 1;
     letter-spacing: var(--display-tracking);

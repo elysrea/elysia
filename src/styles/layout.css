@@ -78,7 +78,7 @@
   .index-list span {
     display: block;
     margin-top: 4px;
-    font-size: 15px;
+    font-size: 14.5px;
     color: var(--halo);
   }
 
@@ -87,13 +87,31 @@
   }
 }
 
-@layer components {
+@layer utilities {
+  /* Small text, set the way a magazine sets a standfirst: the reading face,
+     a little heavier than the body, and no tracking. Letter-spacing on small
+     type is a way of making plain type look considered; type with its own
+     character does not need it. */
+  .label {
+    font-family: var(--font-sans);
+    font-size: var(--size-label);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  /* Kept for the things that genuinely are values: token names, a year. */
+  .code {
+    font-family: var(--font-mono);
+    font-size: var(--size-code);
+    letter-spacing: 0;
+  }
+
   /* A section label, and nothing else. It carried an accent dot in front of it
      for a while; six of them down the page read as punctuation the sections
      did not need. */
   .eyebrow {
     display: inline-block;
-    margin-bottom: clamp(28px, 4vh, 52px);
+    margin-bottom: clamp(20px, 2.6vw, 36px);
     color: var(--text-dim);
   }
 

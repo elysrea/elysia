@@ -877,3 +877,45 @@ not. It is the one place that spectrum survives, and the docs say that instead.
 
 What is still violet above the fold: the call to action in the nav capsule, and
 the page's lilac ink wherever deck text shows through at the bottom edge.
+
+## Sizes and spacing, and a rule that went missing
+
+**A regression, found by measuring.** The pass started with a census of every
+distinct text size the built page actually renders, and it showed 25 elements
+carrying the `label` class — nav links, the call to action, section labels, the
+seam tabs, the tagline, the footer — all at the 16.5px body size. The class had
+no rule. "Four subtractions" removed the capability cards by cutting everything
+between their comment and `.eyebrow`, and `.label`, `.code` and the line opening
+`@layer utilities` were in that range. Every label on the site jumped from 13px
+to 16.5px, and `.eyebrow` and `.visually-hidden` spent a commit in the wrong
+cascade layer. No test asserts label styling, so nothing failed.
+
+Both rules are restored verbatim and the utilities layer is reopened where it
+was. That alone took the header from 483×61 to 428×55, and put the contact note
+and the footer back at the sizes they were designed at.
+
+**Then the tuning.** The header is 43px tall: 13px type, tighter padding, a
+smaller mark. Its lilac went neutral, the call to action a pale neutral pill
+with the same sheen the gradient had, on one shared `--neutral-rgb` that the
+grey hero also reads now instead of its own copy. Contrast: links 7.3–7.5:1,
+the active link 12.6–13.5:1, the pill's text 13.0–17.2:1.
+
+Section padding is sized from width rather than viewport height. At 11vh a tall
+phone got 93px above and below every section; it is
+`clamp(56px, 4vw + 20px, 96px)` now.
+
+|                                  | before        | after             |
+| -------------------------------- | ------------- | ----------------- |
+| header, desktop                  | 428 × 55      | **387 × 43**      |
+| section padding, desktop / phone | 99 / 93px     | **78 / 56px**     |
+| lede                             | 46.4px        | **38.4px**        |
+| work titles                      | 29.6px        | **25.6px**        |
+| footer name                      | 28px          | **24px**          |
+| contact note, case intro         | 19.2px        | **17.6px**        |
+| body                             | 16.5px        | **16px**          |
+| distinct sizes, desktop / phone  | 12 / 13       | **11 / 10**       |
+| page height, desktop / phone     | 3766 / 4810px | **3499 / 4269px** |
+
+The 15px used by the fact values and the bench's part samples merged into the
+14.5px beside it; half a pixel apart, they were one size pretending to be two.
+The wordmark was left alone — it is the one element meant to be that large.

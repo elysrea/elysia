@@ -22,7 +22,7 @@
      both went, and what is left says the same thing in a sentence. */
   .contact-note {
     max-width: 54ch;
-    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
     line-height: 1.62;
     color: var(--text);
   }
