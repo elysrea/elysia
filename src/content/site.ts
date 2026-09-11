@@ -248,8 +248,6 @@ export const contact = {
     { text: 'say hello', href: `mailto:${meta.email}` },
     '.',
   ] as readonly Fragment[],
-
-  place: 'Written and built remotely, from six desks across Europe.',
 } as const;
 
 export interface FooterGroup {

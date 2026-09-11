@@ -92,10 +92,4 @@
   .contact-note a:hover {
     text-decoration-color: var(--halo);
   }
-
-  .contact-place {
-    max-width: 46ch;
-    margin-top: clamp(14px, 2vh, 20px);
-    color: var(--text-dim);
-  }
 }

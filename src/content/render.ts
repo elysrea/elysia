@@ -268,7 +268,6 @@ function renderFragments(fragments: readonly Fragment[]): string {
 export function renderContact(): string {
   return `<div class="contact">
         <p class="contact-note">${renderFragments(contact.note)}</p>
-        <p class="contact-place">${escapeHtml(contact.place)}</p>
       </div>`;
 }
 

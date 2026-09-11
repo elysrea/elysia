@@ -919,3 +919,10 @@ phone got 93px above and below every section; it is
 The 15px used by the fact values and the bench's part samples merged into the
 14.5px beside it; half a pixel apart, they were one size pretending to be two.
 The wordmark was left alone — it is the one element meant to be that large.
+
+## The place line went too
+
+"Written and built remotely, from six desks across Europe." sat under the
+contact note. The studio section already says remote, Europe, and six people, a
+screen earlier and in facts rather than flourish. The note is the whole section
+now: one paragraph, and the footer under it.
