@@ -134,7 +134,7 @@ function renderMotion(): string {
 /** The real components, rendered rather than pictured. */
 function renderParts(): string {
   return `<div class="bench-parts">
-              <a class="nav-cta label" href="#contact"><span class="nav-cta-long">Start a project</span></a>
+              <a class="nav-cta label" href="#contact"><span class="nav-cta-long">Start a project</span><span class="nav-cta-short" aria-hidden="true">Start</span></a>
               <span class="eyebrow label">Section label</span>
               <ul class="work-stack label"><li>TypeScript</li><li>Design tokens</li><li>WCAG 2.2 AA</li></ul>
               <ul class="case-metrics"><li><b>63 → 9</b><span class="label">Button variants</span></li></ul>

@@ -34,10 +34,16 @@
 
     --deck-radius: clamp(22px, 3.2vw, 40px);
 
-    /* Semantic ink. Everything is the halo at a different presence. */
-    --text: rgb(var(--halo-rgb) / 0.76);
-    --text-dim: rgb(var(--halo-rgb) / 0.5);
-    --text-faint: rgb(var(--halo-rgb) / 0.32);
+    /* Semantic ink. Everything is the halo at a different presence.
+
+       Each step clears 4.5:1 on every ground it can land on, the lightest
+       being a hovered card on the deck. Lighthouse caught the old ones: the
+       dim step sat at 3.98:1 on that card and the faint one at 2.37:1 on the
+       void, which put the footer and the copyright line below AA. The floor
+       is 0.55; the faint step sits just above it at 4.61:1 worst case. */
+    --text: rgb(var(--halo-rgb) / 0.8);
+    --text-dim: rgb(var(--halo-rgb) / 0.66);
+    --text-faint: rgb(var(--halo-rgb) / 0.56);
     /* Surfaces do the work that hairlines used to: the page separates by
        ground and space, not by drawn lines. These two are washes of the ink,
        so they hold their weight on whichever ground they land on. */
