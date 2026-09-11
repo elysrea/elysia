@@ -1,5 +1,10 @@
 @layer components {
   .hero {
+    /* The hero's own ink. --halo is a lilac white, which is the right ink for
+       the page but reads faintly purple over a grey plate; here the type is
+       neutral with the same cool bias as everything under it. */
+    --hero-ink: 236 236 240;
+
     position: relative;
     height: 100svh;
     min-height: 540px;
@@ -11,37 +16,37 @@
      horizon. The canvas paints the stars over this.
 
      The ends of the vertical gradient are the page's own ground, so the hero
-     starts and finishes as black; the violet lives in the middle, around the
-     horizon, where the nebula is. On a black site that band is the only colour
-     above the fold, which is the point of it. */
+     starts and finishes as black. It was violet in the middle; it is grey now,
+     each stop matched to the luminance of the violet it replaced, so the light
+     sits exactly where it did and only the hue is gone. */
   .sky {
     position: absolute;
     inset: 0;
     background:
       radial-gradient(
         60% 42% at 78% calc(var(--horizon) - 6%),
-        rgb(150 108 220 / 0.22) 0%,
-        rgb(104 72 178 / 0.1) 42%,
+        rgb(122 124 130 / 0.22) 0%,
+        rgb(84 86 92 / 0.1) 42%,
         transparent 74%
       ),
       radial-gradient(
         90% 55% at 18% 108%,
-        rgb(78 44 140 / 0.28) 0%,
-        rgb(38 20 74 / 0.12) 48%,
+        rgb(56 58 64 / 0.28) 0%,
+        rgb(26 27 31 / 0.12) 48%,
         transparent 80%
       ),
       radial-gradient(
         70% 40% at 50% var(--horizon),
-        rgb(var(--halo-rgb) / 0.09) 0%,
+        rgb(var(--hero-ink) / 0.09) 0%,
         transparent 70%
       ),
       linear-gradient(
         to bottom,
         #050506 0%,
-        #08070f 30%,
-        #150c2c 58%,
-        #1d1038 70%,
-        #08070f 88%,
+        #08080a 30%,
+        #111114 58%,
+        #17171a 70%,
+        #08080a 88%,
         #050506 100%
       );
   }
@@ -82,7 +87,7 @@
     line-height: var(--display-leading);
     letter-spacing: var(--display-tracking);
     text-align: center;
-    color: var(--halo);
+    color: rgb(var(--hero-ink));
     opacity: 0;
     filter: blur(14px);
     animation: wordmark-land 1700ms var(--ease-land) 1150ms forwards;
@@ -103,7 +108,8 @@
     max-width: none;
     text-align: center;
 
-    color: rgb(var(--halo-rgb) / 0.62);
+    /* It was the lilac ink at 0.62. Same weight, no hue. */
+    color: rgb(var(--hero-ink) / 0.62);
     opacity: 0;
     animation: surface 1500ms ease-out 1900ms forwards;
   }

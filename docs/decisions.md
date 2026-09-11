@@ -829,3 +829,51 @@ nothing appears to be happening, which makes a prism just a multicoloured
 paragraph. Ten seconds is where the colour is visibly travelling through the
 words without the line you are reading changing underneath you. Verified by
 capturing the paragraph 1.5 seconds apart and confirming the frames differ.
+
+## The hero went grey
+
+**Context.** The grounds went black two commits ago and violet stopped being the
+floor. The hero kept it: a violet nebula over a violet sky, the one room in a
+different colour from the rest of the house.
+
+**Decision.** Grey, everywhere the hero paints.
+
+- `hero/ramp.ts` is a grey ramp — a long exposure in black and white rather
+  than a colour plate. Each stop carries a few points more blue than red and
+  green, the same bias the black grounds carry, so the nebula and the page read
+  as one material.
+- The `.sky` gradients, visible before first paint, under reduced motion and
+  with scripting off, went grey stop for stop, each matched to the luminance of
+  the violet it replaced — the light sits where it did and only the hue is gone.
+- The scrim was `rgba(5,3,12)`, a violet black; it is the page's `--void` now.
+  The stars were lilac and are white with the same cool bias.
+- The wordmark and tagline take `--hero-ink`, scoped to the hero. `--halo` is a
+  lilac white — the right ink for the page, faintly purple over a grey plate —
+  and the page's ink was not what was asked about, so it stays.
+- The seam lift was a 20% mix of `--iris`: a violet rim under a grey hero, which
+  reads as a leftover. It is `#1e1e24`, landing the seam edge at 1.229 against
+  the void where the violet one sat at 1.230.
+
+**Measured, not eyeballed.** Chroma — the spread between a pixel's highest and
+lowest channel — on the rendered hero below the nav: **max 7**. The grey ramp's
+stops peak at 8; the violet ramp's ran up to 134. The only pixels in the viewport
+above 16 are 238 in a 52×12 box at the bottom edge: the label on the active seam
+tab, which is deck ink, not hero.
+
+That measurement also caught a mistake. The first pass read the tagline as
+having no colour of its own — a regex looking for `var(--text…)` did not match
+the declaration's actual form and reported absence instead of a miss — and the
+hero still measured 34. That is exactly `255 − 221`, the lilac itself. The
+tagline was set to `--halo` at 62%, and is `--hero-ink` at 62% now.
+
+**`--iris` is retired.** With the seam neutral it had no reader left but its own
+swatch in the palette bench, and a palette exhibit that lists a colour the page
+does not use is a swatch library. Token and swatch both went.
+
+**The prism now has a history.** Its stops were lifted from the violet ramp,
+and three places said so in the present tense — the token's comment, the
+accent's comment and the README. The prism kept the colours; the nebula did
+not. It is the one place that spectrum survives, and the docs say that instead.
+
+What is still violet above the fold: the call to action in the nav capsule, and
+the page's lilac ink wherever deck text shows through at the bottom edge.

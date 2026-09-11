@@ -14,8 +14,13 @@
 
     /* The tab rises above the deck's top edge, so it has to be painted the
        same colour the deck starts at — not the colour it settles to. One
-       token, read by the deck, the tab and both notches. */
-    --deck-top: color-mix(in oklab, var(--iris) 20%, var(--surface));
+       token, read by the deck, the tab and both notches.
+
+       It was a 20% mix of --iris, a violet rim along the bottom of the hero.
+       The hero is grey now and a violet line under it would read as a leftover,
+       so the lift is neutral: #1e1e24, chosen to land the seam edge where the
+       violet one sat, at 1.230 against the void. */
+    --deck-top: #1e1e24;
 
     position: relative;
     z-index: 2;

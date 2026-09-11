@@ -1,21 +1,26 @@
 /**
- * Colour ramp, cold to hot, baked to a 256-entry lookup.
+ * Colour ramp, dark to light, baked to a 256-entry lookup.
  *
- * It stays inside the site's violet family until the very top of the range,
- * where it breaks warm — so the brightest cores of the nebula read as heat
- * rather than as another shade of purple.
+ * Grey — a long exposure in black and white rather than a colour plate. It
+ * held violet until the top of the range and broke pink then warm, which was
+ * right while the page was violet; once the grounds went black, a purple hero
+ * was the one room in a different colour from the rest of the house.
+ *
+ * Every stop carries a few points more blue than red and green. That is not a
+ * tint, it is the same bias the black grounds carry (#17171d, #141419), so the
+ * nebula and the page it sits on read as one material.
  *
  * Baking it means the per-frame renderer only ever reads an array: no colour
  * arithmetic happens inside the pixel loop.
  */
 const STOPS: readonly (readonly [number, number, number, number])[] = [
-  [0.0, 12, 9, 34],
-  [0.3, 34, 22, 84],
-  [0.52, 84, 42, 150],
-  [0.68, 138, 60, 178],
-  [0.8, 204, 82, 158],
-  [0.9, 246, 132, 112],
-  [1.0, 255, 232, 198],
+  [0.0, 10, 10, 12],
+  [0.3, 26, 26, 30],
+  [0.52, 66, 67, 73],
+  [0.68, 116, 117, 124],
+  [0.8, 168, 169, 176],
+  [0.9, 212, 213, 218],
+  [1.0, 244, 244, 247],
 ];
 
 export function buildRamp(): Uint8Array {

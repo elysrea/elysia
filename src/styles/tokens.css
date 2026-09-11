@@ -10,9 +10,11 @@
        1.108 across the work band against 1.102. The same architecture, with
        the colour taken out of it.
 
-       Violet did not leave the site, it stopped being the floor: it is in the
-       nebula, the light at the seam, the accent and the prism, which is a
-       better place for the only hue on a page to live.
+       Violet did not leave the site, but it has been pushed to the edges. The
+       nebula and the light at the seam went grey with the hero, so what is left
+       is the ink's lilac cast, the call to action in the capsule, and the prism
+       on the contact note. A single hue is easier to spend well when there is
+       less of it.
 
        These are the page's planes, and the gaps between them are load-bearing.
        The site once ran --void #05030c under the hero and --surface #0a0619
@@ -24,7 +26,6 @@
     --deep: #141419; /* raised chrome: the nav pill, the skip link */
     --surface: #17171d; /* the deck: 1.142 against the void, so the seam cuts */
     --dusk: #0a0a0c; /* the work band, dropped back for long reading */
-    --iris: #4a2a86; /* the lift inside the deck, brightest at the seam */
     --halo: #e9ddff;
     --halo-rgb: 233 221 255;
 
@@ -41,16 +42,18 @@
     --surface-hover: rgb(var(--halo-rgb) / 0.085);
     --hairline: rgb(var(--halo-rgb) / 0.1);
 
-    /* One warm note, borrowed from the hot end of the nebula's ramp. */
+    /* One warm note. It was borrowed from the hot end of the nebula's ramp
+       while the ramp still had one; the nebula is grey now, and this is the
+       only warm colour on the page. */
     --accent: #f0895f;
 
     /*
      * The prism.
      *
-     * Not a rainbow — this site already has a spectrum, and it is the one
-     * `hero/ramp.ts` bakes for the nebula: violet holding until the top of the
-     * range, where it breaks pink and then warm. These are the ramp's upper
-     * stops lifted into a register that reads as type on a dark ground.
+     * Not a rainbow. These stops were lifted from the nebula's colour ramp
+     * while the nebula was violet, when the ramp broke pink and then warm at
+     * the top of its range. The nebula has since gone grey; the prism kept the
+     * colours, and is now the only place on the page that spectrum survives.
      *
      * The sequence appears twice so the image is two periods across. At
      * `background-size: 200%`, sliding the position by one element width moves

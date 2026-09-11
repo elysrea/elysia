@@ -17,7 +17,7 @@ export const benchPanels: readonly BenchPanel[] = [
   {
     name: 'palette',
     label: 'Palette',
-    caption: 'Four blacks carrying the page, and two colours that never touch a ground.',
+    caption: 'Four blacks carrying the page, an ink, and one warm note.',
   },
   {
     name: 'type',
@@ -43,7 +43,6 @@ export const swatches: readonly Swatch[] = [
   { token: '--dusk', label: 'Dusk' },
   { token: '--deep', label: 'Deep' },
   { token: '--surface', label: 'Surface' },
-  { token: '--iris', label: 'Iris' },
   { token: '--halo', label: 'Halo' },
   { token: '--accent', label: 'Accent' },
 ];

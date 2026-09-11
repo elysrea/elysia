@@ -5,15 +5,11 @@ import { fbm, makeNoise, type Noise2D } from '../noise.ts';
 import type { Scene, SceneLayout } from '../scene.ts';
 
 /**
- * A drifting nebula: domain-warped noise through the same colour ramp the
- * planet uses.
+ * A drifting nebula: domain-warped noise through a baked colour ramp.
  *
- * Where the planet is a map of somewhere real, this is a mood. It reuses the
- * ramp deliberately, so the two heroes are recognisably the same site.
- *
- * Like the planet it renders coarser than the screen and is drawn back scaled
- * up. Unlike the planet nothing can be precomputed — the field moves — so the
- * sample grid is coarser still, and the browser's smoothing does the rest.
+ * It renders coarser than the screen and is drawn back scaled up. Nothing can
+ * be precomputed — the field moves — so the sample grid is coarse, and the
+ * browser's smoothing does the rest.
  */
 export function sampleScaleFor(quality: number): number {
   const clamped = Math.min(1, Math.max(0.35, quality));
@@ -97,9 +93,9 @@ export class NebulaScene implements Scene {
       this.#height * 0.46,
       Math.max(this.#width, this.#height) * 0.62,
     );
-    scrim.addColorStop(0, `rgba(5,3,12,${(0.74 * rise).toFixed(3)})`);
-    scrim.addColorStop(0.45, `rgba(5,3,12,${(0.44 * rise).toFixed(3)})`);
-    scrim.addColorStop(1, 'rgba(5,3,12,0)');
+    scrim.addColorStop(0, `rgba(5,5,6,${(0.74 * rise).toFixed(3)})`);
+    scrim.addColorStop(0.45, `rgba(5,5,6,${(0.44 * rise).toFixed(3)})`);
+    scrim.addColorStop(1, 'rgba(5,5,6,0)');
     context.fillStyle = scrim;
     context.fillRect(0, 0, this.#width, this.#height);
 
@@ -107,7 +103,7 @@ export class NebulaScene implements Scene {
     for (const star of this.#stars) {
       const alpha = twinkle(star, this.#seconds) * rise;
       if (alpha <= 0.01) continue;
-      context.fillStyle = `rgba(226,220,255,${alpha.toFixed(3)})`;
+      context.fillStyle = `rgba(230,231,236,${alpha.toFixed(3)})`;
       context.fillRect(star.x - star.size / 2, star.y - star.size / 2, star.size, star.size);
     }
     context.globalCompositeOperation = 'source-over';
