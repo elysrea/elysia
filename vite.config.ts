@@ -3,8 +3,8 @@ import { defineConfig } from 'vite';
 import { htmlContent } from './plugins/html-content.ts';
 
 /**
- * `BASE_PATH` lets the same build serve from a domain root or from a GitHub
- * Pages project subpath without editing anything in the source.
+ * `BASE_PATH` lets the same build serve from a domain root or from a subpath
+ * without editing anything in the source.
  */
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
@@ -17,5 +17,7 @@ export default defineConfig({
     modulePreload: { polyfill: false },
     reportCompressedSize: true,
   },
-  server: { open: false },
+  // `npm run dev` is how everyone meets this project, so it opens the page
+  // rather than leaving a URL in the terminal for them to find.
+  server: { open: true },
 });

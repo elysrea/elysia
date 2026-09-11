@@ -1,7 +1,6 @@
 # Elysia
 
 [![CI](https://github.com/elysrea/elysia/actions/workflows/ci.yml/badge.svg)](https://github.com/elysrea/elysia/actions/workflows/ci.yml)
-[![Deploy](https://github.com/elysrea/elysia/actions/workflows/deploy.yml/badge.svg)](https://github.com/elysrea/elysia/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 
 A studio website built as a front-end engineering project. No framework and no
@@ -9,13 +8,29 @@ runtime dependencies: content is typed data rendered to static HTML at build
 time, and the hero is a live canvas nebula that keeps itself inside a frame
 budget.
 
-**[Live site](https://elysrea.github.io/elysia/)** · **[Decision log](docs/decisions.md)** · **[Run it locally](#running-it)**
+**[Run it locally](#try-it)** · **[Decision log](docs/decisions.md)**
 
 ![The Elysia homepage: a large wordmark over a grey canvas nebula, under a floating navigation capsule](docs/images/hero.jpg)
 
 > **Elysia is not a real studio.** The copy and the case studies are invented so
 > that a realistic content model had something to model. The engineering is the
 > point of the repository.
+
+## Try it
+
+You need [Node.js](https://nodejs.org) 20.19 or newer.
+
+```bash
+git clone https://github.com/elysrea/elysia.git
+cd elysia
+npm install
+npm run dev
+```
+
+The page opens in your browser at `http://localhost:5173`. Two things worth
+trying once it is up: add `?type=serif` or `?type=mono` to the address to switch
+the whole type system, and turn on reduced motion in your system settings to
+watch the canvas give way to a still frame without a reload.
 
 ## At a glance
 
@@ -26,7 +41,7 @@ budget.
 | **JavaScript**                                          | 11.2 kB, 4.6 kB gzipped — the whole site, with zero runtime dependencies                                 |
 | **First visit**                                         | 8 requests, 114 KiB transferred, 96 KiB of it self-hosted fonts                                          |
 | **Tests**                                               | 127 · 92.9% of statements and 94.9% of lines covered                                                     |
-| **Stack**                                               | TypeScript 6 (strict) · Vite 8 · Vitest 5 · ESLint 10 · Prettier · GitHub Actions and Pages              |
+| **Stack**                                               | TypeScript 6 (strict) · Vite 8 · Vitest 5 · ESLint 10 · Prettier · GitHub Actions                        |
 
 ## What is interesting here
 
@@ -191,14 +206,7 @@ nothing about each other, and `main.ts` wires them together with each
 enhancement independently guarded, so an unsupported API in one feature cannot
 take the rest of the page down with it.
 
-## Running it
-
-Requires Node 20.19 or newer.
-
-```bash
-npm install
-npm run dev
-```
+## Commands
 
 | Command              | Does                             |
 | -------------------- | -------------------------------- |
@@ -210,14 +218,17 @@ npm run dev
 | `npm run check`      | Everything CI runs               |
 | `npm run fonts:sync` | Re-vendor the font subsets       |
 
-## Deployment
+## Continuous integration
 
-Every push to `main` runs CI — typecheck, lint, format check, tests with
-coverage, and a build — and a separate workflow deploys to GitHub Pages. A
-project page is served from a subpath, so the deploy build is given `BASE_PATH`
-and `SITE_URL`, which set the asset paths and the canonical, link-preview and
-sitemap addresses. The same source builds for a domain root with neither.
-Dependabot proposes dependency and workflow updates monthly.
+Every push and pull request runs CI on GitHub Actions: typecheck, lint, format
+check, tests with coverage, and a production build. Dependabot proposes
+dependency and workflow updates monthly.
+
+The project is not hosted anywhere — it is meant to be run locally. The build is
+plain static files, though, and any host can serve them as they are: set
+`BASE_PATH` when serving from a subpath, and `SITE_URL` so the canonical link,
+the link previews and the sitemap point at the real address. To see the
+production build locally, run `npm run build` and then `npm run preview`.
 
 ## How decisions were made
 

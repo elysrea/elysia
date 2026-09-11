@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Portfolio site for a fictional design and technology studio, built as a zero-framework TypeScript project.",
-  "homepage": "https://elysrea.github.io/elysia/",
+  "homepage": "https://github.com/elysrea/elysia#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/elysrea/elysia.git"

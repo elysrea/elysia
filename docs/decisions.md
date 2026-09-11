@@ -9,7 +9,7 @@ The log runs in the order the decisions were made, and nothing is deleted from
 it. When a decision is reversed, the new entry names the ones it supersedes and
 the old ones stay: how a decision was retired is part of the record.
 
-**Still standing (31)**
+**Still standing (32)**
 
 - [Content is rendered at build time, not in the browser](#content-is-rendered-at-build-time-not-in-the-browser)
 - [Fixed timestep instead of per-frame increments](#fixed-timestep-instead-of-per-frame-increments)
@@ -42,6 +42,7 @@ the old ones stay: how a decision was retired is part of the record.
 - [Sizes and spacing, and a rule that went missing](#sizes-and-spacing-and-a-rule-that-went-missing)
 - [The place line went too](#the-place-line-went-too)
 - [Presentable, and measured](#presentable-and-measured)
+- [Not hosted: it runs where the reader is](#not-hosted-it-runs-where-the-reader-is)
 
 **Superseded, kept for the record (17)**
 
@@ -1054,3 +1055,26 @@ so a placeholder named `constructor` fails the build instead of calling
 `theme-color` was still the violet black from two palettes ago and now matches
 `--void`. And this log gained an index, split into what still stands and what
 was superseded, generated from the entries' own supersede lines.
+
+## Not hosted: it runs where the reader is
+
+**Context.** The site was set up to deploy to GitHub Pages on every push. Pages
+was never switched on, so every push produced a failing Deploy run, and the
+README carried a red badge and a live link that returned a 404.
+
+**Decision.** No hosting. The project is meant to be cloned and run: install,
+start the dev server, and the page opens. The deploy workflow is deleted rather
+than left failing — a red cross on every commit reads as a broken project to
+anyone skimming the history, whatever the reason behind it. And since
+`npm run dev` is now how every reader meets the site, the dev server opens the
+browser itself instead of leaving an address in the terminal.
+
+**Consequence.** CI is the only workflow and stays green. The README leads with
+the four commands a reader types rather than with a link. `package.json`'s
+`homepage` points at the repository instead of at an address that would not
+exist.
+
+The `BASE_PATH` and `SITE_URL` support stays in the build. It costs nothing, it
+is tested, and it means the output is still plain static files any host can
+serve — the README says how. Three of the open Dependabot updates were for
+actions only the deploy workflow used, and have nothing left to update.
