@@ -35,7 +35,19 @@ enhance('reveal', () => {
 enhance('bench', () => {
   const deck = query('.deck');
   if (deck) initTabs(deck, { idPrefix: 'bench' });
-  initBenchValues();
+
+  // The token read waits until after the next frame. Everything above has
+  // just written to the DOM, so reading computed style now would make the
+  // browser recalculate it on the spot — Lighthouse measured 50–165ms of it.
+  // A frame later the cascade is clean and the read is free. The bench sits
+  // below the fold; nobody sees its values arrive a frame late.
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      enhance('bench values', () => {
+        initBenchValues();
+      });
+    }, 0);
+  });
 });
 
 enhance('work', () => {

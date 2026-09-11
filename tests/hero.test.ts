@@ -180,6 +180,32 @@ describe('SceneHost', () => {
     expect(context.clears).toBeGreaterThan(before);
   });
 
+  it('never reads layout while animating', () => {
+    stubEnvironment(false);
+    host = new SceneHost(canvas, new SpyScene());
+
+    // Count every layout read from here on. Size is measured on resize and
+    // cached; a per-frame read forces a layout whenever anything else on the
+    // page has dirtied it since the last frame.
+    let reads = 0;
+    for (const [prop, value] of [
+      ['clientWidth', 1280],
+      ['clientHeight', 800],
+    ] as const) {
+      Object.defineProperty(canvas, prop, {
+        configurable: true,
+        get: () => {
+          reads++;
+          return value;
+        },
+      });
+    }
+
+    for (let i = 0; i < 20; i++) clock.tick();
+
+    expect(reads).toBe(0);
+  });
+
   it('stops stepping the scene when the hero scrolls away', () => {
     stubEnvironment(false);
     const scene = new SpyScene();

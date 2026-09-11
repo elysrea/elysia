@@ -17,11 +17,16 @@ export function initBenchValues(scope: ParentNode = document): () => void {
   const root = document.documentElement;
   const computed = getComputedStyle(root);
 
-  for (const slot of slots) {
-    const token = slot.dataset.token;
-    if (!token) continue;
+  // Every read first, then every write. Writing a slot invalidates style, so
+  // with the two interleaved each read after the first forced a fresh style
+  // recalculation — Lighthouse measured 71ms of it on desktop, 101ms on a
+  // throttled phone.
+  const read = slots.map((slot) => {
+    const token = slot.dataset.token ?? '';
+    return { slot, token, value: token ? computed.getPropertyValue(token).trim() : '' };
+  });
 
-    const value = computed.getPropertyValue(token).trim();
+  for (const { slot, token, value } of read) {
     if (value === '') continue;
 
     // Font stacks are long and the first family is the one being shown.
